@@ -81,7 +81,7 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-  bump_version_tudat_feedstock:
+  bump_version_tudat_feedstock: # bump version on https://github.com/tudat-team/tudat-feedstock
     needs: check_recent_24h_commit
     if: ${{ needs.check_recent_24h_commit.outputs.should_run != 'false' }}
     runs-on: ubuntu-latest
@@ -90,7 +90,7 @@ jobs:
         - name: checkout tudat-feedstock
           uses: actions/checkout@v4
           with:
-            repository: niketagrawal/tudat-feedstock
+            repository: tudat-team/tudat-feedstock
             token: ${{ secrets.<add_secret_name> }}
             ref: develop
 
