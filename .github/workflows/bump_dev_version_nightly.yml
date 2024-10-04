@@ -81,7 +81,7 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-  bump_version_tudat_feedstock: # bump version on https://github.com/tudat-team/tudat-feedstock
+  bump_version_tudat_feedstock:
     needs: check_recent_24h_commit
     if: ${{ needs.check_recent_24h_commit.outputs.should_run != 'false' }}
     runs-on: ubuntu-latest
@@ -102,6 +102,13 @@ jobs:
               git config --global user.email "actions@github.com"
               git config --global user.name "GitHub Actions"
               bump2version dev --config-file .bumpversion.cfg --verbose
+
+        - name: Reset build number in meta.yml to 0
+          shell: bash
+          run: |
+                sed -i 's/build = ".*" %}/build = "0" %}/' recipe/meta.yaml
+                git add recipe/meta.yaml
+                git commit --amend --no-edit
 
         - name: Push tag to tudat-feedstock
           run: git push origin --follow-tags
