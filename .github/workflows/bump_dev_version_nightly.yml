@@ -91,7 +91,7 @@ jobs:
           uses: actions/checkout@v4
           with:
             repository: tudat-team/tudat-feedstock
-            token: ${{ secrets.<add_secret_name> }}
+            token: ${{ secrets.BUMP_VERSION_NIGHTLY }}
             ref: develop
 
         - name: Install bump2version
