@@ -113,4 +113,4 @@ jobs:
         - name: Push tag to tudat-feedstock
           run: git push origin --follow-tags
           env:
-              GITHUB_TOKEN: ${{ secrets.<add_secret_name>}}
+              GITHUB_TOKEN: ${{ secrets.BUMP_VERSION_NIGHTLY}}
