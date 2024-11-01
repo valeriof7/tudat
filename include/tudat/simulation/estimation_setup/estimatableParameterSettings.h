@@ -1112,6 +1112,34 @@ public:
 };
 
 
+class GlobalPolynomialClockCorrectionsParameterSettings: public EstimatableParameterSettings
+{
+public:
+    GlobalPolynomialClockCorrectionsParameterSettings(
+            const std::string& associatedBody,
+            const std::string& associatedStation,
+            const std::vector< int > correctionPowers ):
+            EstimatableParameterSettings( associatedBody, global_polynomial_clock_corrections, associatedStation ),
+            correctionPowers_( correctionPowers ){ }
+
+    std::vector< int > correctionPowers_;
+};
+
+class MultiArcPolynomialClockCorrectionsParameterSettings: public EstimatableParameterSettings
+{
+public:
+    MultiArcPolynomialClockCorrectionsParameterSettings(
+            const std::string& associatedBody,
+            const std::string& associatedStation,
+            const std::vector< int > correctionPowers,
+            const std::vector< int > arcIndices ):
+            EstimatableParameterSettings( associatedBody, arc_wise_polynomial_clock_corrections, associatedStation ),
+            correctionPowers_( correctionPowers ), arcIndices_( arcIndices ){ }
+
+    std::vector< int > correctionPowers_;
+    std::vector< int > arcIndices_;
+};
+
 inline std::shared_ptr< EstimatableParameterSettings > gravitationalParameter( const std::string bodyName )
 {
     return std::make_shared< EstimatableParameterSettings >( bodyName, gravitational_parameter );
@@ -1270,6 +1298,25 @@ inline std::shared_ptr< EstimatableParameterSettings > arcwiseTimeObservationBia
 {
     return std::make_shared< ArcWiseTimeBiasEstimatableParameterSettings >(
             linkEnds, observableType, arcStartTimes, linkEndForTime );
+}
+
+inline std::shared_ptr< EstimatableParameterSettings > globalPolynomialClockCorrections(
+        const std::string& associatedBody,
+        const std::string& associatedStation,
+        const std::vector< int > correctionPowers )
+{
+    return std::make_shared< GlobalPolynomialClockCorrectionsParameterSettings >(
+            associatedBody, associatedStation, correctionPowers );
+}
+
+inline std::shared_ptr< EstimatableParameterSettings > multiArcPolynomialClockCorrections(
+        const std::string& associatedBody,
+        const std::string& associatedStation,
+        const std::vector< int > correctionPowers,
+        const std::vector< int > arcIndices )
+{
+    return std::make_shared< MultiArcPolynomialClockCorrectionsParameterSettings >(
+            associatedBody, associatedStation, correctionPowers, arcIndices );
 }
 
 inline std::shared_ptr< EstimatableParameterSettings > constantEmpiricalAccelerationMagnitudes(
@@ -1557,6 +1604,19 @@ inline std::shared_ptr< EstimatableParameterSettings > radiationPressureTargetPe
     return std::make_shared< EstimatableParameterSettings >( targetName, source_perpendicular_direction_radiation_pressure_scaling_factor, sourceName );
 }
 
+inline std::shared_ptr< EstimatableParameterSettings > diffuseReflectivity(
+        const std::string bodyName,
+        const std::string panel_group_id )
+{
+    return std::make_shared< EstimatableParameterSettings >( bodyName, diffuse_reflectivity, panel_group_id );
+}
+
+inline std::shared_ptr< EstimatableParameterSettings > specularReflectivity(
+        const std::string bodyName,
+        const std::string panel_group_id )
+{
+    return std::make_shared< EstimatableParameterSettings >( bodyName, specular_reflectivity, panel_group_id );
+}
 
 
 inline std::shared_ptr< EstimatableParameterSettings > polynomialGravityFieldVariationParameter(

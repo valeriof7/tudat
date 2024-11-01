@@ -559,8 +559,12 @@ class OdfCommonDataBlock
     // Returns the observable time in UTC seconds since the reference time specified in the header.
     Time getObservableTime( )
     {
+<<<<<<< HEAD
         return Time( static_cast< double >( integerTimeTag_ ) ) +
                 Time( static_cast< double >( fractionalTimeTag_ ) / 1000.0 );
+=======
+        return Time( static_cast< double >( integerTimeTag_ ) ) + Time( static_cast<     double >( fractionalTimeTag_ ) / 1000.0 );
+>>>>>>> tudat-team/develop
     }
 
     // Returns the observable value in SI units.

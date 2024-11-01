@@ -70,6 +70,10 @@ class ProcessedOdfFileSingleLinkData
         receivingStation_( receivingStation ), observableType_( observableType )
     { }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> tudat-team/develop
     // Destructor
     virtual ~ProcessedOdfFileSingleLinkData( ) { }
 
@@ -163,7 +167,11 @@ class ProcessedOdfFileDopplerData : public ProcessedOdfFileSingleLinkData< TimeT
     { }
 
     // Destructor
+<<<<<<< HEAD
     ~ProcessedOdfFileDopplerData( ) { }
+=======
+    ~ProcessedOdfFileDopplerData( ){ }
+>>>>>>> tudat-team/develop
 
     // Name of the transmitting ground station
     std::string transmittingStation_;
@@ -1514,6 +1522,7 @@ createOdfObservedObservationCollection(
             sortedObservationSets );
 }
 
+
 template< typename ObservationScalarType = double, typename TimeType = double >
 std::shared_ptr< observation_models::SingleObservationSet< ObservationScalarType, TimeType > >
 compressDopplerData(
@@ -1771,7 +1780,37 @@ void setOdfInformationInBodies(
     vehicleSystems->setTransponderTurnaroundRatio( getTurnaroundRatio );
 }
 
+<<<<<<< HEAD
 }  // namespace observation_models
+=======
+
+template< typename ObservationScalarType = double, typename TimeType = Time >
+std::shared_ptr< observation_models::ObservationCollection< ObservationScalarType, TimeType > > createOdfObservedObservationCollectionFromFile(
+    simulation_setup::SystemOfBodies& bodies,
+    const std::vector< std::string >& odfFileNames,
+    const std::string& targetName,
+    const bool verboseOutput = true,
+    const std::map< std::string, Eigen::Vector3d >& earthFixedGroundStationPositions =
+    simulation_setup::getApproximateDsnGroundStationPositions( ) )
+{
+
+    std::vector< std::shared_ptr< input_output::OdfRawFileContents > > rawOdfDataVector;
+    for( std::string odfFileName : odfFileNames )
+    {
+        rawOdfDataVector.push_back( std::make_shared< input_output::OdfRawFileContents>( odfFileName ) );
+    }
+
+    std::shared_ptr< ProcessedOdfFileContents< TimeType > > processedOdfFileContents =
+        std::make_shared< ProcessedOdfFileContents< TimeType > >( rawOdfDataVector, targetName, verboseOutput, earthFixedGroundStationPositions );
+    observation_models::setOdfInformationInBodies( processedOdfFileContents, bodies );
+
+    // Create observed observation collection
+    return observation_models::createOdfObservedObservationCollection< ObservationScalarType, TimeType >(
+        processedOdfFileContents );
+}
+
+} // namespace observation_models
+>>>>>>> tudat-team/develop
 
 }  // namespace tudat
 
