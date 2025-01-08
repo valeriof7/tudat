@@ -1,0 +1,50 @@
+name: Clang-Format Check and Fix
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  format-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install Clang-Format
+      run: sudo apt-get install -y clang-format
+
+    - name: Display Clang-Format Version
+      run: clang-format --version
+
+    - name: Run Clang-Format
+      run: |
+        # Apply clang-format to all source files
+        clang-format -style=file -i $(find . -regex '.*\.\(cpp\|hpp\|c\|h\)')
+
+    - name: Check for formatting differences
+      id: check_diff
+      run: |
+        git diff --exit-code || echo "Formatting issues found."
+
+    - name: Auto-commit formatting changes
+      if: failure()  # Only run if formatting differences are detected
+      run: |
+        git config --local user.name "github-actions[bot]"
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git add .
+        git commit -m "Apply clang-format"
+        git push origin HEAD:${{ github.head_ref }}
+
+    - name: Report Success or Failure
+      run: |
+        if [ "${{ steps.check_diff.outcome }}" == "failure" ]; then
+          echo "Formatting issues were detected and fixed."
+        else
+          echo "Code is properly formatted."
+        fi
