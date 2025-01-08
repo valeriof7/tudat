@@ -32,7 +32,7 @@ namespace basic_astrodynamics
 //! Calculate displacement due to degree 2 tide, band-independet love and shida numbers.
 Eigen::Vector3d calculateDegreeTwoBasicTidalDisplacement( 
     const double gravitationalParameterRatio,
-                                                          const Eigen::Vector3d& stationPositionUnitVector,
+    const Eigen::Vector3d& stationPositionUnitVector,
                                                           const Eigen::Vector3d& relativeBodyState,
                                                           const double bodyEquatorialRadius,
                                                           const double degreeTwoLoveNumber,
