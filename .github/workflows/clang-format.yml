@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - feature/**
   pull_request:
     branches:
       - main
@@ -24,8 +25,8 @@ jobs:
 
     - name: Run Clang-Format
       run: |
-        # Apply clang-format to all source files
-        clang-format -style=file -i $(find . -regex '.*\.\(cpp\|hpp\|c\|h\)')
+        # Get changed files and apply clang-format
+        git diff --name-only --diff-filter=ACM HEAD^ | grep -E '\.(cpp|hpp|c|h)$' | xargs -r clang-format -style=file -i
 
     - name: Check for formatting differences
       id: check_diff
