@@ -40,7 +40,7 @@ Eigen::Vector3d calculateDegreeTwoBasicTidalDisplacement(
 
 //! Calculate displacement due to degree 3 tide, band-independet love and shida numbers.
 Eigen::Vector3d calculateDegreeThreeBasicTidalDisplacement( const double gravitationalParameterRatio,
-                                                            const Eigen::Vector3d& stationPositionUnitVector,
+    const Eigen::Vector3d& stationPositionUnitVector,
                                                             const Eigen::Vector3d& relativeBodyState,
                                                             const double bodyEquatorialRadius,
                                                             const double degreeThreeLoveNumber,
