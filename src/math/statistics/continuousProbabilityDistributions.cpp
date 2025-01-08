@@ -8,10 +8,11 @@
  *    http://tudat.tudelft.nl/LICENSE.
  */
 
+#include "tudat/math/statistics/continuousProbabilityDistributions.h"
+
 #include <boost/math/special_functions/erf.hpp>
 
 #include "tudat/math/basic/mathematicalConstants.h"
-#include "tudat/math/statistics/continuousProbabilityDistributions.h"
 
 namespace tudat
 {
@@ -33,6 +34,6 @@ double calculateGaussianCdf( const double independentVariable, const double mean
     return 0.5 * ( 1.0 + boost::math::erf( ( independentVariable - mean ) / ( std::sqrt( 2.0 ) * ( standardDeviation ) ) ) );
 }
 
-}
+}  // namespace statistics
 
-}
+}  // namespace tudat

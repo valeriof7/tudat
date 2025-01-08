@@ -11,9 +11,8 @@
 #ifndef TUDAT_NUMERICAL_QUADRATURE_H
 #define TUDAT_NUMERICAL_QUADRATURE_H
 
-#include <vector>
-
 #include <Eigen/Core>
+#include <vector>
 
 namespace tudat
 {
@@ -30,7 +29,6 @@ template< typename IndependentVariableType, typename DependentVariableType >
 class NumericalQuadrature
 {
 public:
-
     //! Destructor.
     virtual ~NumericalQuadrature( ) { }
 
@@ -42,7 +40,6 @@ public:
     virtual DependentVariableType getQuadrature( ) = 0;
 
 protected:
-
     //! Function that is called to perform the numerical quadrature
     /*!
      * Function that is called to perform the numerical quadrature. It must be implemented in derived classes. Any
@@ -51,11 +48,10 @@ protected:
     virtual void performQuadrature( ) = 0;
 
 private:
-
 };
 
-} // namespace numerical_quadrature
+}  // namespace numerical_quadrature
 
-} // namespace tudat
+}  // namespace tudat
 
-#endif // TUDAT_NUMERICAL_QUADRATURE_H
+#endif  // TUDAT_NUMERICAL_QUADRATURE_H

@@ -11,18 +11,14 @@
 #ifndef TUDAT_ONEWAYRANGEOBSERVATIONMODEL_H
 #define TUDAT_ONEWAYRANGEOBSERVATIONMODEL_H
 
+#include <Eigen/Geometry>
+#include <functional>
 #include <map>
 
-#include <functional>
-
-
-#include <Eigen/Geometry>
-
 #include "tudat/astro/basic_astro/physicalConstants.h"
-
 #include "tudat/astro/ephemerides/simpleRotationalEphemeris.h"
-#include "tudat/astro/observation_models/observationModel.h"
 #include "tudat/astro/observation_models/lightTimeSolution.h"
+#include "tudat/astro/observation_models/observationModel.h"
 
 namespace tudat
 {
@@ -36,11 +32,10 @@ namespace observation_models
  *  The one-way range is defined as the light time multiplied by speed of light.
  *  The user may add observation biases to model system-dependent deviations between measured and true observation.
  */
-template< typename ObservationScalarType = double,
-          typename TimeType = double >
-class OneWayRangeObservationModel: public ObservationModel< 1, ObservationScalarType, TimeType >
+template< typename ObservationScalarType = double, typename TimeType = double >
+class OneWayRangeObservationModel : public ObservationModel< 1, ObservationScalarType, TimeType >
 {
-public:    
+public:
     typedef Eigen::Matrix< ObservationScalarType, 6, 1 > StateType;
     typedef Eigen::Matrix< ObservationScalarType, 3, 1 > PositionType;
 
@@ -53,15 +48,14 @@ public:
      */
     OneWayRangeObservationModel(
             const LinkEnds& linkEnds,
-            const std::shared_ptr< observation_models::LightTimeCalculator
-            < ObservationScalarType, TimeType > > lightTimeCalculator,
+            const std::shared_ptr< observation_models::LightTimeCalculator< ObservationScalarType, TimeType > > lightTimeCalculator,
             const std::shared_ptr< ObservationBias< 1 > > observationBiasCalculator = nullptr ):
         ObservationModel< 1, ObservationScalarType, TimeType >( one_way_range, linkEnds, observationBiasCalculator ),
-      lightTimeCalculator_( lightTimeCalculator ){ }
+        lightTimeCalculator_( lightTimeCalculator )
+    { }
 
     //! Destructor
-    ~OneWayRangeObservationModel( ){ }
-
+    ~OneWayRangeObservationModel( ) { }
 
     //! Function to compute one-way range observable without any corrections.
     /*!
@@ -79,11 +73,11 @@ public:
      *  \return Ideal one-way range observable.
      */
     Eigen::Matrix< ObservationScalarType, 1, 1 > computeIdealObservationsWithLinkEndData(
-                    const TimeType time,
-                    const LinkEndType linkEndAssociatedWithTime,
-                    std::vector< double >& linkEndTimes,
-                    std::vector< Eigen::Matrix< double, 6, 1 > >& linkEndStates,
-            const std::shared_ptr< ObservationAncilliarySimulationSettings > ancilliarySetings = nullptr  )
+            const TimeType time,
+            const LinkEndType linkEndAssociatedWithTime,
+            std::vector< double >& linkEndTimes,
+            std::vector< Eigen::Matrix< double, 6, 1 > >& linkEndStates,
+            const std::shared_ptr< ObservationAncilliarySimulationSettings > ancilliarySetings = nullptr )
     {
         linkEndTimes.clear( );
         linkEndStates.clear( );
@@ -99,23 +93,23 @@ public:
         // Check link end associated with input time and compute observable
         switch( linkEndAssociatedWithTime )
         {
-        case receiver:
-            observation = lightTimeCalculator_->calculateLightTimeWithLinkEndsStates(
+            case receiver:
+                observation = lightTimeCalculator_->calculateLightTimeWithLinkEndsStates(
                         receiverState, transmitterState, time, 1, ancilliarySetings );
-            transmissionTime = time - observation;
-            receptionTime = time;
-            break;
+                transmissionTime = time - observation;
+                receptionTime = time;
+                break;
 
-        case transmitter:
-            observation = lightTimeCalculator_->calculateLightTimeWithLinkEndsStates(
+            case transmitter:
+                observation = lightTimeCalculator_->calculateLightTimeWithLinkEndsStates(
                         receiverState, transmitterState, time, 0, ancilliarySetings );
-            transmissionTime = time;
-            receptionTime = time + observation;
-            break;
-        default:
-            std::string errorMessage = "Error, cannot have link end type: " +
-                    std::to_string( linkEndAssociatedWithTime ) + "for one-way range";
-            throw std::runtime_error( errorMessage );
+                transmissionTime = time;
+                receptionTime = time + observation;
+                break;
+            default:
+                std::string errorMessage =
+                        "Error, cannot have link end type: " + std::to_string( linkEndAssociatedWithTime ) + "for one-way range";
+                throw std::runtime_error( errorMessage );
         }
 
         // Convert light time to range.
@@ -136,31 +130,27 @@ public:
      * Function to get the object to calculate light time.
      * \return Object to calculate light time.
      */
-    std::shared_ptr< observation_models::LightTimeCalculator< ObservationScalarType, TimeType > >
-    getLightTimeCalculator( )
+    std::shared_ptr< observation_models::LightTimeCalculator< ObservationScalarType, TimeType > > getLightTimeCalculator( )
     {
         return lightTimeCalculator_;
     }
 
 private:
-
     //! Object to calculate light time.
     /*!
      *  Object to calculate light time, including possible corrections from troposphere, relativistic corrections, etc.
      */
-    std::shared_ptr< observation_models::LightTimeCalculator< ObservationScalarType, TimeType > >
-    lightTimeCalculator_;
+    std::shared_ptr< observation_models::LightTimeCalculator< ObservationScalarType, TimeType > > lightTimeCalculator_;
 
     //! Pre-declared receiver state, to prevent many (de-)allocations
     StateType receiverState;
 
     //! Pre-declared transmitter state, to prevent many (de-)allocations
     StateType transmitterState;
-
 };
 
-} // namespace observation_models
+}  // namespace observation_models
 
-} // namespace tudat
+}  // namespace tudat
 
-#endif // TUDAT_ONEWAYRANGEOBSERVATIONMODEL_H
+#endif  // TUDAT_ONEWAYRANGEOBSERVATIONMODEL_H

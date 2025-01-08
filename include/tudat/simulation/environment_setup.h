@@ -22,14 +22,14 @@
 #include "environment_setup/createGravityField.h"
 #include "environment_setup/createGravityFieldVariations.h"
 #include "environment_setup/createGroundStations.h"
-#include "environment_setup/createRadiationPressureInterface.h"
-#include "environment_setup/createRadiationSourceModel.h"
-#include "environment_setup/createRadiationPressureTargetModel.h"
-#include "environment_setup/createSurfacePropertyDistribution.h"
 #include "environment_setup/createOccultationModel.h"
-#include "environment_setup/createSystemModel.h"
+#include "environment_setup/createRadiationPressureInterface.h"
+#include "environment_setup/createRadiationPressureTargetModel.h"
+#include "environment_setup/createRadiationSourceModel.h"
 #include "environment_setup/createRotationModel.h"
+#include "environment_setup/createSurfacePropertyDistribution.h"
+#include "environment_setup/createSystemModel.h"
 #include "environment_setup/defaultBodies.h"
 #include "environment_setup/thrustSettings.h"
 
-#endif // TUDAT_ENVIRONMENT_SETUP_H
+#endif  // TUDAT_ENVIRONMENT_SETUP_H

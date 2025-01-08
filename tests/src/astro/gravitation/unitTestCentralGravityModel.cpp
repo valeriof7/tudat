@@ -12,16 +12,14 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
+#include <Eigen/Core>
 #include <boost/test/unit_test.hpp>
-
-#include "tudat/astro/gravitation/centralGravityModel.h"
-#include "tudat/basics/testMacros.h"
-#include "tudat/astro/gravitation/gravityFieldModel.h"
-
 #include <cmath>
 #include <limits>
 
-#include <Eigen/Core>
+#include "tudat/astro/gravitation/centralGravityModel.h"
+#include "tudat/astro/gravitation/gravityFieldModel.h"
+#include "tudat/basics/testMacros.h"
 
 namespace tudat
 {
@@ -45,9 +43,8 @@ BOOST_AUTO_TEST_CASE( testWrapperClassPotentialAndAcceleration )
     const Eigen::Vector3d position( 7.0e6, 8.0e6, 9.0e6 );
 
     // Declare spherical harmonics gravitational acceleration class object.
-    std::shared_ptr< CentralGravitationalAccelerationModel3d > earthGravity
-            = std::make_shared< CentralGravitationalAccelerationModel3d >(
-                [ & ]( Eigen::Vector3d& input ){ input = position; }, gravitationalParameter );
+    std::shared_ptr< CentralGravitationalAccelerationModel3d > earthGravity = std::make_shared< CentralGravitationalAccelerationModel3d >(
+            [ & ]( Eigen::Vector3d& input ) { input = position; }, gravitationalParameter );
     earthGravity->resetUpdatePotential( true );
     earthGravity->updateMembers( );
 
@@ -57,16 +54,12 @@ BOOST_AUTO_TEST_CASE( testWrapperClassPotentialAndAcceleration )
     BOOST_CHECK_EQUAL( expectedPotential, earthGravity->getCurrentPotential( ) );
 
     // Determine the expected result for the gradient of the potential of myPlanet
-    const Eigen::Vector3d expectedAcceleration = - gravitationalParameter
-            / std::pow( position.norm( ), 3.0 ) * position;
+    const Eigen::Vector3d expectedAcceleration = -gravitationalParameter / std::pow( position.norm( ), 3.0 ) * position;
     // Check if expected result matches computed result.
-    TUDAT_CHECK_MATRIX_CLOSE_FRACTION( expectedAcceleration, earthGravity->getAcceleration( ),
-                                       std::numeric_limits< double >::epsilon( ) );
-
+    TUDAT_CHECK_MATRIX_CLOSE_FRACTION( expectedAcceleration, earthGravity->getAcceleration( ), std::numeric_limits< double >::epsilon( ) );
 }
-
 
 BOOST_AUTO_TEST_SUITE_END( )
 
-} // namespace tudat
-} // namespace unit_tests
+}  // namespace unit_tests
+}  // namespace tudat

@@ -11,6 +11,7 @@
 #ifndef TUDAT_STATISTICS_H
 #define TUDAT_STATISTICS_H
 
+#include "statistics/allanVariance.h"
 #include "statistics/basicStatistics.h"
 #include "statistics/boostProbabilityDistributions.h"
 #include "statistics/continuousProbabilityDistributions.h"
@@ -19,6 +20,5 @@
 #include "statistics/randomSampling.h"
 #include "statistics/randomVariableGenerator.h"
 #include "statistics/simpleLinearRegression.h"
-#include "statistics/allanVariance.h"
 
-#endif // TUDAT_STATISTICS_H
+#endif  // TUDAT_STATISTICS_H

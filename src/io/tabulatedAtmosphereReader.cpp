@@ -9,6 +9,7 @@
  */
 
 #include "tudat/io/tabulatedAtmosphereReader.h"
+
 #include "tudat/io/util.h"
 
 namespace tudat
@@ -17,8 +18,6 @@ namespace tudat
 namespace input_output
 {
 
-
-
 }
 
-}
+}  // namespace tudat

@@ -11,9 +11,8 @@
 #ifndef TUDAT_METRIC_H
 #define TUDAT_METRIC_H
 
-#include <memory>
-
 #include <Eigen/Core>
+#include <memory>
 
 namespace tudat
 {
@@ -21,19 +20,14 @@ namespace tudat
 namespace relativity
 {
 
-
 //! Minkowski metric (-1,1,1,1 signature) represented as a Matrix
-const static Eigen::Matrix4d minkowskiMetric = ( Eigen::Matrix4d( ) <<
-                                                 -1.0, 0.0, 0.0, 0.0,
-                                                 0.0, 1.0, 0.0, 0.0,
-                                                 0.0, 0.0, 1.0, 0.0,
-                                                 0.0, 0.0, 0.0, 1.0 ).finished( );
+const static Eigen::Matrix4d minkowskiMetric =
+        ( Eigen::Matrix4d( ) << -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ).finished( );
 
 //! Class that stores the PPN parameters, typically used as a 'global' environment property stored in ppnParameterSet variable
 class PPNParameterSet
 {
 public:
-
     //! Constructor
     /*!
      * Constructor
@@ -45,7 +39,7 @@ public:
     { }
 
     //! Destructor
-    ~PPNParameterSet( ){ }
+    ~PPNParameterSet( ) { }
 
     //! Function to retrieve value of PPN parameter gamma.
     /*!
@@ -88,13 +82,11 @@ public:
     }
 
 protected:
-
     //! Value of PPN parameter gamma.
     double parameterGamma_;
 
     //! Value of PPN parameter beta.
     double parameterBeta_;
-
 };
 
 //! Global PPN parameter set, initialized upon compilation (with values equal to GR).
@@ -103,8 +95,8 @@ extern std::shared_ptr< PPNParameterSet > ppnParameterSet;
 //! Global parameter denoting EP violation in proper time rate, initialized to GR value of 0 upon compilation.
 extern double equivalencePrincipleLpiViolationParameter;
 
-}
+}  // namespace relativity
 
-}
+}  // namespace tudat
 
-#endif // TUDAT_METRIC_H
+#endif  // TUDAT_METRIC_H

@@ -12,25 +12,17 @@
 #ifndef TUDAT_SHORTPERIODEARTHORIENTATIONCORRECTIONCALCULATOR_H
 #define TUDAT_SHORTPERIODEARTHORIENTATIONCORRECTIONCALCULATOR_H
 
-
+#include <Eigen/Core>
+#include <functional>
 #include <string>
 
-#include <functional>
-
-
-
-#include <Eigen/Core>
-
-#include "tudat/basics/basicTypedefs.h"
-#include "tudat/io/basicInputOutput.h"
-#include "tudat/astro/basic_astro/unitConversions.h"
 #include "tudat/astro/basic_astro/timeConversions.h"
+#include "tudat/astro/basic_astro/unitConversions.h"
 #include "tudat/astro/earth_orientation/readAmplitudeAndArgumentMultipliers.h"
-
+#include "tudat/basics/basicTypedefs.h"
 #include "tudat/interface/sofa/fundamentalArguments.h"
 #include "tudat/io/basicInputOutput.h"
 #include "tudat/math/interpolators/createInterpolator.h"
-
 
 namespace tudat
 {
@@ -63,9 +55,9 @@ public:
             const double conversionFactor,
             const double minimumAmplitude,
             const std::vector< std::string >& amplitudesFiles,
-            const std::vector< std::string >& argumentMultipliersFile ,
-            const std::function< Eigen::Vector6d( const double )  > argumentFunction =
-            std::bind( &sofa_interface::calculateApproximateDelaunayFundamentalArgumentsWithGmst, std::placeholders::_1 ),
+            const std::vector< std::string >& argumentMultipliersFile,
+            const std::function< Eigen::Vector6d( const double ) > argumentFunction =
+                    std::bind( &sofa_interface::calculateApproximateDelaunayFundamentalArgumentsWithGmst, std::placeholders::_1 ),
             const std::shared_ptr< interpolators::InterpolatorGenerationSettings< double > > shortTermInterpolatorSettings = nullptr ):
         argumentFunction_( argumentFunction )
     {
@@ -79,18 +71,16 @@ public:
         for( unsigned int i = 0; i < amplitudesFiles.size( ); i++ )
         {
             dataFromFile = readAmplitudesAndFundamentalArgumentMultipliers(
-                        amplitudesFiles.at( i ), argumentMultipliersFile.at( i ), minimumAmplitude );
+                    amplitudesFiles.at( i ), argumentMultipliersFile.at( i ), minimumAmplitude );
             argumentAmplitudes_.push_back( conversionFactor * dataFromFile.first );
             argumentMultipliers_.push_back( dataFromFile.second );
         }
 
         if( shortTermInterpolatorSettings != nullptr )
         {
-            std::function< OutputType( const double ) > correctionFunction  =
-                std::bind( &ShortPeriodEarthOrientationCorrectionCalculator< OutputType >::getCorrections, this,
-                           std::placeholders::_1 );
-            correctionInterpolator_ =
-                interpolators::createOneDimensionalInterpolator< double, OutputType >(
+            std::function< OutputType( const double ) > correctionFunction = std::bind(
+                    &ShortPeriodEarthOrientationCorrectionCalculator< OutputType >::getCorrections, this, std::placeholders::_1 );
+            correctionInterpolator_ = interpolators::createOneDimensionalInterpolator< double, OutputType >(
                     correctionFunction, shortTermInterpolatorSettings );
         }
         else
@@ -109,7 +99,7 @@ public:
     {
         if( correctionInterpolator_ == nullptr )
         {
-            return sumCorrectionTerms( argumentFunction_( ephemerisTime ));
+            return sumCorrectionTerms( argumentFunction_( ephemerisTime ) );
         }
         else
         {
@@ -129,7 +119,6 @@ public:
     }
 
 private:
-
     //! Function to sum all the corrcetion terms.
     /*!
      *  Function to sum all the corrcetion terms.
@@ -148,7 +137,6 @@ private:
     std::function< Eigen::Vector6d( const double ) > argumentFunction_;
 
     std::shared_ptr< interpolators::OneDimensionalInterpolator< double, OutputType > > correctionInterpolator_;
-
 };
 
 //! Function to retrieve the default UT1 short-period correction calculator
@@ -171,9 +159,8 @@ std::shared_ptr< ShortPeriodEarthOrientationCorrectionCalculator< double > > get
 std::shared_ptr< ShortPeriodEarthOrientationCorrectionCalculator< Eigen::Vector2d > > getDefaultPolarMotionCorrectionCalculator(
         const double minimumAmplitude = 0.0 );
 
-}
+}  // namespace earth_orientation
 
-}
+}  // namespace tudat
 
-
-#endif //TUDAT_SHORTPERIODEARTHORIENTATIONCORRECTIONCALCULATOR_H
+#endif  // TUDAT_SHORTPERIODEARTHORIENTATIONCORRECTIONCALCULATOR_H

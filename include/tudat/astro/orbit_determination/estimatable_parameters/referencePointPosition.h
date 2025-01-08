@@ -8,15 +8,13 @@
  *    http://tudat.tudelft.nl/LICENSE.
  */
 
-
 #ifndef TUDAT_REFERENCEPOINTPOSITION_H
 #define TUDAT_REFERENCEPOINTPOSITION_H
 
 #include <Eigen/Core>
 
-#include "tudat/astro/system_models/vehicleSystems.h"
 #include "tudat/astro/orbit_determination/estimatable_parameters/estimatableParameter.h"
-
+#include "tudat/astro/system_models/vehicleSystems.h"
 
 namespace tudat
 {
@@ -24,39 +22,41 @@ namespace tudat
 namespace estimatable_parameters
 {
 
-class ReferencePointPosition: public EstimatableParameter< Eigen::VectorXd >
+class ReferencePointPosition : public EstimatableParameter< Eigen::VectorXd >
 {
-
 public:
-
     ReferencePointPosition( const std::shared_ptr< system_models::VehicleSystems > systemModels,
                             const std::string& associatedBody,
                             const std::string& associatedReferencePoint ):
-        EstimatableParameter< Eigen::VectorXd  >( reference_point_position, associatedBody, associatedReferencePoint ),
+        EstimatableParameter< Eigen::VectorXd >( reference_point_position, associatedBody, associatedReferencePoint ),
         systemModels_( systemModels )
     {
         if( systemModels_->doesReferencePointExist( associatedReferencePoint ) == false )
         {
-            throw std::runtime_error( "Error when making reference point position parameter for " +
-                associatedBody + ", " + associatedReferencePoint + ", reference point not found" );
+            throw std::runtime_error( "Error when making reference point position parameter for " + associatedBody + ", " +
+                                      associatedReferencePoint + ", reference point not found" );
         }
         else
         {
-            if ( std::dynamic_pointer_cast< ephemerides::ConstantEphemeris >( systemModels_->getReferencePoints( ).at( associatedReferencePoint ) ) == nullptr )
+            if( std::dynamic_pointer_cast< ephemerides::ConstantEphemeris >(
+                        systemModels_->getReferencePoints( ).at( associatedReferencePoint ) ) == nullptr )
             {
-                throw std::runtime_error( "Error when creating reference_point_position parameter, the ephemeris of reference point (" + associatedBody + ", "
-                + associatedReferencePoint + ") should be of type ConstantEphemeris for the reference point position to be estimatable." );
+                throw std::runtime_error( "Error when creating reference_point_position parameter, the ephemeris of reference point (" +
+                                          associatedBody + ", " + associatedReferencePoint +
+                                          ") should be of type ConstantEphemeris for the reference point position to be estimatable." );
             }
         }
     }
 
-    //! Destructor    
+    //! Destructor
     ~ReferencePointPosition( ) { }
 
     Eigen::VectorXd getParameterValue( )
     {
         return std::dynamic_pointer_cast< ephemerides::ConstantEphemeris >(
-                systemModels_->getReferencePointEphemerisInBodyFixedFrame( parameterName_.second.second ) )->getCartesianState( ).segment( 0, 3 );
+                       systemModels_->getReferencePointEphemerisInBodyFixedFrame( parameterName_.second.second ) )
+                ->getCartesianState( )
+                .segment( 0, 3 );
     }
 
     void setParameterValue( Eigen::VectorXd parameterValue )
@@ -70,14 +70,12 @@ public:
     }
 
 protected:
-
 private:
-
     std::shared_ptr< system_models::VehicleSystems > systemModels_;
 };
 
-}
+}  // namespace estimatable_parameters
 
-}
+}  // namespace tudat
 
-#endif // TUDAT_REFERENCEPOINTPOSITION_H
+#endif  // TUDAT_REFERENCEPOINTPOSITION_H

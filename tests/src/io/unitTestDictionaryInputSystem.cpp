@@ -12,19 +12,15 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
+#include <boost/algorithm/string.hpp>
+#include <boost/assign.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/test/unit_test.hpp>
 #include <fstream>
 #include <stdexcept>
 #include <string>
 
-#include <boost/algorithm/string.hpp>
-#include <boost/assign.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
-
-#include <boost/test/unit_test.hpp>
-
 #include "tudat/astro/basic_astro/unitConversions.h"
-#include "tudat/io/streamFilters.h"
-
 #include "tudat/io/basicInputOutput.h"
 #include "tudat/io/dictionaryComparer.h"
 #include "tudat/io/dictionaryEntry.h"
@@ -32,6 +28,7 @@
 #include "tudat/io/fieldType.h"
 #include "tudat/io/parsedDataVectorUtilities.h"
 #include "tudat/io/separatedParser.h"
+#include "tudat/io/streamFilters.h"
 
 namespace tudat
 {
@@ -54,12 +51,12 @@ input_output::dictionary::DictionaryPointer getExampleDictionary( )
     DictionaryPointer dictionary = std::make_shared< Dictionary >( );
 
     // Insert example entries.
-    addEntry( dictionary, "stringParameter",             true,  false                       );
-    addEntry( dictionary, "stringParameterWithSynonym",  false, true, { "sParam" }          );
-    addEntry( dictionary, "doubleParameter",             false, false                       );
-    addEntry( dictionary, "integerParameterWithSynonym", true,  true, { "intParam" }        );
-    addEntry( dictionary, "missingOptionalParameter",    false, false                       );
-    addEntry( dictionary, "missingRequiredParameter",    true,  false                       );
+    addEntry( dictionary, "stringParameter", true, false );
+    addEntry( dictionary, "stringParameterWithSynonym", false, true, { "sParam" } );
+    addEntry( dictionary, "doubleParameter", false, false );
+    addEntry( dictionary, "integerParameterWithSynonym", true, true, { "intParam" } );
+    addEntry( dictionary, "missingOptionalParameter", false, false );
+    addEntry( dictionary, "missingRequiredParameter", true, false );
 
     return dictionary;
 }
@@ -72,8 +69,7 @@ input_output::dictionary::DictionaryPointer getExampleDictionary( )
  *          (default is taken as '#').
  * \return filteredData Filtered data as string.
  */
-std::string readAndFilterInputFile( const std::string& inputFileName,
-                                    const char commentCharacter = '#' )
+std::string readAndFilterInputFile( const std::string& inputFileName, const char commentCharacter = '#' )
 {
     // Create input file stream.
     std::ifstream inputFileStream( inputFileName.c_str( ) );
@@ -85,11 +81,14 @@ std::string readAndFilterInputFile( const std::string& inputFileName,
     std::string line;
 
     // Read input file line-by-line and store in unfilteredData.
-    if ( inputFileStream.is_open( ) )
+    if( inputFileStream.is_open( ) )
     {
-        while ( std::getline( inputFileStream, line ) )
+        while( std::getline( inputFileStream, line ) )
         {
-            if ( !line.empty( ) ) { unfilteredData += line + "\n"; }
+            if( !line.empty( ) )
+            {
+                unfilteredData += line + "\n";
+            }
         }
     }
 
@@ -136,9 +135,7 @@ BOOST_AUTO_TEST_CASE( testInputFileParsingUsingDictionary )
     std::string filteredData = readAndFilterInputFile( inputFile );
 
     // Declare a separated parser.
-    input_output::SeparatedParser parser( std::string( ": " ), 2,
-                                                 general::parameterName,
-                                                 general::parameterValue );
+    input_output::SeparatedParser parser( std::string( ": " ), 2, general::parameterName, general::parameterValue );
 
     // Parse filtered data.
     const ParsedDataVectorPtr parsedData = parser.parse( filteredData );
@@ -159,7 +156,7 @@ BOOST_AUTO_TEST_CASE( testInputFileParsingUsingDictionary )
         }
 
         // Catch the error thrown.
-        catch ( std::runtime_error& requiredParametersError )
+        catch( std::runtime_error& requiredParametersError )
         {
             areRequiredParametersMissingBeforeExtraction = true;
         }
@@ -172,8 +169,7 @@ BOOST_AUTO_TEST_CASE( testInputFileParsingUsingDictionary )
     //         not synonym).
     {
         std::string stringParameter = extractParameterValue< std::string >(
-                    parsedData->begin( ), parsedData->end( ),
-                    findEntry( dictionary, "stringParameter" ) );
+                parsedData->begin( ), parsedData->end( ), findEntry( dictionary, "stringParameter" ) );
 
         BOOST_CHECK_EQUAL( stringParameter, "this is a string parameter" );
     }
@@ -182,19 +178,16 @@ BOOST_AUTO_TEST_CASE( testInputFileParsingUsingDictionary )
     //         "stringParameterWithSynonym").
     {
         std::string stringParameterWithSynonym = extractParameterValue< std::string >(
-                    parsedData->begin( ), parsedData->end( ),
-                    findEntry( dictionary, "stringParameterWithSynonym" ) );
+                parsedData->begin( ), parsedData->end( ), findEntry( dictionary, "stringParameterWithSynonym" ) );
 
-        BOOST_CHECK_EQUAL( stringParameterWithSynonym,
-                           "this string was extracted using a synonym" );
+        BOOST_CHECK_EQUAL( stringParameterWithSynonym, "this string was extracted using a synonym" );
     }
 
     // Test 4: test extraction of "intParam" (required, case-sensitive, no conversion, synonym for
     //         "integerParameterWithSynonym").
     {
         int integerParameterWithSynonym = extractParameterValue< int >(
-                    parsedData->begin( ), parsedData->end( ),
-                    findEntry( dictionary, "integerParameterWithSynonym" ) );
+                parsedData->begin( ), parsedData->end( ), findEntry( dictionary, "integerParameterWithSynonym" ) );
 
         BOOST_CHECK_EQUAL( integerParameterWithSynonym, 12 );
     }
@@ -202,10 +195,11 @@ BOOST_AUTO_TEST_CASE( testInputFileParsingUsingDictionary )
     // Test 5: test extraction of "doubleParameter" (required, not case-sensitive,
     //         kilometers-to-meters conversion, not synonym).
     {
-        double doubleParameter = extractParameterValue< double >(
-                    parsedData->begin( ), parsedData->end( ),
-                    findEntry( dictionary, "doubleParameter" ), 0.0,
-                    &convertKilometersToMeters< double > );
+        double doubleParameter = extractParameterValue< double >( parsedData->begin( ),
+                                                                  parsedData->end( ),
+                                                                  findEntry( dictionary, "doubleParameter" ),
+                                                                  0.0,
+                                                                  &convertKilometersToMeters< double > );
 
         BOOST_CHECK_EQUAL( doubleParameter, 987650.0 );
     }
@@ -213,8 +207,7 @@ BOOST_AUTO_TEST_CASE( testInputFileParsingUsingDictionary )
     // Test 6: test extraction of missing, optional parameter in input stream.
     {
         double missingOptionalParameter = extractParameterValue< double >(
-                    parsedData->begin( ), parsedData->end( ),
-                    findEntry( dictionary, "missingOptionalParameter" ), 123.45 );
+                parsedData->begin( ), parsedData->end( ), findEntry( dictionary, "missingOptionalParameter" ), 123.45 );
 
         BOOST_CHECK_EQUAL( missingOptionalParameter, 123.45 );
     }
@@ -228,12 +221,11 @@ BOOST_AUTO_TEST_CASE( testInputFileParsingUsingDictionary )
         try
         {
             std::string integerParameterWithSynonym = extractParameterValue< std::string >(
-                        parsedData->begin( ), parsedData->end( ),
-                        findEntry( dictionary, "missingRequiredParameter" ) );
+                    parsedData->begin( ), parsedData->end( ), findEntry( dictionary, "missingRequiredParameter" ) );
         }
 
         // Catch error thrown.
-        catch ( std::runtime_error& nonExistentRequireParameterError )
+        catch( std::runtime_error& nonExistentRequireParameterError )
         {
             isRequiredParameterMissing = true;
         }
@@ -249,8 +241,7 @@ BOOST_AUTO_TEST_CASE( testInputFileParsingUsingDictionary )
         bool areRequiredParametersMissingAfterFullExtraction = false;
 
         // Set "missingParameter" dictionary entry to extracted.
-        Dictionary::const_iterator missingParameterIterator
-                = findEntry( dictionary, "missingRequiredParameter" );
+        Dictionary::const_iterator missingParameterIterator = findEntry( dictionary, "missingRequiredParameter" );
         ( *missingParameterIterator )->isExtracted = true;
 
         // Check if required parameters are missing.
@@ -260,7 +251,7 @@ BOOST_AUTO_TEST_CASE( testInputFileParsingUsingDictionary )
         }
 
         // Catch the error thrown.
-        catch ( std::runtime_error& requiredParametersError )
+        catch( std::runtime_error& requiredParametersError )
         {
             areRequiredParametersMissingAfterFullExtraction = true;
         }
@@ -272,5 +263,5 @@ BOOST_AUTO_TEST_CASE( testInputFileParsingUsingDictionary )
 
 BOOST_AUTO_TEST_SUITE_END( )
 
-} // namespace unit_tests
-} // namespace tudat
+}  // namespace unit_tests
+}  // namespace tudat

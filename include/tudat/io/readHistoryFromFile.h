@@ -12,13 +12,12 @@
 #ifndef TUDAT_READHISTORYFROMFILE_H
 #define TUDAT_READHISTORYFROMFILE_H
 
-#include <map>
-#include <string>
+#include <Eigen/Core>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-
-#include <Eigen/Core>
+#include <map>
+#include <string>
 
 namespace tudat
 {
@@ -35,14 +34,14 @@ namespace input_output
  *  \return Matrix history from file.
  */
 template< typename TimeType, typename StateScalarType >
-std::map< TimeType, Eigen::Matrix< StateScalarType, Eigen::Dynamic, Eigen::Dynamic > > readMatrixHistoryFromFile(
-        const int singleMatrixRows, const int singleMatrixColumns, const std::string& fileName )
+std::map< TimeType, Eigen::Matrix< StateScalarType, Eigen::Dynamic, Eigen::Dynamic > >
+readMatrixHistoryFromFile( const int singleMatrixRows, const int singleMatrixColumns, const std::string& fileName )
 {
     std::map< TimeType, Eigen::Matrix< StateScalarType, Eigen::Dynamic, Eigen::Dynamic > > matrixHistory;
 
     std::ifstream fileStream;
     fileStream.open( fileName );
-    if ( !fileStream.is_open( ) )
+    if( !fileStream.is_open( ) )
     {
         throw std::runtime_error( "Data file: " + fileName + " could not be opened." );
     }
@@ -65,7 +64,6 @@ std::map< TimeType, Eigen::Matrix< StateScalarType, Eigen::Dynamic, Eigen::Dynam
         }
 
         matrixHistory[ currentTime ] = currentMatrix;
-
     }
     fileStream.close( );
 
@@ -80,14 +78,14 @@ std::map< TimeType, Eigen::Matrix< StateScalarType, Eigen::Dynamic, Eigen::Dynam
  *  \return Vector history from file.
  */
 template< typename TimeType, typename StateScalarType >
-std::map< TimeType, Eigen::Matrix< StateScalarType, Eigen::Dynamic, 1 > > readVectorHistoryFromFile(
-        const int singleMatrixRows, const std::string& fileName )
+std::map< TimeType, Eigen::Matrix< StateScalarType, Eigen::Dynamic, 1 > > readVectorHistoryFromFile( const int singleMatrixRows,
+                                                                                                     const std::string& fileName )
 {
     std::map< TimeType, Eigen::Matrix< StateScalarType, Eigen::Dynamic, 1 > > matrixHistory;
 
     std::ifstream fileStream;
     fileStream.open( fileName );
-    if ( !fileStream.is_open( ) )
+    if( !fileStream.is_open( ) )
     {
         throw std::runtime_error( "Data file: " + fileName + " could not be opened." );
     }
@@ -107,7 +105,6 @@ std::map< TimeType, Eigen::Matrix< StateScalarType, Eigen::Dynamic, 1 > > readVe
         }
 
         matrixHistory[ currentTime ] = currentMatrix;
-
     }
     fileStream.close( );
 
@@ -139,9 +136,8 @@ std::map< S, T > readScalarHistoryFromFile( const std::string& fileName )
     return dataMap;
 }
 
+}  // namespace input_output
 
-}
+}  // namespace tudat
 
-}
-
-#endif // TUDAT_READHISTORYFROMFILE_H
+#endif  // TUDAT_READHISTORYFROMFILE_H

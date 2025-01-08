@@ -13,10 +13,9 @@
 #ifndef TUDAT_TRIMORIENTATION_H
 #define TUDAT_TRIMORIENTATION_H
 
+#include <Eigen/Core>
 #include <functional>
 #include <memory>
-
-#include <Eigen/Core>
 
 #include "tudat/astro/aerodynamics/aerodynamicCoefficientInterface.h"
 #include "tudat/math/root_finders/rootFinder.h"
@@ -27,8 +26,6 @@ namespace tudat
 namespace aerodynamics
 {
 
-
-
 //! Class to determine the trimmed angle-of-attack for a given set of aerodynamic coefficients.
 /*!
  *  Class to determine the trimmed angle-of-attack for a given set of aerodynamic coefficients. The coefficient interface
@@ -37,7 +34,6 @@ namespace aerodynamics
 class TrimOrientationCalculator
 {
 public:
-
     //! Constructor
     /*!
      * Constructor
@@ -46,9 +42,8 @@ public:
      * \param rootFinder Object to iteratively find the root of the equations C_m(alpha)=0, i.e. to determine the
      * angle of attack for which the pitch moment is zero.
      */
-    TrimOrientationCalculator(
-            const std::shared_ptr< AerodynamicCoefficientInterface > coefficientInterface,
-            const std::shared_ptr< root_finders::RootFinder< double > > rootFinder = nullptr );
+    TrimOrientationCalculator( const std::shared_ptr< AerodynamicCoefficientInterface > coefficientInterface,
+                               const std::shared_ptr< root_finders::RootFinder< double > > rootFinder = nullptr );
 
     //! Function to find the trimmed angle of attack for a given set of independent  variables
     /*!
@@ -62,10 +57,9 @@ public:
      * with map key denoting the control surface name (in order required as input for coefficient interfaces)
      * \return Trimmed angle of attack.
      */
-    double findTrimAngleOfAttack(
-            const std::vector< double > untrimmedIndependentVariables,
-            const std::map< std::string, std::vector< double > > untrimmedControlSurfaceIndependentVariables =
-            std::map< std::string, std::vector< double > >( ) );
+    double findTrimAngleOfAttack( const std::vector< double > untrimmedIndependentVariables,
+                                  const std::map< std::string, std::vector< double > > untrimmedControlSurfaceIndependentVariables =
+                                          std::map< std::string, std::vector< double > >( ) );
 
     //! Function to find the trimmed angle of attack for a given set of independent  variables
     /*!
@@ -82,15 +76,12 @@ public:
      */
     double findTrimAngleOfAttackFromFunction(
             const std::function< std::vector< double >( ) > untrimmedIndependentVariablesFunction,
-            const std::function< std::map< std::string, std::vector< double > >( ) >
-            untrimmedControlSurfaceIndependentVariablesFunction )
+            const std::function< std::map< std::string, std::vector< double > >( ) > untrimmedControlSurfaceIndependentVariablesFunction )
     {
-        return findTrimAngleOfAttack( untrimmedIndependentVariablesFunction( ),
-                                      untrimmedControlSurfaceIndependentVariablesFunction( ) );
+        return findTrimAngleOfAttack( untrimmedIndependentVariablesFunction( ), untrimmedControlSurfaceIndependentVariablesFunction( ) );
     }
 
 private:
-
     //! Function to get the moment coefficient for a given angle of attack
     /*!
      * Function to get the moment coefficient for a given perturbed angle of attack, keeping all other independent  variables
@@ -121,8 +112,8 @@ private:
     std::map< std::string, int > controlSurfaceVariableIndex_;
 };
 
-} // namespace aerodynamics
+}  // namespace aerodynamics
 
-} // namespace tudat
+}  // namespace tudat
 
-#endif // TUDAT_TRIMORIENTATION_H
+#endif  // TUDAT_TRIMORIENTATION_H

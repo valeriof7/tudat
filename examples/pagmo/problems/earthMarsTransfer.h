@@ -11,18 +11,17 @@
 #ifndef TUDAT_EXAMPLE_PAGMO_PROBLEM_EARTH_MARS_TRANSFER_H
 #define TUDAT_EXAMPLE_PAGMO_PROBLEM_EARTH_MARS_TRANSFER_H
 
-#include <vector>
-#include <utility>
-#include <limits>
-
-#include <Eigen/Core>
-
-#include <tudat/astro/basic_astro/orbitalElementConversions.h>
 #include <tudat/astro/basic_astro/convertMeanToEccentricAnomalies.h>
+#include <tudat/astro/basic_astro/orbitalElementConversions.h>
 #include <tudat/astro/mission_segments/multiRevolutionLambertTargeterIzzo.h>
 
-#include "pagmo/island.hpp"
+#include <Eigen/Core>
+#include <limits>
+#include <utility>
+#include <vector>
+
 #include "pagmo/io.hpp"
+#include "pagmo/island.hpp"
 #include "pagmo/problem.hpp"
 
 /*!
@@ -38,13 +37,11 @@
 using namespace pagmo;
 
 //! Test function for a new interplanetary trajectory class in Tudat
-struct EarthMarsTransfer
-{
-
+struct EarthMarsTransfer {
     typedef Eigen::Matrix< double, 6, 1 > StateType;
 
     //! Default constructor, required for Pagmo compatibility
-    EarthMarsTransfer( ): useTripTime_( false ){ }
+    EarthMarsTransfer( ): useTripTime_( false ) { }
 
     //! Constructor that sets boundaries of independent variables, and a boolean denoting whether the fitness is single-objective
     //! (Delta V), or dual objective (Delta V and time of flight).
@@ -54,22 +51,22 @@ struct EarthMarsTransfer
     std::vector< double > fitness( const std::vector< double > &x ) const;
 
     //! Retrieve the allowable limits of the parameter vector x: pair containing minima and maxima of parameter values
-    std::pair< std::vector< double >, std::vector< double > > get_bounds() const;
+    std::pair< std::vector< double >, std::vector< double > > get_bounds( ) const;
 
     //! Retrieve the name of the problem
     std::string get_name( ) const;
 
     //! Serialization function for Pagmo compatibility
-    template <typename Archive>
-    void serialize(Archive &ar)
+    template< typename Archive >
+    void serialize( Archive &ar )
     {
-        ar(problemBounds_);
+        ar( problemBounds_ );
     }
 
     //! Retrieve the number of objectives in problem, e.g. the size of the vector returned by the fitness function
-    vector_double::size_type get_nobj() const
+    vector_double::size_type get_nobj( ) const
     {
-        if(useTripTime_ )
+        if( useTripTime_ )
         {
             return 2u;
         }
@@ -80,7 +77,6 @@ struct EarthMarsTransfer
     }
 
 private:
-
     const std::vector< std::vector< double > > problemBounds_;
 
     StateType getPlanetPosition( const double date, const std::string planetName ) const;
@@ -88,4 +84,4 @@ private:
     bool useTripTime_;
 };
 
-#endif // TUDAT_EXAMPLE_PAGMO_PROBLEM_EARTH_MARS_TRANSFER_H
+#endif  // TUDAT_EXAMPLE_PAGMO_PROBLEM_EARTH_MARS_TRANSFER_H

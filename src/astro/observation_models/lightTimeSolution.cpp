@@ -8,31 +8,28 @@
  *    http://tudat.tudelft.nl/LICENSE.
  */
 
+#include "tudat/astro/observation_models/lightTimeSolution.h"
 
 #include "tudat/astro/basic_astro/physicalConstants.h"
-
-#include "tudat/astro/observation_models/lightTimeSolution.h"
 
 namespace tudat
 {
 namespace observation_models
 {
 
-
 //! Function to retrieve the default tolerance for the light-time equation solution.
-template< >
+template<>
 double getDefaultLightTimeTolerance< double >( )
 {
     return 1.0E-12;
 }
 
 //! Function to retrieve the default tolerance for the light-time equation solution.
-template< >
+template<>
 long double getDefaultLightTimeTolerance< long double >( )
 {
     return 1.0E-15L;
 }
 
-
-} // namespace observation_models
-} // namespace tudat
+}  // namespace observation_models
+}  // namespace tudat

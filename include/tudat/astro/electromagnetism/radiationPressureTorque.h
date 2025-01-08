@@ -11,15 +11,13 @@
 #ifndef TUDAT_RADIATIONPRESSURETORQUE_H
 #define TUDAT_RADIATIONPRESSURETORQUE_H
 
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 #include <functional>
 #include <memory>
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
-
 #include "tudat/astro/basic_astro/torqueModel.h"
 #include "tudat/astro/electromagnetism/radiationPressureAcceleration.h"
-
 
 namespace tudat
 {
@@ -30,33 +28,32 @@ namespace electromagnetism
  * Class modeling radiation pressure torque. Radiation pressure torque a target due to electromagnetic
  * radiation from a source.
  */
-class IsotropicPointSourceRadiationPressureTorque: public basic_astrodynamics::TorqueModel
+class IsotropicPointSourceRadiationPressureTorque : public basic_astrodynamics::TorqueModel
 {
 public:
-
     IsotropicPointSourceRadiationPressureTorque(
-        const std::shared_ptr< IsotropicPointSourceRadiationPressureAcceleration > radiationPressureAcceleration,
-        const std::function< Eigen::Vector3d( ) > centerOfMassFunction ):
-        radiationPressureAcceleration_( radiationPressureAcceleration ),
-        centerOfMassFunction_( centerOfMassFunction )
+            const std::shared_ptr< IsotropicPointSourceRadiationPressureAcceleration > radiationPressureAcceleration,
+            const std::function< Eigen::Vector3d( ) > centerOfMassFunction ):
+        radiationPressureAcceleration_( radiationPressureAcceleration ), centerOfMassFunction_( centerOfMassFunction )
     {
         radiationPressureAcceleration_->getTargetModel( )->enableTorqueComputation( centerOfMassFunction );
     }
 
-    ~IsotropicPointSourceRadiationPressureTorque( ){ }
+    ~IsotropicPointSourceRadiationPressureTorque( ) { }
 
     /*!
      * Update class members.
      *
      * @param currentTime Current simulation time
      */
-    void updateMembers(double currentTime) override
+    void updateMembers( double currentTime ) override
     {
         radiationPressureAcceleration_->updateMembers( currentTime );
         currentTorque_ = radiationPressureAcceleration_->getTargetModel( )->getCurrentRadiationPressureTorque( );
         if( !radiationPressureAcceleration_->getTargetModel( )->forceFunctionRequiresLocalFrameInputs( ) )
         {
-            currentTorque_ = radiationPressureAcceleration_->getTargetRotationFromLocalToGlobalFrameFunction( )( ).inverse( ) * currentTorque_;
+            currentTorque_ =
+                    radiationPressureAcceleration_->getTargetRotationFromLocalToGlobalFrameFunction( )( ).inverse( ) * currentTorque_;
         }
     }
 
@@ -70,7 +67,6 @@ public:
         return currentTorque_;
     }
 
-
     virtual void resetCurrentTime( ) override
     {
         currentTime_ = TUDAT_NAN;
@@ -78,7 +74,6 @@ public:
     }
 
 protected:
-
     std::shared_ptr< IsotropicPointSourceRadiationPressureAcceleration > radiationPressureAcceleration_;
 
     const std::function< Eigen::Vector3d( ) > centerOfMassFunction_;
@@ -86,7 +81,7 @@ protected:
     Eigen::Vector3d currentTorque_;
 };
 
-} // tudat
-} // electromagnetism
+}  // namespace electromagnetism
+}  // namespace tudat
 
-#endif //TUDAT_RADIATIONPRESSURETORQUE_H
+#endif  // TUDAT_RADIATIONPRESSURETORQUE_H

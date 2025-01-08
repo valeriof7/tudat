@@ -13,8 +13,9 @@
  *
  */
 
-#include "tudat/astro/gravitation/centralGravityModel.h"
 #include "tudat/astro/gravitation/thirdBodyPerturbation.h"
+
+#include "tudat/astro/gravitation/centralGravityModel.h"
 
 namespace tudat
 {
@@ -22,21 +23,16 @@ namespace gravitation
 {
 
 //! Compute perturbing acceleration by third body
-Eigen::Vector3d computeThirdBodyPerturbingAcceleration(
-        const double gravitationalParameterOfPerturbingBody,
-        const Eigen::Vector3d& positionOfPerturbingBody,
-        const Eigen::Vector3d& positionOfAffectedBody,
-        const Eigen::Vector3d& positionOfCentralBody )
+Eigen::Vector3d computeThirdBodyPerturbingAcceleration( const double gravitationalParameterOfPerturbingBody,
+                                                        const Eigen::Vector3d& positionOfPerturbingBody,
+                                                        const Eigen::Vector3d& positionOfAffectedBody,
+                                                        const Eigen::Vector3d& positionOfCentralBody )
 // Using chapter 4 of (Wakker, 2010).
 {
     // Return acceleration.
-    return computeGravitationalAcceleration( positionOfAffectedBody,
-                                             gravitationalParameterOfPerturbingBody,
-                                             positionOfPerturbingBody ) -
-            computeGravitationalAcceleration( positionOfCentralBody,
-                                              gravitationalParameterOfPerturbingBody,
-                                              positionOfPerturbingBody );
+    return computeGravitationalAcceleration( positionOfAffectedBody, gravitationalParameterOfPerturbingBody, positionOfPerturbingBody ) -
+            computeGravitationalAcceleration( positionOfCentralBody, gravitationalParameterOfPerturbingBody, positionOfPerturbingBody );
 }
 
-} // namespace gravitation
-} // namespace tudat
+}  // namespace gravitation
+}  // namespace tudat

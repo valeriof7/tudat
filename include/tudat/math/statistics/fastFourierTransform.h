@@ -1,11 +1,11 @@
 #ifndef FASTFOURIERTRANSFORM_H
 #define FASTFOURIERTRANSFORM_H
 
-#include <complex>
-#include <vector>
-#include <map>
-
 #include <fftw3.h>
+
+#include <complex>
+#include <map>
+#include <vector>
 
 namespace tudat
 {
@@ -26,9 +26,8 @@ std::vector< double > performInverseFftToRealData( const std::vector< std::compl
 // i.e. assuming other terms are conjugates.
 double* performRawInverseFFtToRealData( fftw_complex* frequencyDomainData, const int numberOfDataPoints );
 
+}  // namespace fftw_interface
 
-}
+}  // namespace tudat
 
-}
-
-#endif // FASTFOURIERTRANSFORM_H
+#endif  // FASTFOURIERTRANSFORM_H

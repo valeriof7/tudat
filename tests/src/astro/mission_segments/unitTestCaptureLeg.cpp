@@ -17,14 +17,12 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
-#include <limits>
-
-#include <boost/test/tools/floating_point_comparison.hpp> 
-#include <boost/test/unit_test.hpp>
+#include <tudat/basics/testMacros.h>
 
 #include <Eigen/Core>
-
-#include <tudat/basics/testMacros.h>
+#include <boost/test/tools/floating_point_comparison.hpp>
+#include <boost/test/unit_test.hpp>
+#include <limits>
 
 #include "tudat/astro/ephemerides/constantEphemeris.h"
 #include "tudat/astro/mission_segments/transferNode.h"
@@ -51,15 +49,17 @@ BOOST_AUTO_TEST_CASE( testVelocitiesInfiniteParkingOrbit )
 
     // Specify the required parameters.
     // Set the planetary positions and velocities.
-    const Eigen::Vector6d planetState = ( Eigen::Vector6d( ) <<
-                53627979831.9492, -5044669560.01491, -5339232305.54465,
-                -4857.99954791498, 50668.339570669, 4579.44661303178 ).finished( );
-    std::shared_ptr< ephemerides::Ephemeris > constantEphemeris =
-            std::make_shared< ephemerides::ConstantEphemeris >( planetState );
+    const Eigen::Vector6d planetState = ( Eigen::Vector6d( ) << 53627979831.9492,
+                                          -5044669560.01491,
+                                          -5339232305.54465,
+                                          -4857.99954791498,
+                                          50668.339570669,
+                                          4579.44661303178 )
+                                                .finished( );
+    std::shared_ptr< ephemerides::Ephemeris > constantEphemeris = std::make_shared< ephemerides::ConstantEphemeris >( planetState );
 
     // Set velocity before capture body.
-    const Eigen::Vector3d velocityBeforePlanet (
-                -5080.6362408257, 55179.1205883308, 3549.4183219232 );
+    const Eigen::Vector3d velocityBeforePlanet( -5080.6362408257, 55179.1205883308, 3549.4183219232 );
 
     // Set the gravitational parameters. The sun's is irrelevant for the deltaV consumption, but
     // required only for other functionality in the class.
@@ -72,11 +72,8 @@ BOOST_AUTO_TEST_CASE( testVelocitiesInfiniteParkingOrbit )
     // Set test case.
     using namespace tudat::mission_segments;
     CaptureWithFixedIncomingVelocityNode captureNode(
-                constantEphemeris,
-                mercuryGravitationalParameter, semiMajorAxis, eccentricity,
-                [=]( ){return velocityBeforePlanet; } );
-    captureNode.updateNodeParameters( ( Eigen::VectorXd( 1 )<<0.0 ).finished( ) );
-
+            constantEphemeris, mercuryGravitationalParameter, semiMajorAxis, eccentricity, [ = ]( ) { return velocityBeforePlanet; } );
+    captureNode.updateNodeParameters( ( Eigen::VectorXd( 1 ) << 0.0 ).finished( ) );
 
     // Prepare the variables for the results.
     double resultingDeltaV = captureNode.getNodeDeltaV( );
@@ -99,31 +96,26 @@ BOOST_AUTO_TEST_CASE( testVelocitiesCircularParkingOrbit )
 
     // Specify the required parameters.
     // Set the planetary positions and velocities.
-    const Eigen::Vector6d planetState = ( Eigen::Vector6d( ) <<
-                 227936637698.942, 0.0, 0.0,
-                 0.0, 24129.4836355380, 0.0 ).finished( );
-    std::shared_ptr< ephemerides::Ephemeris > constantEphemeris =
-            std::make_shared< ephemerides::ConstantEphemeris >( planetState );
+    const Eigen::Vector6d planetState = ( Eigen::Vector6d( ) << 227936637698.942, 0.0, 0.0, 0.0, 24129.4836355380, 0.0 ).finished( );
+    std::shared_ptr< ephemerides::Ephemeris > constantEphemeris = std::make_shared< ephemerides::ConstantEphemeris >( planetState );
 
     // Set velocity before capture body.
-    const Eigen::Vector3d velocityBeforePlanet ( 0.0, 21480.6500358053, 0.0 );
+    const Eigen::Vector3d velocityBeforePlanet( 0.0, 21480.6500358053, 0.0 );
 
     // Set the gravitational parameters. The Sun's is irrelevant for the deltaV consumption, but
     // required only for other functionality in the class.
     const double marsGravitationalParameter = 4.2830e13;
 
     // Set the capture orbit.
-    const double semiMajorAxis = 1.1 * 3.3895e6;;
+    const double semiMajorAxis = 1.1 * 3.3895e6;
+    ;
     const double eccentricity = 0.;
 
     // Set test case.
     using namespace tudat::mission_segments;
     CaptureWithFixedIncomingVelocityNode captureNode(
-                constantEphemeris,
-                marsGravitationalParameter, semiMajorAxis, eccentricity,
-                [=]( ){return velocityBeforePlanet; } );
-    captureNode.updateNodeParameters( ( Eigen::VectorXd( 1 )<<0.0 ) .finished( ) );
-
+            constantEphemeris, marsGravitationalParameter, semiMajorAxis, eccentricity, [ = ]( ) { return velocityBeforePlanet; } );
+    captureNode.updateNodeParameters( ( Eigen::VectorXd( 1 ) << 0.0 ).finished( ) );
 
     // Prepare the variables for the results.
     double resultingDeltaV = captureNode.getNodeDeltaV( );
@@ -135,5 +127,5 @@ BOOST_AUTO_TEST_CASE( testVelocitiesCircularParkingOrbit )
 
 BOOST_AUTO_TEST_SUITE_END( )
 
-} // namespace unit_tests
-} // namespace tudat
+}  // namespace unit_tests
+}  // namespace tudat

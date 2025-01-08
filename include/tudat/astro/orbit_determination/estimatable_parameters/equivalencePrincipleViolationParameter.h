@@ -11,8 +11,8 @@
 #ifndef TUDAT_EQUIVALENCEPRINCIPLEVIOLATIONPARAMETER_H
 #define TUDAT_EQUIVALENCEPRINCIPLEVIOLATIONPARAMETER_H
 
-#include "tudat/astro/relativity/metric.h"
 #include "tudat/astro/orbit_determination/estimatable_parameters/estimatableParameter.h"
+#include "tudat/astro/relativity/metric.h"
 
 namespace tudat
 {
@@ -21,17 +21,16 @@ namespace estimatable_parameters
 {
 
 //! Class used to estimate equivalence principle LPI violation parameter, e.g. putative effect on observers proper time rate
-class EquivalencePrincipleLpiViolationParameter: public EstimatableParameter< double >
+class EquivalencePrincipleLpiViolationParameter : public EstimatableParameter< double >
 {
-
 public:
-
     //! Constuctor
     /*!
      * Constuctor
      */
     EquivalencePrincipleLpiViolationParameter( ):
-        EstimatableParameter< double >( equivalence_principle_lpi_violation_parameter, "global_metric" ){ }
+        EstimatableParameter< double >( equivalence_principle_lpi_violation_parameter, "global_metric" )
+    { }
 
     //! Destructor
     ~EquivalencePrincipleLpiViolationParameter( ) { }
@@ -67,13 +66,11 @@ public:
     }
 
 protected:
-
 private:
-
 };
 
-}
+}  // namespace estimatable_parameters
 
-}
+}  // namespace tudat
 
-#endif // TUDAT_EQUIVALENCEPRINCIPLEVIOLATIONPARAMETER_H
+#endif  // TUDAT_EQUIVALENCEPRINCIPLEVIOLATIONPARAMETER_H

@@ -11,11 +11,10 @@
 #ifndef TUDAT_ATTITUDE_ELEMENT_CONVERSIONS_H
 #define TUDAT_ATTITUDE_ELEMENT_CONVERSIONS_H
 
-#include <cmath>
-#include <limits>
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <cmath>
+#include <limits>
 
 #include "tudat/basics/basicTypedefs.h"
 
@@ -61,8 +60,8 @@ Eigen::Vector4d convertQuaternionsToExponentialMapElements( const Eigen::Vector4
  */
 Eigen::Vector4d convertExponentialMapToQuaternionElements( const Eigen::Vector4d& exponentialMapElements );
 
-} // namespace orbital_element_conversions
+}  // namespace orbital_element_conversions
 
-} // namespace tudat
+}  // namespace tudat
 
-#endif // TUDAT_ATTITUDE_ELEMENT_CONVERSIONS_H
+#endif  // TUDAT_ATTITUDE_ELEMENT_CONVERSIONS_H

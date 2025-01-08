@@ -11,31 +11,25 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
+#include <boost/test/unit_test.hpp>
 #include <string>
 
-
-#include <boost/test/unit_test.hpp>
-
-#include "tudat/math/basic/linearAlgebra.h"
-#include "tudat/astro/basic_astro/physicalConstants.h"
-#include "tudat/astro/basic_astro/orbitalElementConversions.h"
-
-#include "tudat/interface/spice/spiceInterface.h"
-#include "tudat/math/integrators/rungeKuttaCoefficients.h"
-#include "tudat/math/interpolators/lagrangeInterpolator.h"
 #include "tudat/astro/basic_astro/accelerationModel.h"
 #include "tudat/astro/basic_astro/keplerPropagator.h"
-#include "tudat/io/basicInputOutput.h"
-
 #include "tudat/astro/basic_astro/orbitalElementConversions.h"
-#include "tudat/simulation/environment_setup/body.h"
+#include "tudat/astro/basic_astro/physicalConstants.h"
 #include "tudat/astro/propagators/nBodyCowellStateDerivative.h"
-#include "tudat/simulation/propagation_setup/dynamicsSimulator.h"
+#include "tudat/interface/spice/spiceInterface.h"
+#include "tudat/io/basicInputOutput.h"
+#include "tudat/math/basic/linearAlgebra.h"
 #include "tudat/math/integrators/createNumericalIntegrator.h"
+#include "tudat/math/integrators/rungeKuttaCoefficients.h"
+#include "tudat/math/interpolators/lagrangeInterpolator.h"
+#include "tudat/simulation/environment_setup/body.h"
 #include "tudat/simulation/environment_setup/createBodies.h"
-#include "tudat/simulation/estimation_setup/createNumericalSimulator.h"
 #include "tudat/simulation/environment_setup/defaultBodies.h"
-
+#include "tudat/simulation/estimation_setup/createNumericalSimulator.h"
+#include "tudat/simulation/propagation_setup/dynamicsSimulator.h"
 
 namespace tudat
 {
@@ -43,8 +37,7 @@ namespace tudat
 namespace unit_tests
 {
 
-
-//Using declarations.
+// Using declarations.
 using namespace tudat::ephemerides;
 using namespace tudat::interpolators;
 using namespace tudat::numerical_integrators;
@@ -60,11 +53,10 @@ BOOST_AUTO_TEST_SUITE( test_global_frame_origin )
 //! Test to ensure that a point-mass acceleration on a body produces a Kepler orbit (to within
 //! numerical error bounds).
 template< typename TimeType, typename StateScalarType >
-Eigen::Matrix< StateScalarType, 6, 1 > testGlobalFrameOrigin(
-        const std::string& globalFrameOrigin, const std::string& moonEphemerisOrigin  )
+Eigen::Matrix< StateScalarType, 6, 1 > testGlobalFrameOrigin( const std::string& globalFrameOrigin, const std::string& moonEphemerisOrigin )
 {
     std::cout << "Testing with origin: ************************************** " << globalFrameOrigin << std::endl;
-    //Load spice kernels.
+    // Load spice kernels.
     spice_interface::loadStandardSpiceKernels( );
 
     // Define bodies in simulation.
@@ -82,19 +74,18 @@ Eigen::Matrix< StateScalarType, 6, 1 > testGlobalFrameOrigin(
     double buffer = 5.0 * maximumTimeStep;
 
     // Create bodies needed in simulation
-    BodyListSettings bodySettings =
-            getDefaultBodySettings( bodyNames, initialEphemerisTime - buffer, finalEphemerisTime + buffer,
-                                    globalFrameOrigin, "ECLIPJ2000" );
+    BodyListSettings bodySettings = getDefaultBodySettings(
+            bodyNames, initialEphemerisTime - buffer, finalEphemerisTime + buffer, globalFrameOrigin, "ECLIPJ2000" );
 
     // Change ephemeris origins to test full functionality
-    std::dynamic_pointer_cast< InterpolatedSpiceEphemerisSettings >( bodySettings.at( "Moon" )->ephemerisSettings )->
-            resetFrameOrigin( moonEphemerisOrigin );
-    std::dynamic_pointer_cast< InterpolatedSpiceEphemerisSettings >( bodySettings.at( "Earth" )->ephemerisSettings )->
-            resetFrameOrigin( "Sun" );
-    std::dynamic_pointer_cast< InterpolatedSpiceEphemerisSettings >( bodySettings.at( "Mars" )->ephemerisSettings )->
-            resetFrameOrigin( "Sun" );
-    std::dynamic_pointer_cast< InterpolatedSpiceEphemerisSettings >( bodySettings.at( "Venus" )->ephemerisSettings )->
-            resetFrameOrigin( "SSB" );
+    std::dynamic_pointer_cast< InterpolatedSpiceEphemerisSettings >( bodySettings.at( "Moon" )->ephemerisSettings )
+            ->resetFrameOrigin( moonEphemerisOrigin );
+    std::dynamic_pointer_cast< InterpolatedSpiceEphemerisSettings >( bodySettings.at( "Earth" )->ephemerisSettings )
+            ->resetFrameOrigin( "Sun" );
+    std::dynamic_pointer_cast< InterpolatedSpiceEphemerisSettings >( bodySettings.at( "Mars" )->ephemerisSettings )
+            ->resetFrameOrigin( "Sun" );
+    std::dynamic_pointer_cast< InterpolatedSpiceEphemerisSettings >( bodySettings.at( "Venus" )->ephemerisSettings )
+            ->resetFrameOrigin( "SSB" );
 
     SystemOfBodies bodies = createSystemOfBodies< StateScalarType, TimeType >( bodySettings );
 
@@ -115,23 +106,21 @@ Eigen::Matrix< StateScalarType, 6, 1 > testGlobalFrameOrigin(
 
     // Define settings for numerical integrator.
     std::shared_ptr< IntegratorSettings< TimeType > > integratorSettings =
-            std::make_shared< IntegratorSettings< TimeType > >
-            ( rungeKutta4, initialEphemerisTime, 300.0 );
+            std::make_shared< IntegratorSettings< TimeType > >( rungeKutta4, initialEphemerisTime, 300.0 );
 
     // Create acceleration models and propagation settings.
-    Eigen::Matrix< StateScalarType, 6, 1  > systemInitialState =
-                spice_interface::getBodyCartesianStateAtEpoch(
-                  bodiesToIntegrate[ 0 ], centralBodies[ 0 ], "ECLIPJ2000", "NONE", initialEphemerisTime ).
-                template cast< StateScalarType >( );
-    AccelerationMap accelerationModelMap = createAccelerationModelsMap(
-                bodies, accelerationMap, bodiesToIntegrate, centralBodies );
+    Eigen::Matrix< StateScalarType, 6, 1 > systemInitialState =
+            spice_interface::getBodyCartesianStateAtEpoch(
+                    bodiesToIntegrate[ 0 ], centralBodies[ 0 ], "ECLIPJ2000", "NONE", initialEphemerisTime )
+                    .template cast< StateScalarType >( );
+    AccelerationMap accelerationModelMap = createAccelerationModelsMap( bodies, accelerationMap, bodiesToIntegrate, centralBodies );
     std::shared_ptr< TranslationalStatePropagatorSettings< StateScalarType, TimeType > > propagatorSettings =
-            std::make_shared< TranslationalStatePropagatorSettings< StateScalarType, TimeType > >
-            ( centralBodies, accelerationModelMap, bodiesToIntegrate, systemInitialState, finalEphemerisTime );
+            std::make_shared< TranslationalStatePropagatorSettings< StateScalarType, TimeType > >(
+                    centralBodies, accelerationModelMap, bodiesToIntegrate, systemInitialState, finalEphemerisTime );
 
     // Create dynamics simulation object.
     SingleArcDynamicsSimulator< StateScalarType, TimeType > dynamicsSimulator(
-                bodies, integratorSettings, propagatorSettings, true, false, true );
+            bodies, integratorSettings, propagatorSettings, true, false, true );
 
     return dynamicsSimulator.getEquationsOfMotionNumericalSolution( ).rbegin( )->second;
 }
@@ -154,22 +143,18 @@ BOOST_AUTO_TEST_CASE( testCowellPropagatorKeplerCompare )
     {
         for( unsigned int j = 0; j < origins.size( ); j++ )
         {
-            Eigen::Vector6d currentFinalState = testGlobalFrameOrigin< double, double >(
-                        origins.at( i ), origins.at( j ) );
-            for( unsigned int k = 0; k < 3 ; k++ )
+            Eigen::Vector6d currentFinalState = testGlobalFrameOrigin< double, double >( origins.at( i ), origins.at( j ) );
+            for( unsigned int k = 0; k < 3; k++ )
             {
                 BOOST_CHECK_SMALL( std::fabs( benchmarkFinalState( k ) - currentFinalState( k ) ), 1.0E-4 );
                 BOOST_CHECK_SMALL( std::fabs( benchmarkFinalState( k + 3 ) - currentFinalState( k + 3 ) ), 1.0E-9 );
             }
-
-
         }
     }
 }
 
 BOOST_AUTO_TEST_SUITE_END( )
 
+}  // namespace unit_tests
 
-}
-
-}
+}  // namespace tudat

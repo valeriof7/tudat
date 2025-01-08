@@ -12,26 +12,21 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
+#include <boost/lambda/lambda.hpp>
+#include <boost/test/unit_test.hpp>
 #include <limits>
 #include <string>
 #include <vector>
 
-#include <boost/test/unit_test.hpp>
-
-#include <boost/lambda/lambda.hpp>
-
-#include "tudat/basics/testMacros.h"
-
-#include "tudat/io/basicInputOutput.h"
-#include "tudat/interface/spice/spiceInterface.h"
-
-#include "tudat/simulation/estimation_setup/createObservationModel.h"
 #include "tudat/astro/orbit_determination/estimatable_parameters/constantRotationRate.h"
-#include "tudat/simulation/estimation_setup/createObservationPartials.h"
-#include "tudat/support/numericalObservationPartial.h"
+#include "tudat/basics/testMacros.h"
+#include "tudat/interface/spice/spiceInterface.h"
+#include "tudat/io/basicInputOutput.h"
 #include "tudat/simulation/environment_setup/createGroundStations.h"
 #include "tudat/simulation/environment_setup/defaultBodies.h"
-
+#include "tudat/simulation/estimation_setup/createObservationModel.h"
+#include "tudat/simulation/estimation_setup/createObservationPartials.h"
+#include "tudat/support/numericalObservationPartial.h"
 #include "tudat/support/observationPartialTestFunctions.h"
 
 namespace tudat
@@ -47,14 +42,12 @@ using namespace tudat::spice_interface;
 using namespace tudat::observation_partials;
 using namespace tudat::estimatable_parameters;
 
-BOOST_AUTO_TEST_SUITE( test_one_way_observation_partials)
+BOOST_AUTO_TEST_SUITE( test_one_way_observation_partials )
 
 //! Test partial derivatives of one-way differenced range observable, using general test suite of observation partials.
 BOOST_AUTO_TEST_CASE( testOneWayRangePartials )
 {
-
-    Eigen::VectorXd parameterPerturbationMultipliers =
-            ( Eigen::VectorXd( 4 ) << 100.0, 100.0, 1.0, 100.0 ).finished( );
+    Eigen::VectorXd parameterPerturbationMultipliers = ( Eigen::VectorXd( 4 ) << 100.0, 100.0, 1.0, 100.0 ).finished( );
 
     // Define and create ground stations.
     std::vector< std::pair< std::string, std::string > > groundStations;
@@ -77,19 +70,26 @@ BOOST_AUTO_TEST_CASE( testOneWayRangePartials )
         perturbingBodies.push_back( "Earth" );
         std::shared_ptr< ObservationModel< 1 > > oneWayDifferencedRangeModel =
                 observation_models::ObservationModelCreator< 1, double, double >::createObservationModel(
-                    std::make_shared< observation_models::ObservationModelSettings >(
-                        observation_models::one_way_differenced_range, linkEnds,
-                        std::make_shared< FirstOrderRelativisticLightTimeCorrectionSettings >(
-         perturbingBodies ) ), bodies  );
+                        std::make_shared< observation_models::ObservationModelSettings >(
+                                observation_models::one_way_differenced_range,
+                                linkEnds,
+                                std::make_shared< FirstOrderRelativisticLightTimeCorrectionSettings >( perturbingBodies ) ),
+                        bodies );
 
         // Create parameter objects.
-        std::shared_ptr< EstimatableParameterSet< double > > fullEstimatableParameterSet =
-                createEstimatableParameters( bodies, 1.1E7 );
+        std::shared_ptr< EstimatableParameterSet< double > > fullEstimatableParameterSet = createEstimatableParameters( bodies, 1.1E7 );
 
-        testObservationPartials< 1 >(
-                    oneWayDifferencedRangeModel, bodies, fullEstimatableParameterSet, linkEnds,
-                    one_way_differenced_range, 1.0E-4, true, true, 1000.0, parameterPerturbationMultipliers,
-                    getAveragedDopplerAncilliarySettings( 60.0 ) );
+        testObservationPartials< 1 >( oneWayDifferencedRangeModel,
+                                      bodies,
+                                      fullEstimatableParameterSet,
+                                      linkEnds,
+                                      one_way_differenced_range,
+                                      1.0E-4,
+                                      true,
+                                      true,
+                                      1000.0,
+                                      parameterPerturbationMultipliers,
+                                      getAveragedDopplerAncilliarySettings( 60.0 ) );
     }
 
     // Test partials with real ephemerides (without test of position partials)
@@ -107,29 +107,31 @@ BOOST_AUTO_TEST_CASE( testOneWayRangePartials )
         perturbingBodies.push_back( "Earth" );
         std::shared_ptr< ObservationModel< 1 > > oneWayDifferencedRangeModel =
                 observation_models::ObservationModelCreator< 1, double, double >::createObservationModel(
-                    std::make_shared< observation_models::ObservationModelSettings >(
-                        observation_models::one_way_differenced_range, linkEnds,
-                        std::make_shared< FirstOrderRelativisticLightTimeCorrectionSettings >(
-         perturbingBodies ) ), bodies  );
+                        std::make_shared< observation_models::ObservationModelSettings >(
+                                observation_models::one_way_differenced_range,
+                                linkEnds,
+                                std::make_shared< FirstOrderRelativisticLightTimeCorrectionSettings >( perturbingBodies ) ),
+                        bodies );
 
         // Create parameter objects.
-        std::shared_ptr< EstimatableParameterSet< double > > fullEstimatableParameterSet =
-                createEstimatableParameters( bodies, 1.1E7 );
+        std::shared_ptr< EstimatableParameterSet< double > > fullEstimatableParameterSet = createEstimatableParameters( bodies, 1.1E7 );
 
-        testObservationPartials< 1 >(
-                    oneWayDifferencedRangeModel, bodies, fullEstimatableParameterSet, linkEnds,
-                    one_way_differenced_range, 1.0E-4, false, true, 1000.0, parameterPerturbationMultipliers,
-                    getAveragedDopplerAncilliarySettings( 60.0 ) );
+        testObservationPartials< 1 >( oneWayDifferencedRangeModel,
+                                      bodies,
+                                      fullEstimatableParameterSet,
+                                      linkEnds,
+                                      one_way_differenced_range,
+                                      1.0E-4,
+                                      false,
+                                      true,
+                                      1000.0,
+                                      parameterPerturbationMultipliers,
+                                      getAveragedDopplerAncilliarySettings( 60.0 ) );
     }
 }
 
-
 BOOST_AUTO_TEST_SUITE_END( )
 
-} // namespace unit_tests
+}  // namespace unit_tests
 
-} // namespace tudat
-
-
-
-
+}  // namespace tudat

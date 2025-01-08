@@ -23,7 +23,6 @@
 #define TUDAT_SIMPLE_LINEAR_REGRESSION_H
 
 #include <map>
-
 #include <memory>
 
 #include "tudat/math/basic/mathematicalConstants.h"
@@ -40,7 +39,6 @@ namespace statistics
 class SimpleLinearRegression
 {
 public:
-
     //! Type definition of map of input data.
     /*!
      * Type definition of map of input data.
@@ -53,16 +51,11 @@ public:
      *  \param inputDataToFit Input data of independent (key) and dependent (value) variables
      *  to fit.
      */
-    SimpleLinearRegression( const InputDataMap& inputDataToFit )
-        : chiSquared_( TUDAT_NAN ),
-          coefficientOfConstantTerm_( TUDAT_NAN ),
-          coefficientOfLinearTerm_( TUDAT_NAN ),
-          standardDeviationOfCoefficientOfConstantTerm_( TUDAT_NAN ),
-          standardDeviationOfCoefficientOfLinearTerm_( TUDAT_NAN ),
-          sumOfDependentVariableData_( TUDAT_NAN ),
-          sumOfIndependentVariableData_( TUDAT_NAN ),
-          sumOfTemporaryVariableSquared_( TUDAT_NAN ),
-          inputDataToFit_( inputDataToFit )
+    SimpleLinearRegression( const InputDataMap& inputDataToFit ):
+        chiSquared_( TUDAT_NAN ), coefficientOfConstantTerm_( TUDAT_NAN ), coefficientOfLinearTerm_( TUDAT_NAN ),
+        standardDeviationOfCoefficientOfConstantTerm_( TUDAT_NAN ), standardDeviationOfCoefficientOfLinearTerm_( TUDAT_NAN ),
+        sumOfDependentVariableData_( TUDAT_NAN ), sumOfIndependentVariableData_( TUDAT_NAN ), sumOfTemporaryVariableSquared_( TUDAT_NAN ),
+        inputDataToFit_( inputDataToFit )
     { }
 
     //! Get coefficient of constant term of fit.
@@ -70,21 +63,30 @@ public:
      * Returns coefficient of constant term of fit.
      * \return Coefficient of constant term.
      */
-    double getCoefficientOfConstantTerm( ) const { return coefficientOfConstantTerm_; }
+    double getCoefficientOfConstantTerm( ) const
+    {
+        return coefficientOfConstantTerm_;
+    }
 
     //! Get coefficient of linear term of fit.
     /*!
      * Returns coefficient of linear term of fit.
      * \return Coefficient of linear term.
      */
-    double getCoefficientOfLinearTerm( ) const { return coefficientOfLinearTerm_; }
+    double getCoefficientOfLinearTerm( ) const
+    {
+        return coefficientOfLinearTerm_;
+    }
 
     //! Get chi-squared value.
     /*!
      * Returns chi-squared value of fit.
      * \return Chi-squared value.
      */
-    double getChiSquared( ) const { return chiSquared_; }
+    double getChiSquared( ) const
+    {
+        return chiSquared_;
+    }
 
     //! Get standard deviation of coefficient of constant term of fit.
     /*!
@@ -129,9 +131,7 @@ public:
     void computeFitErrors( );
 
 protected:
-
 private:
-
     //! Chi-squared value.
     /*!
      * Chi-squared value of simple linear regression fit.
@@ -211,7 +211,7 @@ private:
 //! Typedef for shared-pointer to SimpleLinearRegression object.
 typedef std::shared_ptr< SimpleLinearRegression > SimpleLinearRegressionPointer;
 
-} // namespace statistics
-} // namespace tudat
+}  // namespace statistics
+}  // namespace tudat
 
-#endif // TUDAT_SIMPLE_LINEAR_REGRESSION_H
+#endif  // TUDAT_SIMPLE_LINEAR_REGRESSION_H

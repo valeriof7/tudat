@@ -7,12 +7,13 @@
  *    a copy of the license with this file. If not, please or visit:
  *    http://tudat.tudelft.nl/LICENSE.
  */
+#include "tudat/interface/spice/spiceRotationalEphemeris.h"
+
 #include <stdexcept>
 
 #include "tudat/astro/basic_astro/physicalConstants.h"
 #include "tudat/astro/basic_astro/timeConversions.h"
 #include "tudat/interface/spice/spiceInterface.h"
-#include "tudat/interface/spice/spiceRotationalEphemeris.h"
 
 namespace tudat
 {
@@ -20,46 +21,39 @@ namespace tudat
 namespace ephemerides
 {
 
-
 //! Function to calculate the rotation quaternion from target frame to original frame.
-Eigen::Quaterniond SpiceRotationalEphemeris::getRotationToBaseFrame(
-        const double secondsSinceEpoch )
+Eigen::Quaterniond SpiceRotationalEphemeris::getRotationToBaseFrame( const double secondsSinceEpoch )
 {
     // Get rotational quaternion from spice wrapper function
-    return spice_interface::computeRotationQuaternionBetweenFrames(
-        spiceFrameName_, baseFrameOrientation_, secondsSinceEpoch );
+    return spice_interface::computeRotationQuaternionBetweenFrames( spiceFrameName_, baseFrameOrientation_, secondsSinceEpoch );
 }
 
 //! Function to calculate the derivative of the rotation matrix from target frame to original
 //! frame.
-Eigen::Matrix3d SpiceRotationalEphemeris::getDerivativeOfRotationToBaseFrame(
-        const double secondsSinceEpoch )
+Eigen::Matrix3d SpiceRotationalEphemeris::getDerivativeOfRotationToBaseFrame( const double secondsSinceEpoch )
 {
     // Get rotation matrix derivative from spice wrapper function
-    return spice_interface::computeRotationMatrixDerivativeBetweenFrames(
-        spiceFrameName_, baseFrameOrientation_, secondsSinceEpoch );
+    return spice_interface::computeRotationMatrixDerivativeBetweenFrames( spiceFrameName_, baseFrameOrientation_, secondsSinceEpoch );
 }
 
 //! Function to calculate the full rotational state at given time
-void SpiceRotationalEphemeris::getFullRotationalQuantitiesToTargetFrame(
-        Eigen::Quaterniond& currentRotationToLocalFrame,
-        Eigen::Matrix3d& currentRotationToLocalFrameDerivative,
-        Eigen::Vector3d& currentAngularVelocityVectorInGlobalFrame,
-        const double secondsSinceEpoch)
+void SpiceRotationalEphemeris::getFullRotationalQuantitiesToTargetFrame( Eigen::Quaterniond& currentRotationToLocalFrame,
+                                                                         Eigen::Matrix3d& currentRotationToLocalFrameDerivative,
+                                                                         Eigen::Vector3d& currentAngularVelocityVectorInGlobalFrame,
+                                                                         const double secondsSinceEpoch )
 {
     // Calculate rotation (and its time derivative) directly from spice.
     std::pair< Eigen::Quaterniond, Eigen::Matrix3d > fullRotation =
             spice_interface::computeRotationQuaternionAndRotationMatrixDerivativeBetweenFrames(
-                baseFrameOrientation_, spiceFrameName_, secondsSinceEpoch );
+                    baseFrameOrientation_, spiceFrameName_, secondsSinceEpoch );
     currentRotationToLocalFrame = fullRotation.first;
     currentRotationToLocalFrameDerivative = fullRotation.second;
 
     // Calculate angular velocity vector.
     currentAngularVelocityVectorInGlobalFrame = getRotationalVelocityVectorInBaseFrameFromMatrices(
-                Eigen::Matrix3d( currentRotationToLocalFrame ), currentRotationToLocalFrameDerivative.transpose( ) );
+            Eigen::Matrix3d( currentRotationToLocalFrame ), currentRotationToLocalFrameDerivative.transpose( ) );
 }
 
+}  // namespace ephemerides
 
-} // namespace ephemerides
-
-} // namespace tudat
+}  // namespace tudat

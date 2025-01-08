@@ -15,13 +15,12 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
+#include <Eigen/Core>
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include <Eigen/Core>
-
-#include "tudat/astro/gravitation/jacobiEnergy.h"
 #include "tudat/astro/basic_astro/stateVectorIndices.h"
+#include "tudat/astro/gravitation/jacobiEnergy.h"
 namespace tudat
 {
 namespace unit_tests
@@ -35,7 +34,6 @@ BOOST_AUTO_TEST_CASE( testJacobiEnergy )
 {
     // Test 1: test Jacobi energy at L1.
     {
-
         // Set mass parameter for Earth-moon system. Value from Table 3.1 (Wakker, 2007).
         double massParameter = 0.01215;
 
@@ -50,12 +48,11 @@ BOOST_AUTO_TEST_CASE( testJacobiEnergy )
         double computedJacobiEnergy = computeJacobiEnergy( massParameter, stateAtL1 );
 
         // Check if expected Jacobi energy matches computed.
-        BOOST_CHECK_CLOSE_FRACTION( expectedJacobiEnergy,  computedJacobiEnergy, 1.0e-4 );
+        BOOST_CHECK_CLOSE_FRACTION( expectedJacobiEnergy, computedJacobiEnergy, 1.0e-4 );
     }
 
     // Test 2: test Jacobi energy at L4.
     {
-
         // Set mass parameter for Earth-moon system. Value from Table 3.1 (Wakker, 2007).
         double massParameter = 0.01215;
 
@@ -71,9 +68,9 @@ BOOST_AUTO_TEST_CASE( testJacobiEnergy )
         double computedJacobiEnergy = computeJacobiEnergy( massParameter, stateAtL4 );
 
         // Check if expected Jacobi energy matches computed.
-        BOOST_CHECK_CLOSE_FRACTION( expectedJacobiEnergy,  computedJacobiEnergy, 1.0e-6 );
+        BOOST_CHECK_CLOSE_FRACTION( expectedJacobiEnergy, computedJacobiEnergy, 1.0e-6 );
     }
 }
 
-} // namespace unit_tests
-} // namespace tudat
+}  // namespace unit_tests
+}  // namespace tudat

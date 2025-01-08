@@ -11,16 +11,16 @@
 #ifndef TUDAT_STATEREPRESENTATIONCONVERSIONS_H
 #define TUDAT_STATEREPRESENTATIONCONVERSIONS_H
 
+#include "tudat/astro/basic_astro/attitudeElementConversions.h"
+#include "tudat/astro/basic_astro/bodyShapeModel.h"
 #include "tudat/astro/basic_astro/convertMeanToEccentricAnomalies.h"
 #include "tudat/astro/basic_astro/geodeticCoordinateConversions.h"
-#include "tudat/astro/basic_astro/orbitalElementConversions.h"
 #include "tudat/astro/basic_astro/modifiedEquinoctialElementConversions.h"
-#include "tudat/astro/basic_astro/unifiedStateModelQuaternionElementConversions.h"
-#include "tudat/astro/basic_astro/unifiedStateModelModifiedRodriguesParameterElementConversions.h"
-#include "tudat/astro/basic_astro/unifiedStateModelExponentialMapElementConversions.h"
-#include "tudat/astro/basic_astro/attitudeElementConversions.h"
+#include "tudat/astro/basic_astro/orbitalElementConversions.h"
 #include "tudat/astro/basic_astro/stateVectorIndices.h"
-#include "tudat/astro/basic_astro/bodyShapeModel.h"
+#include "tudat/astro/basic_astro/unifiedStateModelExponentialMapElementConversions.h"
+#include "tudat/astro/basic_astro/unifiedStateModelModifiedRodriguesParameterElementConversions.h"
+#include "tudat/astro/basic_astro/unifiedStateModelQuaternionElementConversions.h"
 
 namespace tudat
 {
@@ -29,8 +29,7 @@ namespace coordinate_conversions
 {
 
 //! Enum defining available types of position representations
-enum StateElementTypes
-{
+enum StateElementTypes {
     cartesian_state,
     keplerian_state,
     modified_equinoctial_state,
@@ -40,12 +39,7 @@ enum StateElementTypes
 };
 
 //! Enum defining available types of position representations
-enum PositionElementTypes
-{
-    cartesian_position,
-    spherical_position,
-    geodetic_position
-};
+enum PositionElementTypes { cartesian_position, spherical_position, geodetic_position };
 
 //! Function to convert a position from one representation to another
 /*!
@@ -58,15 +52,14 @@ enum PositionElementTypes
  * \param tolerance Tolerance used for conversion (only required for specific element types, e.g. geodetic), default 0.1 mm.
  * \return Position in requested element type.
  */
-Eigen::Vector3d convertPositionElements(
-        const Eigen::Vector3d& originalElements,
-        const PositionElementTypes originalElementTypes,
-        const PositionElementTypes convertedElementTypes,
-        const std::shared_ptr< basic_astrodynamics::BodyShapeModel > shapeModel = nullptr,
-        const double tolerance = 1.0E-4 );
+Eigen::Vector3d convertPositionElements( const Eigen::Vector3d& originalElements,
+                                         const PositionElementTypes originalElementTypes,
+                                         const PositionElementTypes convertedElementTypes,
+                                         const std::shared_ptr< basic_astrodynamics::BodyShapeModel > shapeModel = nullptr,
+                                         const double tolerance = 1.0E-4 );
 
-}
+}  // namespace coordinate_conversions
 
-}
+}  // namespace tudat
 
-#endif // TUDAT_STATEREPRESENTATIONCONVERSIONS_H
+#endif  // TUDAT_STATEREPRESENTATIONCONVERSIONS_H

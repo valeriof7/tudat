@@ -12,22 +12,19 @@
 #ifndef TUDAT_EOPREADER_H
 #define TUDAT_EOPREADER_H
 
-#include <map>
-#include <string>
+#include <Eigen/Core>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <Eigen/Core>
+#include <map>
+#include <string>
 
 #include "tudat/astro/basic_astro/physicalConstants.h"
-#include "tudat/math/basic/mathematicalConstants.h"
-
-#include "tudat/io/basicInputOutput.h"
-
 #include "tudat/astro/basic_astro/timeConversions.h"
 #include "tudat/basics/utilities.h"
 #include "tudat/interface/sofa/earthOrientation.h"
+#include "tudat/io/basicInputOutput.h"
+#include "tudat/math/basic/mathematicalConstants.h"
 #include "tudat/paths.hpp"
-
 
 namespace tudat
 {
@@ -39,7 +36,6 @@ namespace earth_orientation
 class EOPReader
 {
 public:
-
     //! Constructor
     /*!
      * Constructor
@@ -47,10 +43,9 @@ public:
      * \param format Identifier for file format that is provied
      * \param nutationTheory Nutation theory w.r.t. which the EOP data is given.
      */
-    EOPReader(
-            const std::string& eopFile = tudat::paths::getEarthOrientationDataFilesPath( ) + "/eopc04_14_IAU2000.62-now.txt",
-            const std::string& format = "C04",
-            const basic_astrodynamics::IAUConventions nutationTheory = basic_astrodynamics::iau_2006 );
+    EOPReader( const std::string& eopFile = tudat::paths::getEarthOrientationDataFilesPath( ) + "/eopc04_14_IAU2000.62-now.txt",
+               const std::string& format = "C04",
+               const basic_astrodynamics::IAUConventions nutationTheory = basic_astrodynamics::iau_2006 );
 
     //! Function to retrieve the data of UT1-UTC, as provided in the EOP file.
     std::map< double, double > getUt1MinusUtcMapRaw( )
@@ -61,11 +56,10 @@ public:
     //! Function to retrieve the data of UT1-UTC, with map key seconds since J2000
     std::map< double, double > getUt1MinusUtcMapInSecondsSinceJ2000( )
     {
-        return utilities::linearlyScaleKeyOfMap< double, double >
-                ( ut1MinusUtc,
-                  basic_astrodynamics::JULIAN_DAY_ON_J2000 - basic_astrodynamics::JULIAN_DAY_AT_0_MJD,
-                  physical_constants::JULIAN_DAY );
-
+        return utilities::linearlyScaleKeyOfMap< double, double >(
+                ut1MinusUtc,
+                basic_astrodynamics::JULIAN_DAY_ON_J2000 - basic_astrodynamics::JULIAN_DAY_AT_0_MJD,
+                physical_constants::JULIAN_DAY );
     }
 
     //! Function to retrieve the data of LOD offset, as provided in the EOP file.
@@ -85,18 +79,17 @@ public:
      */
     std::map< double, double > getLengthOfDayMapInSecondsSinceJ2000( )
     {
-        return utilities::linearlyScaleKeyOfMap< double, double >
-                ( lengthOfDayOffset,
-                  basic_astrodynamics::JULIAN_DAY_ON_J2000 - basic_astrodynamics::JULIAN_DAY_AT_0_MJD,
-                  physical_constants::JULIAN_DAY );
-
+        return utilities::linearlyScaleKeyOfMap< double, double >(
+                lengthOfDayOffset,
+                basic_astrodynamics::JULIAN_DAY_ON_J2000 - basic_astrodynamics::JULIAN_DAY_AT_0_MJD,
+                physical_constants::JULIAN_DAY );
     }
 
     //! Function to retrieve the data of CIP in ITRS correction (polar motion), as provided in the EOP file.
     /*!
-    *  Function to retrieve the data of CIP in ITRS correction (polar motion), as provided in the EOP file.
-    *  \return Data of CIP in ITRS correction (polar motion), as provided in the EOP file.
-    */
+     *  Function to retrieve the data of CIP in ITRS correction (polar motion), as provided in the EOP file.
+     *  \return Data of CIP in ITRS correction (polar motion), as provided in the EOP file.
+     */
     std::map< double, Eigen::Vector2d > getCipInItrsMapRaw( )
     {
         return cipInItrs;
@@ -104,23 +97,22 @@ public:
 
     //! Function to retrieve the data of CIP in ITRS correction (polar motion), with map key seconds since J2000
     /*!
-    *  Function to retrieve the data of CIP in ITRS correction (polar motion), with map key seconds since J2000
-    *  \return Data of CIP in ITRS correction (polar motion), with map key seconds since J2000
-    */
+     *  Function to retrieve the data of CIP in ITRS correction (polar motion), with map key seconds since J2000
+     *  \return Data of CIP in ITRS correction (polar motion), with map key seconds since J2000
+     */
     std::map< double, Eigen::Vector2d > getCipInItrsMapInSecondsSinceJ2000( )
     {
-        return utilities::linearlyScaleKeyOfMap< double, Eigen::Vector2d >
-                ( cipInItrs,
-                  basic_astrodynamics::JULIAN_DAY_ON_J2000 - basic_astrodynamics::JULIAN_DAY_AT_0_MJD,
-                  physical_constants::JULIAN_DAY );
-
+        return utilities::linearlyScaleKeyOfMap< double, Eigen::Vector2d >(
+                cipInItrs,
+                basic_astrodynamics::JULIAN_DAY_ON_J2000 - basic_astrodynamics::JULIAN_DAY_AT_0_MJD,
+                physical_constants::JULIAN_DAY );
     }
 
     //! Function to retrieve the data of CIP in GCRS correction (nutation), as provided in the EOP file.
     /*!
-    *  Function to retrieve the data of CIP in GCRS correction (nutation), as provided in the EOP file.
-    *  \return Data of CIP in GCRS correction (nutation), as provided in the EOP file.
-    */
+     *  Function to retrieve the data of CIP in GCRS correction (nutation), as provided in the EOP file.
+     *  \return Data of CIP in GCRS correction (nutation), as provided in the EOP file.
+     */
     std::map< double, Eigen::Vector2d > getCipInGcrsCorrectionMapRaw( )
     {
         return cipInGcrsCorrection;
@@ -128,20 +120,18 @@ public:
 
     //! Function to retrieve the data of CIP in GCRS correction (nutation), with map key seconds since J2000
     /*!
-    *  Function to retrieve the data of CIP in GCRS correction (nutation), with map key seconds since J2000
-    *  \return Data of CIP in GCRS correction (nutation), with map key seconds since J2000
-    */
+     *  Function to retrieve the data of CIP in GCRS correction (nutation), with map key seconds since J2000
+     *  \return Data of CIP in GCRS correction (nutation), with map key seconds since J2000
+     */
     std::map< double, Eigen::Vector2d > getCipInGcrsCorrectionMapInSecondsSinceJ2000( )
     {
-        return utilities::linearlyScaleKeyOfMap< double, Eigen::Vector2d >
-                ( cipInGcrsCorrection,
-                  basic_astrodynamics::JULIAN_DAY_ON_J2000 - basic_astrodynamics::JULIAN_DAY_AT_0_MJD,
-                  physical_constants::JULIAN_DAY );
-
+        return utilities::linearlyScaleKeyOfMap< double, Eigen::Vector2d >(
+                cipInGcrsCorrection,
+                basic_astrodynamics::JULIAN_DAY_ON_J2000 - basic_astrodynamics::JULIAN_DAY_AT_0_MJD,
+                physical_constants::JULIAN_DAY );
     }
 
 private:
-
     //! Function to read EOP file
     /*!
      * Function to read EOP file
@@ -160,11 +150,10 @@ private:
 
     //! Corrections to LOD, read from file
     std::map< double, double > lengthOfDayOffset;
-
 };
 
-}
+}  // namespace earth_orientation
 
-}
+}  // namespace tudat
 
-#endif // TUDAT_EOPREADER_H
+#endif  // TUDAT_EOPREADER_H

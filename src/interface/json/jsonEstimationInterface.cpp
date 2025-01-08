@@ -8,9 +8,9 @@
  *    http://tudat.tudelft.nl/LICENSE.
  */
 
-#include <getopt.h>
-
 #include "tudat/interface/json/jsonEstimationInterface.h"
+
+#include <getopt.h>
 
 namespace tudat
 {
@@ -18,14 +18,14 @@ namespace tudat
 namespace json_interface
 {
 
-//template class JsonEstimationManager< double, double >;
+// template class JsonEstimationManager< double, double >;
 
-//#if( BUILD_EXTENDED_PRECISION_PROPAGATION_TOOLS )
+// #if( BUILD_EXTENDED_PRECISION_PROPAGATION_TOOLS )
 ////template class JsonEstimationManager< Time, long double >;
 ////template class JsonEstimationManager< double, double >;
 ////template class JsonEstimationManager< Time, long double >;
-//#endif
+// #endif
 
-}
+}  // namespace json_interface
 
-}
+}  // namespace tudat

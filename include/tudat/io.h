@@ -17,8 +17,8 @@
 #include "io/dictionaryComparer.h"
 #include "io/dictionaryEntry.h"
 #include "io/dictionaryTools.h"
-#include "io/extractor.h"
 #include "io/extractSolarActivityData.h"
+#include "io/extractor.h"
 #include "io/fieldTransform.h"
 #include "io/fieldType.h"
 #include "io/fieldValue.h"
@@ -30,9 +30,9 @@
 #include "io/missileDatcomReader.h"
 #include "io/multiDimensionalArrayReader.h"
 #include "io/multiDimensionalArrayWriter.h"
+#include "io/parseSolarActivityData.h"
 #include "io/parsedDataVectorUtilities.h"
 #include "io/parser.h"
-#include "io/parseSolarActivityData.h"
 #include "io/readHistoryFromFile.h"
 #include "io/readOdfFile.h"
 #include "io/readTabulatedMediaCorrections.h"
@@ -45,4 +45,4 @@
 #include "io/twoLineElementsTextFileReader.h"
 #include "io/util.h"
 
-#endif // TUDAT_IO_H
+#endif  // TUDAT_IO_H

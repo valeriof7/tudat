@@ -11,10 +11,8 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
-#include <limits>
-
 #include <boost/test/unit_test.hpp>
-
+#include <limits>
 
 #include "tudat/astro/propagators/nBodyStateDerivative.h"
 #include "tudat/simulation/environment_setup/body.h"
@@ -55,18 +53,15 @@ BOOST_AUTO_TEST_CASE( testCentralBodyData )
     centralBodies.push_back( "Mars" );
 
     // Create dummy state functions.
-    std::map< std::string,
-              std::function< Eigen::Matrix< double, 6, 1 >( const double ) > > stateFunctions;
+    std::map< std::string, std::function< Eigen::Matrix< double, 6, 1 >( const double ) > > stateFunctions;
     for( unsigned int i = 0; i < bodiesToIntegrate.size( ); i++ )
     {
-        stateFunctions[ bodiesToIntegrate[ i ] ]
-            = [ ]( const double ){ return Eigen::Vector6d::Zero( ); };
+        stateFunctions[ bodiesToIntegrate[ i ] ] = []( const double ) { return Eigen::Vector6d::Zero( ); };
     }
 
     // Create central bodies object.
-    std::shared_ptr< CentralBodyData< double > > centralBodyData
-        = std::make_shared< CentralBodyData< double > >(
-                centralBodies, bodiesToIntegrate, stateFunctions, [ ]( const double ){ return Eigen::Vector6d::Zero( ); }, "SSB" );
+    std::shared_ptr< CentralBodyData< double > > centralBodyData = std::make_shared< CentralBodyData< double > >(
+            centralBodies, bodiesToIntegrate, stateFunctions, []( const double ) { return Eigen::Vector6d::Zero( ); }, "SSB" );
 
     // Get update order.
     std::vector< int > updateOrder = centralBodyData->getUpdateOrder( );
@@ -78,7 +73,7 @@ BOOST_AUTO_TEST_CASE( testCentralBodyData )
 
     // Check whether the update order is consistent with input data.
     BOOST_CHECK_EQUAL( updateOrderMap[ "Moon" ] < updateOrderMap[ "Earth" ], 0 );
-    BOOST_CHECK_EQUAL( updateOrderMap[ "Satellite1" ] < updateOrderMap[ "Moon" ], 0  );
+    BOOST_CHECK_EQUAL( updateOrderMap[ "Satellite1" ] < updateOrderMap[ "Moon" ], 0 );
     BOOST_CHECK_EQUAL( updateOrderMap[ "Phobos" ] < updateOrderMap[ "Mars" ], 0 );
     BOOST_CHECK_EQUAL( updateOrderMap[ "Deimos" ] < updateOrderMap[ "Mars" ], 0 );
     BOOST_CHECK_EQUAL( updateOrderMap[ "Satellite2" ] < updateOrderMap[ "Deimos" ], 0 );
@@ -86,6 +81,6 @@ BOOST_AUTO_TEST_CASE( testCentralBodyData )
 
 BOOST_AUTO_TEST_SUITE_END( )
 
-} // namespace unit_tests
+}  // namespace unit_tests
 
-} // namespace tudat
+}  // namespace tudat

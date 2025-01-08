@@ -11,16 +11,15 @@
 #ifndef TUDAT_FROMTHRUSTMASSRATEMODEL_H
 #define TUDAT_FROMTHRUSTMASSRATEMODEL_H
 
-#include <map>
-#include <vector>
-#include <functional>
-#include <memory>
-
 #include <Eigen/Core>
+#include <functional>
+#include <map>
+#include <memory>
+#include <vector>
 
 #include "tudat/astro/basic_astro/massRateModel.h"
-#include "tudat/math/basic/mathematicalConstants.h"
 #include "tudat/astro/propulsion/thrustAccelerationModel.h"
+#include "tudat/math/basic/mathematicalConstants.h"
 
 namespace tudat
 {
@@ -33,17 +32,15 @@ namespace propulsion
  *  The mass rate is directly obtained from the thrust accelerations. This class can be used to sum the mass rates due to
  *  any number of thrust acceleration models.
  */
-class FromThrustMassRateModel: public basic_astrodynamics::MassRateModel
+class FromThrustMassRateModel : public basic_astrodynamics::MassRateModel
 {
 public:
-
     //! Constructor taking single acceleration model.
     /*!
      *  Constructor taking single acceleration model.
      *  \param thrustAcceleration Thrust acceleration model from which the mass rate is to be retrieved.
      */
-    FromThrustMassRateModel(
-            const std::shared_ptr< ThrustAcceleration > thrustAcceleration )
+    FromThrustMassRateModel( const std::shared_ptr< ThrustAcceleration > thrustAcceleration )
     {
         thrustAccelerations_.push_back( thrustAcceleration );
     }
@@ -57,12 +54,12 @@ public:
     /*!
      * Constructor
      */
-    FromThrustMassRateModel(
-            const std::vector< std::shared_ptr< ThrustAcceleration > > thrustAccelerations ):
-        thrustAccelerations_( thrustAccelerations ){ }
+    FromThrustMassRateModel( const std::vector< std::shared_ptr< ThrustAcceleration > > thrustAccelerations ):
+        thrustAccelerations_( thrustAccelerations )
+    { }
 
     //! Destructor.
-    ~FromThrustMassRateModel( ){ }
+    ~FromThrustMassRateModel( ) { }
 
     //! Update member variables used by the mass rate model and compute the mass rate
     /*!
@@ -99,7 +96,7 @@ public:
 
     virtual void resetCurrentTime( )
     {
-        for( unsigned int i = 0; i < thrustAccelerations_.size( );i++ )
+        for( unsigned int i = 0; i < thrustAccelerations_.size( ); i++ )
         {
             thrustAccelerations_.at( i )->resetCurrentTime( );
         }
@@ -107,13 +104,12 @@ public:
     }
 
 private:
-
     //! List of thrust accelerations from which the total mass rate is to be computed.
     std::vector< std::shared_ptr< ThrustAcceleration > > thrustAccelerations_;
 };
 
-} // namespace propulsion
+}  // namespace propulsion
 
-} // namespace tudat
+}  // namespace tudat
 
-#endif // TUDAT_FROMTHRUSTMASSRATEMODEL_H
+#endif  // TUDAT_FROMTHRUSTMASSRATEMODEL_H

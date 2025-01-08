@@ -23,6 +23,7 @@
 #include "basic_astro/dissipativeTorqueModel.h"
 #include "basic_astro/empiricalAcceleration.h"
 #include "basic_astro/geodeticCoordinateConversions.h"
+#include "basic_astro/hybridBodyShapeModel.h"
 #include "basic_astro/keplerPropagator.h"
 #include "basic_astro/massRateModel.h"
 #include "basic_astro/missionGeometry.h"
@@ -30,10 +31,9 @@
 #include "basic_astro/oblateSpheroidBodyShapeModel.h"
 #include "basic_astro/orbitalElementConversions.h"
 #include "basic_astro/physicalConstants.h"
+#include "basic_astro/polyhedronBodyShapeModel.h"
 #include "basic_astro/polyhedronFuntions.h"
 #include "basic_astro/sphericalBodyShapeModel.h"
-#include "basic_astro/polyhedronBodyShapeModel.h"
-#include "basic_astro/hybridBodyShapeModel.h"
 #include "basic_astro/sphericalStateConversions.h"
 #include "basic_astro/stateRepresentationConversions.h"
 #include "basic_astro/stateVectorIndices.h"
@@ -45,4 +45,4 @@
 #include "basic_astro/unifiedStateModelQuaternionElementConversions.h"
 #include "basic_astro/unitConversions.h"
 
-#endif // TUDAT_BASIC_ASTRO_H
+#endif  // TUDAT_BASIC_ASTRO_H

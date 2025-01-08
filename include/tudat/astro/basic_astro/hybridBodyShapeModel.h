@@ -12,9 +12,10 @@
 #ifndef TUDAT_HYBRIDBODYSHAPEMODEL_H
 #define TUDAT_HYBRIDBODYSHAPEMODEL_H
 
-#include "tudat/math/basic/mathematicalConstants.h"
-#include "tudat/astro/basic_astro/bodyShapeModel.h"
 #include <iostream>
+
+#include "tudat/astro/basic_astro/bodyShapeModel.h"
+#include "tudat/math/basic/mathematicalConstants.h"
 
 namespace tudat
 {
@@ -24,10 +25,9 @@ namespace basic_astrodynamics
 // Hybrid body shape model, consisting of a low-resolution shape model used for high altitudes and high-resolution model
 // used for low altitudes. Useful when the evaluation of the altitude with high resolution is computationally expensive
 // (e.g. polyhedron model).
-class HybridBodyShapeModel: public BodyShapeModel
+class HybridBodyShapeModel : public BodyShapeModel
 {
 public:
-
     /*! Constructor.
      *
      * Constructor.
@@ -35,17 +35,15 @@ public:
      * @param highResolutionBodyShapeModel Model used to compute the altitude for altitudes lower than switchoverAltitude.
      * @param switchoverAltitude Altitude at which the model used to compute the altitude is changed.
      */
-    HybridBodyShapeModel(
-            const std::shared_ptr< BodyShapeModel > lowResolutionBodyShapeModel,
-            const std::shared_ptr< BodyShapeModel > highResolutionBodyShapeModel,
-            double switchoverAltitude):
-        lowResolutionBodyShapeModel_ ( lowResolutionBodyShapeModel ),
-        highResolutionBodyShapeModel_ ( highResolutionBodyShapeModel ),
-        switchoverAltitude_ ( switchoverAltitude )
+    HybridBodyShapeModel( const std::shared_ptr< BodyShapeModel > lowResolutionBodyShapeModel,
+                          const std::shared_ptr< BodyShapeModel > highResolutionBodyShapeModel,
+                          double switchoverAltitude ):
+        lowResolutionBodyShapeModel_( lowResolutionBodyShapeModel ), highResolutionBodyShapeModel_( highResolutionBodyShapeModel ),
+        switchoverAltitude_( switchoverAltitude )
     { }
 
     //! Destructor
-    ~HybridBodyShapeModel( ){ }
+    ~HybridBodyShapeModel( ) { }
 
     //! Calculates the altitude above the body.
     /*!
@@ -62,7 +60,7 @@ public:
         double altitude;
         double lowResolutionAltitude = lowResolutionBodyShapeModel_->getAltitude( bodyFixedPosition );
 
-        if ( lowResolutionAltitude > switchoverAltitude_ )
+        if( lowResolutionAltitude > switchoverAltitude_ )
         {
             altitude = lowResolutionAltitude;
         }
@@ -93,19 +91,18 @@ public:
     }
 
     // Function to return the low-resolution model used to compute the altitude for high-altitudes.
-    std::shared_ptr< BodyShapeModel > getLowResolutionBodyShapeModel ( )
+    std::shared_ptr< BodyShapeModel > getLowResolutionBodyShapeModel( )
     {
         return lowResolutionBodyShapeModel_;
     }
 
     // Function to return the high-resolution model used to compute the altitude for low-altitudes.
-    std::shared_ptr< BodyShapeModel > getHighResolutionBodyShapeModel ( )
+    std::shared_ptr< BodyShapeModel > getHighResolutionBodyShapeModel( )
     {
         return highResolutionBodyShapeModel_;
     }
 
 private:
-
     // Model used to compute the altitude for altitudes higher than switchoverAltitude.
     std::shared_ptr< BodyShapeModel > lowResolutionBodyShapeModel_;
 
@@ -116,8 +113,7 @@ private:
     double switchoverAltitude_;
 };
 
+}  // namespace basic_astrodynamics
+}  // namespace tudat
 
-} // namespace basic_astrodynamics
-} // namespace tudat
-
-#endif //TUDAT_HYBRIDBODYSHAPEMODEL_H
+#endif  // TUDAT_HYBRIDBODYSHAPEMODEL_H

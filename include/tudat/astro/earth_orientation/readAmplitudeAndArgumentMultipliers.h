@@ -12,10 +12,9 @@
 #ifndef TUDAT_READAMPLITUDEANDARGUMENTMULTIPLIERS_H
 #define TUDAT_READAMPLITUDEANDARGUMENTMULTIPLIERS_H
 
+#include <Eigen/Core>
 #include <cmath>
 #include <string>
-
-#include <Eigen/Core>
 
 namespace tudat
 {
@@ -54,13 +53,12 @@ std::pair< Eigen::MatrixXd, Eigen::MatrixXd > readAmplitudesAndFundamentalArgume
  *   is sufficient. A single entry is stored on a single row with same index for fundamental argument
  *   multipliers and amplitude.
  */
-std::pair< Eigen::MatrixXd, Eigen::MatrixXd > filterRawDataForAmplitudes(
-        const Eigen::MatrixXd rawAmplitudes,
-        const Eigen::MatrixXd rawFundamentalArgumentMultipliers,
-        const double minimumAmplitude );
+std::pair< Eigen::MatrixXd, Eigen::MatrixXd > filterRawDataForAmplitudes( const Eigen::MatrixXd rawAmplitudes,
+                                                                          const Eigen::MatrixXd rawFundamentalArgumentMultipliers,
+                                                                          const double minimumAmplitude );
 
-}
+}  // namespace earth_orientation
 
-}
+}  // namespace tudat
 
-#endif // TUDAT_READAMPLITUDEANDARGUMENTMULTIPLIERS_H
+#endif  // TUDAT_READAMPLITUDEANDARGUMENTMULTIPLIERS_H

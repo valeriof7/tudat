@@ -11,38 +11,33 @@
 #ifndef TUDAT_SIMULATIONHEADER_H
 #define TUDAT_SIMULATIONHEADER_H
 
-#include "tudat/astro/basic_astro/physicalConstants.h"
-#include "tudat/astro/basic_astro/timeConversions.h"
-#include "tudat/astro/basic_astro/unitConversions.h"
 #include "tudat/astro/basic_astro/keplerPropagator.h"
+#include "tudat/astro/basic_astro/physicalConstants.h"
 #include "tudat/astro/basic_astro/sphericalStateConversions.h"
 #include "tudat/astro/basic_astro/stateRepresentationConversions.h"
+#include "tudat/astro/basic_astro/timeConversions.h"
+#include "tudat/astro/basic_astro/unitConversions.h"
 #include "tudat/astro/reference_frames/referenceFrameTransformations.h"
-
+#include "tudat/basics/basicTypedefs.h"
+#include "tudat/interface/spice/spiceInterface.h"
 #include "tudat/io/basicInputOutput.h"
 #include "tudat/io/mapTextFileReader.h"
-
-#include "tudat/basics/basicTypedefs.h"
-
 #include "tudat/math/basic/linearAlgebra.h"
 #include "tudat/math/basic/mathematicalConstants.h"
 #include "tudat/math/integrators/createNumericalIntegrator.h"
 #include "tudat/math/interpolators/createInterpolator.h"
-#include "tudat/interface/spice/spiceInterface.h"
-
-
 #include "tudat/simulation/environment_setup/body.h"
-#include "tudat/simulation/environment_setup/createSystemModel.h"
 #include "tudat/simulation/environment_setup/createBodies.h"
+#include "tudat/simulation/environment_setup/createSystemModel.h"
 #include "tudat/simulation/environment_setup/defaultBodies.h"
 #include "tudat/simulation/environment_setup/thrustSettings.h"
 #include "tudat/simulation/estimation_setup/createEstimatableParameters.h"
+#include "tudat/simulation/estimation_setup/createNumericalSimulator.h"
 #include "tudat/simulation/estimation_setup/estimatableParameterSettings.h"
 #include "tudat/simulation/propagation_setup/accelerationSettings.h"
-#include "tudat/simulation/propagation_setup/propagationSettings.h"
-#include "tudat/simulation/propagation_setup/propagationOutputSettings.h"
-#include "tudat/simulation/propagation_setup/propagationTerminationSettings.h"
-#include "tudat/simulation/estimation_setup/createNumericalSimulator.h"
 #include "tudat/simulation/propagation_setup/createMassRateModels.h"
+#include "tudat/simulation/propagation_setup/propagationOutputSettings.h"
+#include "tudat/simulation/propagation_setup/propagationSettings.h"
+#include "tudat/simulation/propagation_setup/propagationTerminationSettings.h"
 
-#endif // TUDAT_SIMULATIONHEADER_H
+#endif  // TUDAT_SIMULATIONHEADER_H

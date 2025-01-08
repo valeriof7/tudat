@@ -12,9 +12,9 @@
 #define TUDAT_INERTIATENSORPARTIALS_H
 
 #include "tudat/astro/gravitation/secondDegreeGravitationalTorque.h"
-#include "tudat/astro/orbit_determination/rotational_dynamics_partials/torquePartial.h"
 #include "tudat/astro/orbit_determination/estimatable_parameters/sphericalHarmonicCosineCoefficients.h"
 #include "tudat/astro/orbit_determination/estimatable_parameters/sphericalHarmonicSineCoefficients.h"
+#include "tudat/astro/orbit_determination/rotational_dynamics_partials/torquePartial.h"
 #include "tudat/math/basic/linearAlgebra.h"
 
 namespace tudat
@@ -24,36 +24,24 @@ namespace acceleration_partials
 {
 
 const static Eigen::Matrix3d UNSCALED_INERTIAL_TENSOR_PARTIAL_WRT_C20 =
-        ( Eigen::Matrix3d( ) << 1.0 / 3.0, 0.0, 0.0,
-          0.0, 1.0 / 3.0, 0.0,
-          0.0, 0.0, -2.0 / 3.0 ).finished( );
-
+        ( Eigen::Matrix3d( ) << 1.0 / 3.0, 0.0, 0.0, 0.0, 1.0 / 3.0, 0.0, 0.0, 0.0, -2.0 / 3.0 ).finished( );
 
 const static Eigen::Matrix3d UNSCALED_INERTIAL_TENSOR_PARTIAL_WRT_C21 =
-        ( Eigen::Matrix3d( ) << 0.0, 0.0, -1.0,
-          0.0, 0.0, 0.0,
-          -1.0, 0.0, 0.0 ).finished( );
+        ( Eigen::Matrix3d( ) << 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0 ).finished( );
 
 const static Eigen::Matrix3d UNSCALED_INERTIAL_TENSOR_PARTIAL_WRT_C22 =
-        ( Eigen::Matrix3d( ) << -2.0, 0.0, 0.0,
-          0.0, 2.0, 0.0,
-          0.0, 0.0, 0.0 ).finished( );
+        ( Eigen::Matrix3d( ) << -2.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0 ).finished( );
 
 const static Eigen::Matrix3d UNSCALED_INERTIAL_TENSOR_PARTIAL_WRT_S21 =
-        ( Eigen::Matrix3d( ) << 0.0, 0.0, 0.0,
-          0.0, 0.0, -1.0,
-          0.0, -1.0, 0.0 ).finished( );
+        ( Eigen::Matrix3d( ) << 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, -1.0, 0.0 ).finished( );
 
 const static Eigen::Matrix3d UNSCALED_INERTIAL_TENSOR_PARTIAL_WRT_S22 =
-        ( Eigen::Matrix3d( ) << 0.0, -2.0, 0.0,
-          -2.0, 0.0, 0.0,
-          0.0, 0.0, 0.0 ).finished( );
+        ( Eigen::Matrix3d( ) << 0.0, -2.0, 0.0, -2.0, 0.0, 0.0, 0.0, 0.0, 0.0 ).finished( );
 
-const static Eigen::Matrix3d UNSCALED_INERTIAL_TENSOR_PARTIAL_WRT_MEAN_MOMENT =
-        Eigen::Matrix3d::Identity( );
+const static Eigen::Matrix3d UNSCALED_INERTIAL_TENSOR_PARTIAL_WRT_MEAN_MOMENT = Eigen::Matrix3d::Identity( );
 
-} // namespace acceleration_partials
+}  // namespace acceleration_partials
 
-} // namespace tudat
+}  // namespace tudat
 
-#endif // TUDAT_INERTIATENSORPARTIALS_H
+#endif  // TUDAT_INERTIATENSORPARTIALS_H

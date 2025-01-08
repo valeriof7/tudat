@@ -8,33 +8,27 @@
  *    http://tudat.tudelft.nl/LICENSE.
  */
 
-
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/test/unit_test.hpp>
 #include <limits>
 #include <string>
 
-#include <boost/test/unit_test.hpp>
-
+#include "tudat/astro/ground_stations/transmittingFrequencies.h"
 #include "tudat/basics/testMacros.h"
-#include "tudat/simulation/estimation.h"
-#include "tudat/simulation/estimation_setup.h"
-#include "tudat/simulation/estimation_setup/createEstimatableParameters.h"
-
 #include "tudat/io/readOdfFile.h"
 #include "tudat/io/readTabulatedMediaCorrections.h"
 #include "tudat/io/readTabulatedWeatherData.h"
+#include "tudat/simulation/estimation.h"
+#include "tudat/simulation/estimation_setup.h"
+#include "tudat/simulation/estimation_setup/createEstimatableParameters.h"
 #include "tudat/simulation/estimation_setup/processOdfFile.h"
 #include "tudat/simulation/estimation_setup/processTrackingTxtFile.h"
-
-#include <boost/date_time/gregorian/gregorian.hpp>
-
-#include "tudat/astro/ground_stations/transmittingFrequencies.h"
 #include "tudat/support/observationPartialTestFunctions.h"
 
-
-//Using declarations.
+// Using declarations.
 using namespace tudat::observation_models;
 using namespace tudat::orbit_determination;
 using namespace tudat::estimatable_parameters;
@@ -58,14 +52,12 @@ namespace tudat
 namespace unit_tests
 {
 
-
-
-BOOST_AUTO_TEST_SUITE( test_frequency_observation_partials)
+BOOST_AUTO_TEST_SUITE( test_frequency_observation_partials )
 
 class LinearStateWrapper
 {
 public:
-    LinearStateWrapper( const double referenceTime, Eigen::Vector6d referenceState  ):
+    LinearStateWrapper( const double referenceTime, Eigen::Vector6d referenceState ):
         referenceState_( referenceState ), referenceTime_( referenceTime )
     { }
 
@@ -90,34 +82,33 @@ public:
     Eigen::Vector6d referenceState_;
 };
 
-void testPartials(
-    const std::shared_ptr< observation_models::ObservationModel< 1, double, double > >  observationModel,
-    const std::shared_ptr< ObservationPartial< 1 > > observationPartial,
-    const std::shared_ptr< PositionPartialScaling > observationPartialScaling,
-    LinearStateWrapper& stateWrapper,
-    const double testObservationTime,
-    const std::shared_ptr<ObservationAncilliarySimulationSettings> ancilliarySettings = nullptr )
+void testPartials( const std::shared_ptr< observation_models::ObservationModel< 1, double, double > > observationModel,
+                   const std::shared_ptr< ObservationPartial< 1 > > observationPartial,
+                   const std::shared_ptr< PositionPartialScaling > observationPartialScaling,
+                   LinearStateWrapper& stateWrapper,
+                   const double testObservationTime,
+                   const std::shared_ptr< ObservationAncilliarySimulationSettings > ancilliarySettings = nullptr )
 {
     std::vector< Eigen::Vector6d > vectorOfStates;
     std::vector< double > vectorOfTimes;
 
     // Compute nominal observation
     Eigen::Matrix< double, 1, 1 > currentObservation = observationModel->computeObservationsWithLinkEndData(
-        testObservationTime, receiver, vectorOfTimes, vectorOfStates, ancilliarySettings );
+            testObservationTime, receiver, vectorOfTimes, vectorOfStates, ancilliarySettings );
 
     // Update scaling
     observationPartialScaling->update( vectorOfStates, vectorOfTimes, receiver, currentObservation );
 
     // Compute partial
-    std::vector< std::pair< Eigen::Matrix< double, 1, Eigen::Dynamic >, double > > singlePartialSet =
-        observationPartial->calculatePartial( vectorOfStates, vectorOfTimes, receiver, ancilliarySettings, currentObservation.template cast< double >( ) );
+    std::vector< std::pair< Eigen::Matrix< double, 1, Eigen::Dynamic >, double > > singlePartialSet = observationPartial->calculatePartial(
+            vectorOfStates, vectorOfTimes, receiver, ancilliarySettings, currentObservation.template cast< double >( ) );
 
     // Combine partial
     Eigen::Matrix< double, 1, 6 > totalPartial;
     totalPartial.setZero( );
     for( int i = 0; i < singlePartialSet.size( ); i++ )
     {
-        std::cout<<singlePartialSet.at( i ).first<<" "<<singlePartialSet.at( i ).second - testObservationTime<<std::endl;
+        std::cout << singlePartialSet.at( i ).first << " " << singlePartialSet.at( i ).second - testObservationTime << std::endl;
         totalPartial += singlePartialSet.at( i ).first;
     }
 
@@ -136,35 +127,34 @@ void testPartials(
         perturbedReferenceState( i ) += positionPerturbation;
         stateWrapper.setState( perturbedReferenceState );
         Eigen::Matrix< double, 1, 1 > upperturbedObservation = observationModel->computeObservationsWithLinkEndData(
-            testObservationTime, receiver, vectorOfTimes, vectorOfStates, ancilliarySettings );
+                testObservationTime, receiver, vectorOfTimes, vectorOfStates, ancilliarySettings );
 
         // Perturb parameter down
         perturbedReferenceState = nominalReferenceState;
         perturbedReferenceState( i ) -= positionPerturbation;
         stateWrapper.setState( perturbedReferenceState );
         Eigen::Matrix< double, 1, 1 > downperturbedObservation = observationModel->computeObservationsWithLinkEndData(
-            testObservationTime, receiver, vectorOfTimes, vectorOfStates, ancilliarySettings );
+                testObservationTime, receiver, vectorOfTimes, vectorOfStates, ancilliarySettings );
         numericalPartial( i ) = ( upperturbedObservation( 0 ) - downperturbedObservation( 0 ) ) / ( 2.0 * positionPerturbation );
-
 
         perturbedReferenceState = nominalReferenceState;
         perturbedReferenceState( i + 3 ) += velocityPerturbation;
         stateWrapper.setState( perturbedReferenceState );
         upperturbedObservation = observationModel->computeObservationsWithLinkEndData(
-            testObservationTime, receiver, vectorOfTimes, vectorOfStates, ancilliarySettings );
+                testObservationTime, receiver, vectorOfTimes, vectorOfStates, ancilliarySettings );
 
         perturbedReferenceState = nominalReferenceState;
         perturbedReferenceState( i + 3 ) -= velocityPerturbation;
         stateWrapper.setState( perturbedReferenceState );
         downperturbedObservation = observationModel->computeObservationsWithLinkEndData(
-            testObservationTime, receiver, vectorOfTimes, vectorOfStates, ancilliarySettings );
+                testObservationTime, receiver, vectorOfTimes, vectorOfStates, ancilliarySettings );
         stateWrapper.referenceState_( i + 3 ) += velocityPerturbation;
         numericalPartial( i + 3 ) = ( upperturbedObservation( 0 ) - downperturbedObservation( 0 ) ) / ( 2.0 * velocityPerturbation );
     }
-//    std::cout<<"ANA: "<<totalPartial<<std::endl;
-//    std::cout<<"NUM: "<<numericalPartial.transpose( )<<std::endl;
-    std::cout<<"Relative error "<<( totalPartial - numericalPartial.transpose( ) ).cwiseQuotient( totalPartial )<<std::endl<<std::endl;
-
+    //    std::cout<<"ANA: "<<totalPartial<<std::endl;
+    //    std::cout<<"NUM: "<<numericalPartial.transpose( )<<std::endl;
+    std::cout << "Relative error " << ( totalPartial - numericalPartial.transpose( ) ).cwiseQuotient( totalPartial ) << std::endl
+              << std::endl;
 }
 
 //! Test partial derivatives of observed frequency observable, using general test suite of observation partials.
@@ -179,26 +169,22 @@ BOOST_AUTO_TEST_CASE( testFrequencyDopplerPartials )
     spice_interface::loadSpiceKernelInTudat( tudat::paths::getTudatTestDataPath( ) + "juice_orbc_000074_230414_310721_v01.bsp" );
 
     // Define bodies to use.
-    std::vector<std::string> bodiesToCreate = { "Earth", "Moon", "Sun", "Jupiter" };
+    std::vector< std::string > bodiesToCreate = { "Earth", "Moon", "Sun", "Jupiter" };
     std::string globalFrameOrigin = "SSB";
     std::string globalFrameOrientation = "J2000";
 
     // Create bodies settings needed in simulation
-    BodyListSettings bodySettings = getDefaultBodySettings(
-        bodiesToCreate, globalFrameOrigin, globalFrameOrientation );
+    BodyListSettings bodySettings = getDefaultBodySettings( bodiesToCreate, globalFrameOrigin, globalFrameOrientation );
 
     // Add ground stations
-    std::shared_ptr<GroundStationSettings> nnorciaSettings = std::make_shared<GroundStationSettings>(
-        "NWNORCIA", getCombinedApproximateGroundStationPositions( ).at( "NWNORCIA" ));
-    nnorciaSettings->addStationMotionSettings(
-        std::make_shared<LinearGroundStationMotionSettings>(
-            ( Eigen::Vector3d( ) << -45.00, 10.00, 47.00 ).finished( ) / 1.0E3 / physical_constants::JULIAN_YEAR,
-            0.0 ));
-    std::shared_ptr<GroundStationSettings> yarragadeeSettings = std::make_shared<GroundStationSettings>(
-        "YARRAGAD", getCombinedApproximateGroundStationPositions( ).at( "YARRAGAD" ));
-    yarragadeeSettings->addStationMotionSettings(
-        std::make_shared<LinearGroundStationMotionSettings>(
-            ( Eigen::Vector3d( ) << -47.45, 9.12, 51.76 ).finished( ) / 1.0E3 / physical_constants::JULIAN_YEAR, 0.0 ));
+    std::shared_ptr< GroundStationSettings > nnorciaSettings =
+            std::make_shared< GroundStationSettings >( "NWNORCIA", getCombinedApproximateGroundStationPositions( ).at( "NWNORCIA" ) );
+    nnorciaSettings->addStationMotionSettings( std::make_shared< LinearGroundStationMotionSettings >(
+            ( Eigen::Vector3d( ) << -45.00, 10.00, 47.00 ).finished( ) / 1.0E3 / physical_constants::JULIAN_YEAR, 0.0 ) );
+    std::shared_ptr< GroundStationSettings > yarragadeeSettings =
+            std::make_shared< GroundStationSettings >( "YARRAGAD", getCombinedApproximateGroundStationPositions( ).at( "YARRAGAD" ) );
+    yarragadeeSettings->addStationMotionSettings( std::make_shared< LinearGroundStationMotionSettings >(
+            ( Eigen::Vector3d( ) << -47.45, 9.12, 51.76 ).finished( ) / 1.0E3 / physical_constants::JULIAN_YEAR, 0.0 ) );
     bodySettings.at( "Earth" )->groundStationSettings.push_back( nnorciaSettings );
     bodySettings.at( "Earth" )->groundStationSettings.push_back( yarragadeeSettings );
 
@@ -208,16 +194,16 @@ BOOST_AUTO_TEST_CASE( testFrequencyDopplerPartials )
     bodySettings.addSettings( spacecraftName );
 
     // Create custom spacecraft ephemeris
-    LinearStateWrapper stateWrapper( referenceTime, spice_interface::getBodyCartesianStateAtEpoch(
-        "JUICE", "Earth", "J2000", "None", referenceTime ) );
+    LinearStateWrapper stateWrapper( referenceTime,
+                                     spice_interface::getBodyCartesianStateAtEpoch( "JUICE", "Earth", "J2000", "None", referenceTime ) );
     bodySettings.get( spacecraftName )->ephemerisSettings = customEphemerisSettings(
-        std::bind( &LinearStateWrapper::getLinearState, &stateWrapper, std::placeholders::_1 ), "Earth", "J2000" );
+            std::bind( &LinearStateWrapper::getLinearState, &stateWrapper, std::placeholders::_1 ), "Earth", "J2000" );
 
     // Create bodies
     SystemOfBodies bodies = createSystemOfBodies( bodySettings );
 
     // Set turnaround ratios in spacecraft (ground station)
-    std::shared_ptr<system_models::VehicleSystems> vehicleSystems = std::make_shared<system_models::VehicleSystems>( );
+    std::shared_ptr< system_models::VehicleSystems > vehicleSystems = std::make_shared< system_models::VehicleSystems >( );
     vehicleSystems->setTransponderTurnaroundRatio( &getDsnDefaultTurnaroundRatios );
     double xBandRatio = getDsnDefaultTurnaroundRatios( x_band, x_band );
     bodies.at( spacecraftName )->setVehicleSystems( vehicleSystems );
@@ -225,98 +211,110 @@ BOOST_AUTO_TEST_CASE( testFrequencyDopplerPartials )
 
     // Set station transmitting frequencies
     double transmissionFrequency = 7180127320;
-    std::shared_ptr<ground_stations::StationFrequencyInterpolator> transmittingFrequencyCalculator =
-        std::make_shared<ground_stations::ConstantFrequencyInterpolator>( transmissionFrequency );
-    bodies.at( "Earth" )->getGroundStation( "NWNORCIA" )->setTransmittingFrequencyCalculator(
-        transmittingFrequencyCalculator );
+    std::shared_ptr< ground_stations::StationFrequencyInterpolator > transmittingFrequencyCalculator =
+            std::make_shared< ground_stations::ConstantFrequencyInterpolator >( transmissionFrequency );
+    bodies.at( "Earth" )->getGroundStation( "NWNORCIA" )->setTransmittingFrequencyCalculator( transmittingFrequencyCalculator );
 
     // Define link ends for observations.
     LinkEnds linkEnds;
-    linkEnds[ transmitter ] = std::make_pair<std::string, std::string>( "Earth", static_cast<std::string>( "NWNORCIA" ));
-    linkEnds[ retransmitter ] = std::make_pair<std::string, std::string>( static_cast<std::string>(spacecraftName), "" );
-    linkEnds[ receiver ] = std::make_pair<std::string, std::string>( "Earth", static_cast<std::string>( "YARRAGAD" ));
+    linkEnds[ transmitter ] = std::make_pair< std::string, std::string >( "Earth", static_cast< std::string >( "NWNORCIA" ) );
+    linkEnds[ retransmitter ] = std::make_pair< std::string, std::string >( static_cast< std::string >( spacecraftName ), "" );
+    linkEnds[ receiver ] = std::make_pair< std::string, std::string >( "Earth", static_cast< std::string >( "YARRAGAD" ) );
 
     // Create observation settings
     std::vector< std::shared_ptr< LightTimeCorrectionSettings > > lightTimeCorrectionsList;
-//        lightTimeCorrectionsList.push_back( std::make_shared< FirstOrderRelativisticLightTimeCorrectionSettings >( std::vector< std::string >( { "Sun", "Moon", "Earth" } ) ) );
+    //        lightTimeCorrectionsList.push_back( std::make_shared< FirstOrderRelativisticLightTimeCorrectionSettings >( std::vector<
+    //        std::string >( { "Sun", "Moon", "Earth" } ) ) );
 
     // Create Doppler model (m/s)
-    std::shared_ptr<DopplerMeasuredFrequencyObservationModel<double, double> > dopplerFrequencyObservationModel =
-        std::dynamic_pointer_cast<DopplerMeasuredFrequencyObservationModel<double, double>>(
-            ObservationModelCreator<1, double, double>::createObservationModel(
-                std::make_shared<ObservationModelSettings>( doppler_measured_frequency, linkEnds, lightTimeCorrectionsList   ), bodies ));
+    std::shared_ptr< DopplerMeasuredFrequencyObservationModel< double, double > > dopplerFrequencyObservationModel =
+            std::dynamic_pointer_cast< DopplerMeasuredFrequencyObservationModel< double, double > >(
+                    ObservationModelCreator< 1, double, double >::createObservationModel(
+                            std::make_shared< ObservationModelSettings >( doppler_measured_frequency, linkEnds, lightTimeCorrectionsList ),
+                            bodies ) );
 
     // Create ancilliary settings
-    std::shared_ptr<ObservationAncilliarySimulationSettings> ancillarySettings =
-        std::make_shared<ObservationAncilliarySimulationSettings>( );
+    std::shared_ptr< ObservationAncilliarySimulationSettings > ancillarySettings =
+            std::make_shared< ObservationAncilliarySimulationSettings >( );
     ancillarySettings->setAncilliaryDoubleVectorData( frequency_bands, { x_band, x_band } );
 
     // Create Doppler model (frequency)
-    std::shared_ptr<TwoWayDopplerObservationModel<double, double> > twoWayDopplerObservationModel =
-        std::dynamic_pointer_cast<TwoWayDopplerObservationModel<double, double>>(
-            ObservationModelCreator<1, double, double>::createObservationModel(
-                std::make_shared<TwoWayDopplerObservationSettings>( linkEnds, lightTimeCorrectionsList  ), bodies ) );
+    std::shared_ptr< TwoWayDopplerObservationModel< double, double > > twoWayDopplerObservationModel =
+            std::dynamic_pointer_cast< TwoWayDopplerObservationModel< double, double > >(
+                    ObservationModelCreator< 1, double, double >::createObservationModel(
+                            std::make_shared< TwoWayDopplerObservationSettings >( linkEnds, lightTimeCorrectionsList ), bodies ) );
 
     // Define link end
     LinkEndType referenceLinkEnd = receiver;
 
     // Create acceleration settings
     SelectedAccelerationMap accelerationMap;
-    std::map<std::string, std::vector<std::shared_ptr<AccelerationSettings> > > accelerationsOfSpacecraft;
-    accelerationsOfSpacecraft[ "Earth" ].push_back( std::make_shared<AccelerationSettings >( point_mass_gravity ));
+    std::map< std::string, std::vector< std::shared_ptr< AccelerationSettings > > > accelerationsOfSpacecraft;
+    accelerationsOfSpacecraft[ "Earth" ].push_back( std::make_shared< AccelerationSettings >( point_mass_gravity ) );
     accelerationMap[ "JUICE" ] = accelerationsOfSpacecraft;
 
     // Set bodies for which initial state is to be estimated and integrated.
-    std::vector<std::string> bodiesToEstimate = { "JUICE" };
-    std::vector<std::string> centralBodies = { "Earth" };
-    AccelerationMap accelerationModelMap = createAccelerationModelsMap(
-        bodies, accelerationMap, bodiesToEstimate, centralBodies );
+    std::vector< std::string > bodiesToEstimate = { "JUICE" };
+    std::vector< std::string > centralBodies = { "Earth" };
+    AccelerationMap accelerationModelMap = createAccelerationModelsMap( bodies, accelerationMap, bodiesToEstimate, centralBodies );
 
     // Get initial state from Spice kernel
     Eigen::VectorXd initialState = getInitialStateOfBody( "JUICE", "Earth", bodies, referenceTime );
 
     // Define propagator settings
-    std::shared_ptr<TranslationalStatePropagatorSettings<double, double> > propagatorSettings =
-        std::make_shared<TranslationalStatePropagatorSettings<double, double> >
-            ( centralBodies, accelerationModelMap, bodiesToEstimate, initialState.template cast<double>( ),
-              double( referenceTime ), numerical_integrators::rungeKuttaFixedStepSettings<double>( 10.0, numerical_integrators::rungeKuttaFehlberg78 ),
-              std::make_shared<PropagationTimeTerminationSettings>( referenceTime + 3600.0 ));
+    std::shared_ptr< TranslationalStatePropagatorSettings< double, double > > propagatorSettings =
+            std::make_shared< TranslationalStatePropagatorSettings< double, double > >(
+                    centralBodies,
+                    accelerationModelMap,
+                    bodiesToEstimate,
+                    initialState.template cast< double >( ),
+                    double( referenceTime ),
+                    numerical_integrators::rungeKuttaFixedStepSettings< double >( 10.0, numerical_integrators::rungeKuttaFehlberg78 ),
+                    std::make_shared< PropagationTimeTerminationSettings >( referenceTime + 3600.0 ) );
 
     // Create parameters
-    std::vector<std::shared_ptr<EstimatableParameterSettings> > parameterNames = getInitialStateParameterSettings<double, double>( propagatorSettings, bodies );
-    std::shared_ptr<estimatable_parameters::EstimatableParameterSet<double> > parametersToEstimate =
-        createParametersToEstimate<double, double>( parameterNames, bodies, propagatorSettings );
+    std::vector< std::shared_ptr< EstimatableParameterSettings > > parameterNames =
+            getInitialStateParameterSettings< double, double >( propagatorSettings, bodies );
+    std::shared_ptr< estimatable_parameters::EstimatableParameterSet< double > > parametersToEstimate =
+            createParametersToEstimate< double, double >( parameterNames, bodies, propagatorSettings );
 
     // Manually create partials for doppler observable (m/s)
     std::map< LinkEnds, std::shared_ptr< observation_models::ObservationModel< 1, double, double > > > twoWayDopplerObservationModelList;
     twoWayDopplerObservationModelList[ linkEnds ] = twoWayDopplerObservationModel;
-    std::map< LinkEnds, std::pair< std::map< std::pair< int, int >,
-        std::shared_ptr< ObservationPartial< 1 > > >,
-        std::shared_ptr< PositionPartialScaling > > > twoWayDopplerObservationPartialsAndScaler = createObservablePartialsList(
-            twoWayDopplerObservationModelList, bodies, parametersToEstimate, false, false );
-    std::shared_ptr< ObservationPartial< 1 > > twoWayDopplerPartial = twoWayDopplerObservationPartialsAndScaler.begin( )->second.first.begin( )->second;
+    std::map< LinkEnds,
+              std::pair< std::map< std::pair< int, int >, std::shared_ptr< ObservationPartial< 1 > > >,
+                         std::shared_ptr< PositionPartialScaling > > >
+            twoWayDopplerObservationPartialsAndScaler =
+                    createObservablePartialsList( twoWayDopplerObservationModelList, bodies, parametersToEstimate, false, false );
+    std::shared_ptr< ObservationPartial< 1 > > twoWayDopplerPartial =
+            twoWayDopplerObservationPartialsAndScaler.begin( )->second.first.begin( )->second;
     std::shared_ptr< PositionPartialScaling > twoWayDopplerScaling = twoWayDopplerObservationPartialsAndScaler.begin( )->second.second;
 
     // Manually create partials for doppler observable (frequency)
     std::map< LinkEnds, std::shared_ptr< observation_models::ObservationModel< 1, double, double > > > frequencyDopplerObservationModelList;
     frequencyDopplerObservationModelList[ linkEnds ] = dopplerFrequencyObservationModel;
-    std::map< LinkEnds, std::pair< std::map< std::pair< int, int >,
-        std::shared_ptr< ObservationPartial< 1 > > >,
-        std::shared_ptr< PositionPartialScaling > > > frequencyDopplerObservationPartialsAndScaler = createObservablePartialsList(
-        frequencyDopplerObservationModelList, bodies, parametersToEstimate, false, false );
-    std::shared_ptr< ObservationPartial< 1 > > frequencyDopplerPartial = frequencyDopplerObservationPartialsAndScaler.begin( )->second.first.begin( )->second;
-    std::shared_ptr< PositionPartialScaling > frequencyDopplerScaling = frequencyDopplerObservationPartialsAndScaler.begin( )->second.second;
+    std::map< LinkEnds,
+              std::pair< std::map< std::pair< int, int >, std::shared_ptr< ObservationPartial< 1 > > >,
+                         std::shared_ptr< PositionPartialScaling > > >
+            frequencyDopplerObservationPartialsAndScaler =
+                    createObservablePartialsList( frequencyDopplerObservationModelList, bodies, parametersToEstimate, false, false );
+    std::shared_ptr< ObservationPartial< 1 > > frequencyDopplerPartial =
+            frequencyDopplerObservationPartialsAndScaler.begin( )->second.first.begin( )->second;
+    std::shared_ptr< PositionPartialScaling > frequencyDopplerScaling =
+            frequencyDopplerObservationPartialsAndScaler.begin( )->second.second;
 
     // Compute manual
     testPartials( twoWayDopplerObservationModel, twoWayDopplerPartial, twoWayDopplerScaling, stateWrapper, referenceTime );
-    testPartials( dopplerFrequencyObservationModel, frequencyDopplerPartial, frequencyDopplerScaling, stateWrapper, referenceTime, ancillarySettings );
-
+    testPartials( dopplerFrequencyObservationModel,
+                  frequencyDopplerPartial,
+                  frequencyDopplerScaling,
+                  stateWrapper,
+                  referenceTime,
+                  ancillarySettings );
 }
-
 
 BOOST_AUTO_TEST_SUITE_END( )
 
+}  // namespace unit_tests
 
-}// namespace unit_tests
-
-}// namespace tudat
+}  // namespace tudat

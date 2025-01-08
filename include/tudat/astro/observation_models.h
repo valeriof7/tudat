@@ -12,6 +12,10 @@
 #define TUDAT_OBSERVATION_MODELS_H
 
 #include "observation_models/angularPositionObservationModel.h"
+#include "observation_models/corrections/atmosphereCorrection.h"
+#include "observation_models/corrections/firstOrderRelativisticCorrection.h"
+#include "observation_models/corrections/lightTimeCorrection.h"
+#include "observation_models/corrections/solarCoronaCorrection.h"
 #include "observation_models/dsnNWayAveragedDopplerObservationModel.h"
 #include "observation_models/eulerAngleObservationModel.h"
 #include "observation_models/lightTimeSolution.h"
@@ -27,12 +31,8 @@
 #include "observation_models/oneWayDopplerObservationModel.h"
 #include "observation_models/oneWayRangeObservationModel.h"
 #include "observation_models/positionObservationModel.h"
+#include "observation_models/relativeAngularPositionObservationModel.h"
 #include "observation_models/twoWayDopplerObservationModel.h"
 #include "observation_models/velocityObservationModel.h"
-#include "observation_models/relativeAngularPositionObservationModel.h"
-#include "observation_models/corrections/lightTimeCorrection.h"
-#include "observation_models/corrections/firstOrderRelativisticCorrection.h"
-#include "observation_models/corrections/atmosphereCorrection.h"
-#include "observation_models/corrections/solarCoronaCorrection.h"
 
-#endif // TUDAT_OBSERVATION_MODELS_H
+#endif  // TUDAT_OBSERVATION_MODELS_H

@@ -9,10 +9,10 @@
  *
  */
 
+#include "tudat/math/basic/basicMathematicsFunctions.h"
+
 #include <cmath>
 #include <ctime>
-
-#include "tudat/math/basic/basicMathematicsFunctions.h"
 
 namespace tudat
 {
@@ -22,10 +22,9 @@ namespace basic_mathematics
 //! Get global random number generator.
 GlobalRandomNumberGeneratorType& getGlobalRandomNumberGenerator( )
 {
-  static GlobalRandomNumberGeneratorType globalRandomNumberGenerator(
-              static_cast< unsigned int >( std::time( 0 ) ) );
-  return globalRandomNumberGenerator;
+    static GlobalRandomNumberGeneratorType globalRandomNumberGenerator( static_cast< unsigned int >( std::time( 0 ) ) );
+    return globalRandomNumberGenerator;
 }
 
-} // namespace basic_mathematics
-} // namespace tudat
+}  // namespace basic_mathematics
+}  // namespace tudat

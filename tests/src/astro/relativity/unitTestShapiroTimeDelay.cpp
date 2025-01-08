@@ -8,19 +8,14 @@
  *    http://tudat.tudelft.nl/LICENSE.
  */
 
-
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
 #include <boost/test/unit_test.hpp>
 
-
-
-
-
-#include "tudat/astro/relativity/relativisticLightTimeCorrection.h"
 #include "tudat/astro/ephemerides/constantEphemeris.h"
 #include "tudat/astro/observation_models/corrections/firstOrderRelativisticCorrection.h"
+#include "tudat/astro/relativity/relativisticLightTimeCorrection.h"
 
 namespace tudat
 {
@@ -39,30 +34,31 @@ BOOST_AUTO_TEST_CASE( testShapiroDelay )
     Eigen::Vector6d groundStationState;
     groundStationState << 0.0, 0.0, 6378.0, 0.0, 0.0, 0.0;
     Eigen::Vector6d satelliteState;
-    satelliteState  <<  0.0, 0.0, 26600.0, 0.0, 0.0, 0.0;
+    satelliteState << 0.0, 0.0, 26600.0, 0.0, 0.0, 0.0;
     Eigen::Vector6d centralBodyPosition = Eigen::Vector6d::Zero( );
 
-    std::shared_ptr< ConstantEphemeris > ephemeris = std::make_shared< ConstantEphemeris >(
-                [ & ]( ){ return centralBodyPosition; } );
+    std::shared_ptr< ConstantEphemeris > ephemeris = std::make_shared< ConstantEphemeris >( [ & ]( ) { return centralBodyPosition; } );
 
     double earthGravitationalParameter = 398600.44189E9;
 
-    double directCalculation = calculateFirstOrderLightTimeCorrectionFromCentralBody(
-                earthGravitationalParameter, groundStationState.segment( 0, 3 ),
-                satelliteState.segment( 0, 3 ), centralBodyPosition.segment( 0, 3 ) );
+    double directCalculation = calculateFirstOrderLightTimeCorrectionFromCentralBody( earthGravitationalParameter,
+                                                                                      groundStationState.segment( 0, 3 ),
+                                                                                      satelliteState.segment( 0, 3 ),
+                                                                                      centralBodyPosition.segment( 0, 3 ) );
 
     std::vector< std::function< Eigen::Vector6d( const double ) > > perturbingBodyStateFunctions;
     std::vector< std::function< double( ) > > perturbingBodyGravitationalParameterFunctions;
 
     perturbingBodyStateFunctions.push_back( std::bind( &Ephemeris::getCartesianState, ephemeris, std::placeholders::_1 ) );
-    perturbingBodyGravitationalParameterFunctions.push_back( [ & ]( ){ return earthGravitationalParameter; } );
+    perturbingBodyGravitationalParameterFunctions.push_back( [ & ]( ) { return earthGravitationalParameter; } );
 
-    FirstOrderLightTimeCorrectionCalculator correctionCalculator(
-                perturbingBodyStateFunctions, perturbingBodyGravitationalParameterFunctions,
-                std::vector< std::string >{ "Earth" }, "Satellite", "Earth" );
+    FirstOrderLightTimeCorrectionCalculator correctionCalculator( perturbingBodyStateFunctions,
+                                                                  perturbingBodyGravitationalParameterFunctions,
+                                                                  std::vector< std::string >{ "Earth" },
+                                                                  "Satellite",
+                                                                  "Earth" );
 
-    double classInterfaceCalculation = correctionCalculator.calculateLightTimeCorrection(
-                groundStationState, satelliteState, 0.0, 0.0 );
+    double classInterfaceCalculation = correctionCalculator.calculateLightTimeCorrection( groundStationState, satelliteState, 0.0, 0.0 );
 
     // Living reviews in relativity, GPS.
     double expectedResult = 6.3E-3;
@@ -73,6 +69,6 @@ BOOST_AUTO_TEST_CASE( testShapiroDelay )
 
 BOOST_AUTO_TEST_SUITE_END( )
 
-}
+}  // namespace unit_tests
 
-}
+}  // namespace tudat

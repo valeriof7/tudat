@@ -12,12 +12,10 @@
 #ifndef TUDAT_TORUS_H
 #define TUDAT_TORUS_H
 
+#include <Eigen/Core>
 #include <memory>
 
-#include <Eigen/Core>
-
 #include "tudat/math/basic/mathematicalConstants.h"
-
 #include "tudat/math/geometric/singleSurfaceGeometry.h"
 
 namespace tudat
@@ -37,7 +35,6 @@ namespace geometric_shapes
 class Torus : public SingleSurfaceGeometry
 {
 public:
-
     //! Default constructor.
     /*!
      *  Default constructor. Default values set to full torus.
@@ -53,7 +50,8 @@ public:
      * \param maximumMinorCircumferentialAngle Maximum of circumferential angle 'subtended by
      *          minor radius'.
      */
-    Torus( const double majorRadius, const double minorRadius,
+    Torus( const double majorRadius,
+           const double minorRadius,
            const double minimumMajorCircumferentialAngle = 0.0,
            const double maximumMajorCircumferentialAngle = 2.0 * mathematical_constants::PI,
            const double minimumMinorCircumferentialAngle = 0.0,
@@ -71,8 +69,7 @@ public:
      *         torus at which to retrieve the surface point.
      * \return Point on torus in Cartesian coordinates.
      */
-    Eigen::VectorXd getSurfacePoint( const double majorCircumferentialAngle,
-                                     const double minorCircumferentialAngle );
+    Eigen::VectorXd getSurfacePoint( const double majorCircumferentialAngle, const double minorCircumferentialAngle );
 
     //! Get surface derivative on torus.
     /*!
@@ -112,42 +109,60 @@ public:
      * Returns the major radius.
      * \return Major radius.
      */
-    double getMajorRadius( ) { return majorRadius_; }
+    double getMajorRadius( )
+    {
+        return majorRadius_;
+    }
 
     //! Get minor radius.
     /*!
      * Returns the minor radius.
      * \return Minor radius.
      */
-    double getMinorRadius( ) { return minorRadius_; }
+    double getMinorRadius( )
+    {
+        return minorRadius_;
+    }
 
     //! Get maximum of major circumferential angle.
     /*!
      * Returns the maximum value of the major circumferential angle.
      * \return Maximum value of major circumferential angle.
      */
-    double getMaximumMajorCircumferentialAngle( ) { return getMaximumIndependentVariable( 1 ); }
+    double getMaximumMajorCircumferentialAngle( )
+    {
+        return getMaximumIndependentVariable( 1 );
+    }
 
     //! Get maximum of minor circumferential angle.
     /*!
      * Returns the maximum of the minor circumferential angle.
      * \return Maximum minor circumferential angle.
      */
-    double getMaximumMinorCircumferentialAngle( ) { return getMaximumIndependentVariable( 2 ); }
+    double getMaximumMinorCircumferentialAngle( )
+    {
+        return getMaximumIndependentVariable( 2 );
+    }
 
     //! Get minimum of major circumferential angle.
     /*!
      * Returns the minimum value of the major circumferential angle.
      * \return Minimum value of major circumferential angle.
      */
-    double getMinimumMajorCircumferentialAngle( ) { return getMinimumIndependentVariable( 1 ); }
+    double getMinimumMajorCircumferentialAngle( )
+    {
+        return getMinimumIndependentVariable( 1 );
+    }
 
     //! Get minimum of minor circumferential angle.
     /*!
      * Returns the minimum value of the minor circumferential angle.
      * \return Minimum value of minor circumferential angle.
      */
-    double getMinimumMinorCircumferentialAngle( ) { return getMinimumIndependentVariable( 2 ); }
+    double getMinimumMinorCircumferentialAngle( )
+    {
+        return getMinimumIndependentVariable( 2 );
+    }
 
     //! Overload ostream to print class information.
     /*!
@@ -158,12 +173,10 @@ public:
      * \param torus Torus frustum of which info is to be printed.
      * \return Stream with printed info.
      */
-    friend std::ostream &operator << ( std::ostream &stream, Torus& torus );
+    friend std::ostream &operator<<( std::ostream &stream, Torus &torus );
 
 protected:
-
 private:
-
     //! Major radius.
     /*!
      * Major radius, i.e. radius of center of torus to center of tube.
@@ -180,7 +193,7 @@ private:
 //! Typedef for shared-pointer to Torus object.
 typedef std::shared_ptr< Torus > TorusPointer;
 
-} // namespace geometric_shapes
-} // namespace tudat
+}  // namespace geometric_shapes
+}  // namespace tudat
 
-#endif // TUDAT_TORUS_H
+#endif  // TUDAT_TORUS_H

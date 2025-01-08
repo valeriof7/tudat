@@ -19,7 +19,7 @@
 #include "integrators/reinitializableNumericalIntegrator.h"
 #include "integrators/rungeKutta4Integrator.h"
 #include "integrators/rungeKuttaCoefficients.h"
-#include "integrators/rungeKuttaVariableStepSizeIntegrator.h"
 #include "integrators/rungeKuttaFixedStepSizeIntegrator.h"
+#include "integrators/rungeKuttaVariableStepSizeIntegrator.h"
 
-#endif // TUDAT_INTEGRATORS_H
+#endif  // TUDAT_INTEGRATORS_H

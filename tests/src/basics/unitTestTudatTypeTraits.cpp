@@ -11,15 +11,13 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
-#include <iostream>
-#include <type_traits>
-
-#include <boost/test/unit_test.hpp>
+#include <tudat/basics/timeType.h>
+#include <tudat/basics/tudatTypeTraits.h>
 
 #include <Eigen/Geometry>
-
-#include <tudat/basics/tudatTypeTraits.h>
-#include <tudat/basics/timeType.h>
+#include <boost/test/unit_test.hpp>
+#include <iostream>
+#include <type_traits>
 
 namespace tudat
 {
@@ -53,8 +51,6 @@ BOOST_AUTO_TEST_CASE( testTypeTraits )
     isTimeType = is_time_type< Time >::value;
     BOOST_CHECK_EQUAL( isTimeType, true );
 
-
-
     bool isStateType;
     isStateType = is_state_scalar< int >::value;
     BOOST_CHECK_EQUAL( isStateType, false );
@@ -70,8 +66,6 @@ BOOST_AUTO_TEST_CASE( testTypeTraits )
 
     isStateType = is_state_scalar< Time >::value;
     BOOST_CHECK_EQUAL( isStateType, false );
-
-
 
     bool isStateAndTimeType;
     isStateAndTimeType = is_state_scalar_and_time_type< int, int >::value;
@@ -95,7 +89,6 @@ BOOST_AUTO_TEST_CASE( testTypeTraits )
 
 BOOST_AUTO_TEST_SUITE_END( )
 
-}
+}  // namespace unit_tests
 
-}
-
+}  // namespace tudat

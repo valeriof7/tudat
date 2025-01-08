@@ -16,8 +16,8 @@
 #include "aerodynamics/aerodynamicCoefficientInterface.h"
 #include "aerodynamics/aerodynamicForce.h"
 #include "aerodynamics/aerodynamicGuidance.h"
-#include "aerodynamics/aerodynamics.h"
 #include "aerodynamics/aerodynamicTorque.h"
+#include "aerodynamics/aerodynamics.h"
 #include "aerodynamics/atmosphereModel.h"
 #include "aerodynamics/controlSurfaceAerodynamicCoefficientInterface.h"
 #include "aerodynamics/customAerodynamicCoefficientInterface.h"
@@ -33,4 +33,4 @@
 #include "aerodynamics/trimOrientation.h"
 #include "aerodynamics/windModel.h"
 
-#endif // TUDATPY_AERODYNAMICS__H
+#endif  // TUDATPY_AERODYNAMICS__H

@@ -12,7 +12,6 @@
 #define TUDAT_JSONINTERFACE_PATH_H
 
 #include <boost/filesystem.hpp>
-
 #include <nlohmann/json.hpp>
 
 #include "tudat/io/basicInputOutput.h"
@@ -24,8 +23,7 @@ namespace json_interface
 
 //! Names for replacable paths in JSON files.
 //! E.g., the text "${TUDAT_ROOT_PATH}" will be replaced with the actual path when reading JSON files.
-static std::vector< std::pair< std::string, std::string > > pathPlaceholders =
-{
+static std::vector< std::pair< std::string, std::string > > pathPlaceholders = {
     std::make_pair( "ATMOSPHERE_TABLES_PATH", paths::getAtmosphereTablesPath( ) + "/" ),
     std::make_pair( "SPICE_KERNELS_PATH", paths::getSpiceKernelPath( ) + "/" ),
     std::make_pair( "GRAVITY_MODELS_PATH", paths::getGravityModelsPath( ) + "/" )
@@ -48,10 +46,9 @@ std::string pathAddingPlaceholders( std::string path );
  */
 std::string pathRemovingPlaceholders( std::string path );
 
-} // namespace json_interface
+}  // namespace json_interface
 
-} // namespace tudat
-
+}  // namespace tudat
 
 namespace boost
 {
@@ -69,4 +66,4 @@ void from_json( const nlohmann::json& j, path& p );
 
 }  // namespace boost
 
-#endif // TUDAT_JSONINTERFACE_PATH_H
+#endif  // TUDAT_JSONINTERFACE_PATH_H

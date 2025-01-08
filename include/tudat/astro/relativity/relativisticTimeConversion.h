@@ -29,9 +29,9 @@ namespace relativity
  * \param equivalencePrincipleLpiViolationParameter Violation parameter of equivalence principle (default to GR value of 0.0
  * \return Proper time rate minus one (d tau/dt - 1.0)
  */
-double calculateFirstCentralBodyProperTimeRateDifference(
-        const double relativeSpeed, const double gravitationalScalarPotential,
-        const double equivalencePrincipleLpiViolationParameter = 0.0 );
+double calculateFirstCentralBodyProperTimeRateDifference( const double relativeSpeed,
+                                                          const double gravitationalScalarPotential,
+                                                          const double equivalencePrincipleLpiViolationParameter = 0.0 );
 
 //! Function to compute proper-time rate w.r.t. coordinate time, minus 1.0, for a 1/c^2 potential from a static mass monopole
 /*!
@@ -43,12 +43,12 @@ double calculateFirstCentralBodyProperTimeRateDifference(
  * \param equivalencePrincipleLpiViolationParameter Violation parameter of equivalence principle (default to GR value of 0.0
  * \return Proper time rate minus one (d tau/dt - 1.0)
  */
-double calculateFirstCentralBodyProperTimeRateDifference(
-        const Eigen::Vector6d relativeStateVector, const double centralBodyGravitationalParameter,
-        const double equivalencePrincipleLpiViolationParameter = 0.0 );
+double calculateFirstCentralBodyProperTimeRateDifference( const Eigen::Vector6d relativeStateVector,
+                                                          const double centralBodyGravitationalParameter,
+                                                          const double equivalencePrincipleLpiViolationParameter = 0.0 );
 
-}
+}  // namespace relativity
 
-}
+}  // namespace tudat
 
-#endif // TUDAT_RELATIVISTIVTIMECONVERSION_H
+#endif  // TUDAT_RELATIVISTIVTIMECONVERSION_H

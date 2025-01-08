@@ -12,11 +12,10 @@
 #ifndef TUDAT_AERODYNAMIC_TORQUE_H
 #define TUDAT_AERODYNAMIC_TORQUE_H
 
-#include <functional>
-#include <boost/lambda/lambda.hpp>
-#include <memory>
-
 #include <Eigen/Core>
+#include <boost/lambda/lambda.hpp>
+#include <functional>
+#include <memory>
 
 #include "tudat/astro/aerodynamics/aerodynamicCoefficientInterface.h"
 #include "tudat/astro/basic_astro/torqueModel.h"
@@ -41,7 +40,8 @@ namespace aerodynamics
  *          aerodynamic coefficients were given, but with opposite sign. i.e., a positive drag
  *          coefficient will give a negative force in -x direction (in the aerodynamic frame).
  */
-Eigen::Vector3d computeAerodynamicMoment( const double dynamicPressure, const double referenceArea,
+Eigen::Vector3d computeAerodynamicMoment( const double dynamicPressure,
+                                          const double referenceArea,
                                           const double referenceLength,
                                           const Eigen::Vector3d& momentCoefficients );
 
@@ -58,7 +58,8 @@ Eigen::Vector3d computeAerodynamicMoment( const double dynamicPressure, const do
  *          aerodynamic coefficients were given, but with opposite sign. i.e., a positive drag
  *          coefficient will give a negative force in -x direction (in the aerodynamic frame).
  */
-Eigen::Vector3d computeAerodynamicMoment( const double dynamicPressure, const double referenceArea,
+Eigen::Vector3d computeAerodynamicMoment( const double dynamicPressure,
+                                          const double referenceArea,
                                           const Eigen::Vector3d& referenceLengths,
                                           const Eigen::Vector3d& momentCoefficients );
 
@@ -74,23 +75,19 @@ Eigen::Vector3d computeAerodynamicMoment( const double dynamicPressure, const do
  * \return Resultant aerodynamic moment, given in reference frame in which the
  *          aerodynamic coefficients were given.
  */
-Eigen::Vector3d computeAerodynamicMoment(
-        const double dynamicPressure,
-        AerodynamicCoefficientInterfacePointer coefficientInterface );
+Eigen::Vector3d computeAerodynamicMoment( const double dynamicPressure, AerodynamicCoefficientInterfacePointer coefficientInterface );
 
 //! Class for calculation of aerodynamic torques.
 class AerodynamicTorque : public basic_astrodynamics::TorqueModel
 {
 private:
-
     //! Typedef for double-returning function.
-    typedef std::function< double ( ) > DoubleReturningFunction;
+    typedef std::function< double( ) > DoubleReturningFunction;
 
     //! Typedef for coefficient-returning function.
     typedef std::function< Eigen::Vector3d( ) > CoefficientReturningFunction;
 
 public:
-
     //! Acceleration torque constructor.
     /*!
      * Acceleration torque constructor, taking function pointers for all member variables.
@@ -110,11 +107,8 @@ public:
                        const DoubleReturningFunction referenceAreaFunction,
                        const CoefficientReturningFunction referenceLengthsFunction,
                        const bool areCoefficientsInNegativeDirection = true ):
-        coefficientFunction_( coefficientFunction ),
-        densityFunction_( densityFunction ),
-        airSpeedFunction_( airSpeedFunction ),
-        referenceAreaFunction_( referenceAreaFunction ),
-        referenceLengthsFunction_( referenceLengthsFunction )
+        coefficientFunction_( coefficientFunction ), densityFunction_( densityFunction ), airSpeedFunction_( airSpeedFunction ),
+        referenceAreaFunction_( referenceAreaFunction ), referenceLengthsFunction_( referenceLengthsFunction )
     {
         coefficientMultiplier_ = areCoefficientsInNegativeDirection ? -1.0 : 1.0;
     }
@@ -150,16 +144,16 @@ public:
             currentDensity_ = this->densityFunction_( );
             currentAirspeed_ = this->airSpeedFunction_( );
             currentReferenceArea_ = this->referenceAreaFunction_( );
-            currentReferenceLengths_ =  this->referenceLengthsFunction_( );
-            currentTorque_ = computeAerodynamicMoment(
-                        0.5 * currentDensity_ * currentAirspeed_ * currentAirspeed_,
-                        currentReferenceArea_, currentReferenceLengths_, currentMomentCoefficients_ );
+            currentReferenceLengths_ = this->referenceLengthsFunction_( );
+            currentTorque_ = computeAerodynamicMoment( 0.5 * currentDensity_ * currentAirspeed_ * currentAirspeed_,
+                                                       currentReferenceArea_,
+                                                       currentReferenceLengths_,
+                                                       currentMomentCoefficients_ );
             currentTime_ = currentTime;
         }
     }
 
 private:
-
     //! Function to retrieve the current aerodynamic moment coefficients.
     const CoefficientReturningFunction coefficientFunction_;
 
@@ -194,11 +188,10 @@ private:
 
     //! Multiplier to reverse direction of coefficients.
     double coefficientMultiplier_;
-
 };
 
-} // namespace aerodynamics
+}  // namespace aerodynamics
 
-} // namespace tudat
+}  // namespace tudat
 
-#endif // TUDAT_AERODYNAMIC_TORQUE_H
+#endif  // TUDAT_AERODYNAMIC_TORQUE_H

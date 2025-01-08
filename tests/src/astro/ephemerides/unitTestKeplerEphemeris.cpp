@@ -11,22 +11,20 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
+#include <Eigen/Core>
+#include <boost/test/tools/floating_point_comparison.hpp>
+#include <boost/test/unit_test.hpp>
 #include <limits>
 #include <map>
 
-#include <boost/test/tools/floating_point_comparison.hpp>
-#include <boost/test/unit_test.hpp>
-
-#include <Eigen/Core>
-
+#include "tudat/astro/basic_astro/keplerPropagator.h"
+#include "tudat/astro/basic_astro/keplerPropagatorTestData.h"
 #include "tudat/astro/basic_astro/orbitalElementConversions.h"
+#include "tudat/astro/ephemerides/keplerEphemeris.h"
 #include "tudat/basics/testMacros.h"
+#include "tudat/io/basicInputOutput.h"
 #include "tudat/math/basic/basicMathematicsFunctions.h"
 #include "tudat/math/basic/mathematicalConstants.h"
-#include "tudat/astro/basic_astro/keplerPropagatorTestData.h"
-#include "tudat/astro/basic_astro/keplerPropagator.h"
-#include "tudat/astro/ephemerides/keplerEphemeris.h"
-#include "tudat/io/basicInputOutput.h"
 
 namespace tudat
 {
@@ -50,24 +48,19 @@ BOOST_AUTO_TEST_CASE( testKeplerEphemerisElliptical )
     PropagationHistory computedPropagationHistory;
     computedPropagationHistory[ 0.0 ] = expectedPropagationHistory[ 0.0 ];
 
-    ephemerides::KeplerEphemeris keplerEphemeris(
-                expectedPropagationHistory[ 0.0 ],
-                0.0, earthGravitationalParameter );
+    ephemerides::KeplerEphemeris keplerEphemeris( expectedPropagationHistory[ 0.0 ], 0.0, earthGravitationalParameter );
 
     for( PropagationHistory::iterator stateIterator = expectedPropagationHistory.begin( );
-         stateIterator != expectedPropagationHistory.end( ); stateIterator++ )
+         stateIterator != expectedPropagationHistory.end( );
+         stateIterator++ )
     {
         // Compute next entry.
-        computedPropagationHistory[ stateIterator->first ] =
-                orbital_element_conversions::convertCartesianToKeplerianElements(
-                    keplerEphemeris.getCartesianState( stateIterator->first ),
-                    earthGravitationalParameter );
+        computedPropagationHistory[ stateIterator->first ] = orbital_element_conversions::convertCartesianToKeplerianElements(
+                keplerEphemeris.getCartesianState( stateIterator->first ), earthGravitationalParameter );
 
         // Check that computed results match expected results.
         BOOST_CHECK_CLOSE_FRACTION(
-                    computedPropagationHistory[ stateIterator->first ]( 5 ),
-                    expectedPropagationHistory[ stateIterator->first ]( 5 ),
-                    2.5e-14 );
+                computedPropagationHistory[ stateIterator->first ]( 5 ), expectedPropagationHistory[ stateIterator->first ]( 5 ), 2.5e-14 );
     }
 }
 
@@ -82,30 +75,24 @@ BOOST_AUTO_TEST_CASE( testKeplerEphemerisHyperbolic )
     PropagationHistory computedPropagationHistory;
     computedPropagationHistory[ 0.0 ] = expectedPropagationHistory[ 0.0 ];
 
-    ephemerides::KeplerEphemeris keplerEphemeris(
-                expectedPropagationHistory[ 0.0 ],
-                0.0, getGTOPGravitationalParameter( ) );
+    ephemerides::KeplerEphemeris keplerEphemeris( expectedPropagationHistory[ 0.0 ], 0.0, getGTOPGravitationalParameter( ) );
 
     for( PropagationHistory::iterator stateIterator = expectedPropagationHistory.begin( );
-         stateIterator != expectedPropagationHistory.end( ); stateIterator++ )
+         stateIterator != expectedPropagationHistory.end( );
+         stateIterator++ )
     {
         // Compute next entry.
-        computedPropagationHistory[ stateIterator->first ] =
-                orbital_element_conversions::convertCartesianToKeplerianElements(
-                    keplerEphemeris.getCartesianState( stateIterator->first ),
-                    getGTOPGravitationalParameter( ) );
+        computedPropagationHistory[ stateIterator->first ] = orbital_element_conversions::convertCartesianToKeplerianElements(
+                keplerEphemeris.getCartesianState( stateIterator->first ), getGTOPGravitationalParameter( ) );
 
         // Check that computed results match expected results.
         BOOST_CHECK_CLOSE_FRACTION(
-                    computedPropagationHistory[ stateIterator->first ]( 5 ),
-                    expectedPropagationHistory[ stateIterator->first ]( 5 ),
-                    1.0e-15 );
+                computedPropagationHistory[ stateIterator->first ]( 5 ), expectedPropagationHistory[ stateIterator->first ]( 5 ), 1.0e-15 );
     }
 }
 
 BOOST_AUTO_TEST_SUITE_END( )
 
-} // namespace unit_tests
+}  // namespace unit_tests
 
-} // namespace tudat
-
+}  // namespace tudat

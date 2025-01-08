@@ -13,9 +13,8 @@
 #define TUDAT_SEPARATED_PARSER_H
 
 #include <cstdarg>
-#include <string>
-
 #include <memory>
+#include <string>
 
 #include "tudat/io/textParser.h"
 
@@ -34,7 +33,6 @@ namespace input_output
 class SeparatedParser : public TextParser
 {
 public:
-
     //! Create a parser that parses based on a specified separator and field type list.
     /*!
      * \param separator String representation of symbol or text which is used as separator.
@@ -46,24 +44,28 @@ public:
     SeparatedParser( std::string separator, int numberOfFields, ... );
 
     //! Set trim: Trim whitespace off fields (default=true).
-    void setTrim( bool trim ) { doTrim = trim; }
+    void setTrim( bool trim )
+    {
+        doTrim = trim;
+    }
 
     //! Get trim setting: Trim whitespace off fields (default=true).
-    bool getTrim( ) { return doTrim; }
+    bool getTrim( )
+    {
+        return doTrim;
+    }
 
     //! Set unit transformation map.
     /*!
      * \param unitTransformationMap Map providing field transforms for any or all of the
      *          FieldTypes.
      */
-    void setUnitTransformationMap(
-            std::map< FieldType, std::shared_ptr< FieldTransform > > unitTransformationMap )
+    void setUnitTransformationMap( std::map< FieldType, std::shared_ptr< FieldTransform > > unitTransformationMap )
     {
         unitTransformationMap_ = unitTransformationMap;
     }
 
 protected:
-
     //! Parses one line of text.
     /*!
      * Parses one line of text by dividing the line in fields using the specified separator.
@@ -72,7 +74,6 @@ protected:
     void parseLine( std::string& line );
 
 private:
-
     //! Number of fields that is parsed.
     unsigned int numberOfFields_;
 
@@ -95,7 +96,7 @@ private:
 //! Typedef for shared-pointer to SeparatedParser object.
 typedef std::shared_ptr< SeparatedParser > SeparatedParserPointer;
 
-} // namespace input_output
-} // namespace tudat
+}  // namespace input_output
+}  // namespace tudat
 
-#endif // TUDAT_SEPARATED_PARSER_H
+#endif  // TUDAT_SEPARATED_PARSER_H

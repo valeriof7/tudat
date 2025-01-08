@@ -8,11 +8,10 @@
  *    http://tudat.tudelft.nl/LICENSE.
  */
 
-#include "tudat/astro/basic_astro/physicalConstants.h"
-
-#include "tudat/astro/relativity/relativisticLightTimeCorrection.h"
 #include "tudat/astro/observation_models/corrections/firstOrderRelativisticCorrection.h"
 
+#include "tudat/astro/basic_astro/physicalConstants.h"
+#include "tudat/astro/relativity/relativisticLightTimeCorrection.h"
 
 namespace tudat
 {
@@ -30,9 +29,13 @@ double FirstOrderLightTimeCorrectionCalculator::calculateLightTimeCorrectionWith
     // Retrieve state and time of receiver and transmitter
     Eigen::Vector6d transmitterState, receiverState;
     double transmissionTime, receptionTime;
-    getTransmissionReceptionTimesAndStates(
-            linkEndsStates, linkEndsTimes, currentMultiLegTransmitterIndex, transmitterState, receiverState,
-            transmissionTime, receptionTime );
+    getTransmissionReceptionTimesAndStates( linkEndsStates,
+                                            linkEndsTimes,
+                                            currentMultiLegTransmitterIndex,
+                                            transmitterState,
+                                            receiverState,
+                                            transmissionTime,
+                                            receptionTime );
 
     // Retrieve ppn parameter gamma.
     double ppnParameterGamma = ppnParameterGammaFunction_( );
@@ -47,10 +50,11 @@ double FirstOrderLightTimeCorrectionCalculator::calculateLightTimeCorrectionWith
         evaluationTime = transmissionTime + lightTimeEvaluationContribution_.at( i ) * ( receptionTime - transmissionTime );
         // Calculate correction due to current body and add to total.
         currentLighTimeCorrectionComponents_[ i ] = relativity::calculateFirstOrderLightTimeCorrectionFromCentralBody(
-                    perturbingBodyGravitationalParameterFunctions_[ i ]( ),
-                    transmitterState.segment( 0, 3 ), receiverState.segment( 0, 3 ),
-                    perturbingBodyStateFunctions_[ i ]( evaluationTime ).segment( 0, 3 ),
-                    ppnParameterGamma );
+                perturbingBodyGravitationalParameterFunctions_[ i ]( ),
+                transmitterState.segment( 0, 3 ),
+                receiverState.segment( 0, 3 ),
+                perturbingBodyStateFunctions_[ i ]( evaluationTime ).segment( 0, 3 ),
+                ppnParameterGamma );
         currentTotalLightTimeCorrection_ += currentLighTimeCorrectionComponents_[ i ];
     }
 
@@ -58,8 +62,7 @@ double FirstOrderLightTimeCorrectionCalculator::calculateLightTimeCorrectionWith
 }
 
 //! Function to compute the partial derivative of the light-time correction w.r.t. link end position
-Eigen::Matrix< double, 3, 1 > FirstOrderLightTimeCorrectionCalculator::
-calculateLightTimeCorrectionPartialDerivativeWrtLinkEndPosition(
+Eigen::Matrix< double, 3, 1 > FirstOrderLightTimeCorrectionCalculator::calculateLightTimeCorrectionPartialDerivativeWrtLinkEndPosition(
         const Eigen::Vector6d& transmitterState,
         const Eigen::Vector6d& receiverState,
         const double transmissionTime,
@@ -84,9 +87,10 @@ calculateLightTimeCorrectionPartialDerivativeWrtLinkEndPosition(
 
         // Calculate correction due to current body and add to total.
         currentTotalLightTimeCorrectionPartial_ += relativity::calculateFirstOrderCentralBodyLightTimeCorrectionGradient(
-                    perturbingBodyGravitationalParameterFunctions_[ i ]( ),
-                    transmitterState.segment( 0, 3 ), receiverState.segment( 0, 3 ),
-                    perturbingBodyStateFunctions_[ i ]( evaluationTime ).segment( 0, 3 ),
+                perturbingBodyGravitationalParameterFunctions_[ i ]( ),
+                transmitterState.segment( 0, 3 ),
+                receiverState.segment( 0, 3 ),
+                perturbingBodyStateFunctions_[ i ]( evaluationTime ).segment( 0, 3 ),
                 ( linkEndAtWhichPartialIsEvaluated == receiver ),
                 ppnParameterGamma );
     }
@@ -94,7 +98,6 @@ calculateLightTimeCorrectionPartialDerivativeWrtLinkEndPosition(
     return currentTotalLightTimeCorrectionPartial_;
 }
 
-}
+}  // namespace observation_models
 
-}
-
+}  // namespace tudat

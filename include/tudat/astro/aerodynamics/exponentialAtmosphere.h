@@ -17,16 +17,14 @@
 #ifndef TUDAT_EXPONENTIAL_ATMOSPHERE_H
 #define TUDAT_EXPONENTIAL_ATMOSPHERE_H
 
+#include <cmath>
 #include <memory>
 
-#include <cmath>
-
-#include "tudat/basics/utilityMacros.h"
-
-#include "tudat/astro/aerodynamics/atmosphereModel.h"
 #include "tudat/astro/aerodynamics/aerodynamics.h"
+#include "tudat/astro/aerodynamics/atmosphereModel.h"
 #include "tudat/astro/aerodynamics/standardAtmosphere.h"
 #include "tudat/astro/basic_astro/physicalConstants.h"
+#include "tudat/basics/utilityMacros.h"
 
 namespace tudat
 {
@@ -38,12 +36,7 @@ namespace aerodynamics
 /*!
  *  Bodies with predefined exponential atmospheres.
  */
-enum BodiesWithPredefinedExponentialAtmospheres
-{
-    undefined_body = -1,
-    earth = 0,
-    mars = 1
-};
+enum BodiesWithPredefinedExponentialAtmospheres { undefined_body = -1, earth = 0, mars = 1 };
 
 //! Exponential atmosphere class.
 /*!
@@ -57,7 +50,6 @@ enum BodiesWithPredefinedExponentialAtmospheres
 class ExponentialAtmosphere : public StandardAtmosphere
 {
 public:
-
     //! Default constructor.
     /*!
      *  Default constructor setting all parameters manually.
@@ -67,17 +59,13 @@ public:
      *  \param specificGasConstant The constant specific gas constant of the atmosphere.
      *  \param ratioOfSpecificHeats The constant ratio of specific heats of the atmosphere.
      */
-    ExponentialAtmosphere(
-            const double scaleHeight,
-            const double constantTemperature,
-            const double densityAtZeroAltitude,
-            const double specificGasConstant = physical_constants::SPECIFIC_GAS_CONSTANT_AIR,
-            const double ratioOfSpecificHeats = 1.4 ):
-        scaleHeight_( scaleHeight ),
-        constantTemperature_( constantTemperature ),
-        densityAtZeroAltitude_( densityAtZeroAltitude ),
-        specificGasConstant_( specificGasConstant ),
-        ratioOfSpecificHeats_( ratioOfSpecificHeats )
+    ExponentialAtmosphere( const double scaleHeight,
+                           const double constantTemperature,
+                           const double densityAtZeroAltitude,
+                           const double specificGasConstant = physical_constants::SPECIFIC_GAS_CONSTANT_AIR,
+                           const double ratioOfSpecificHeats = 1.4 ):
+        scaleHeight_( scaleHeight ), constantTemperature_( constantTemperature ), densityAtZeroAltitude_( densityAtZeroAltitude ),
+        specificGasConstant_( specificGasConstant ), ratioOfSpecificHeats_( ratioOfSpecificHeats )
     { }
 
     //! Constructor from default atmospheric settings.
@@ -86,22 +74,27 @@ public:
      *  \param bodyWithPredefinedExponentialAtmosphere Identifier of body for which the
      *  atmosphere is to be created.
      */
-    ExponentialAtmosphere(
-         const BodiesWithPredefinedExponentialAtmospheres bodyWithPredefinedExponentialAtmosphere );
+    ExponentialAtmosphere( const BodiesWithPredefinedExponentialAtmospheres bodyWithPredefinedExponentialAtmosphere );
 
     //! Get scale height.
     /*!
      * Returns the scale height (property of exponential atmosphere) in meters.
      * \return scaleHeight Scale height of exponential atmosphere.
      */
-    double getScaleHeight( ) { return scaleHeight_; }
+    double getScaleHeight( )
+    {
+        return scaleHeight_;
+    }
 
     //! Get density at zero altitude.
     /*!
      * Returns the density at zero altitude (property of exponential atmosphere) in kg per meter^3.
      * \return densityAtZeroAltitude Atmospheric density at zero altitude.
      */
-    double getDensityAtZeroAltitude( ) { return densityAtZeroAltitude_; }
+    double getDensityAtZeroAltitude( )
+    {
+        return densityAtZeroAltitude_;
+    }
 
     //! Get constant temperature.
     /*!
@@ -109,7 +102,10 @@ public:
      * Kelvin.
      * \return constantTemperature Constant atmospheric temperature in exponential atmosphere.
      */
-    double getConstantTemperature( ) { return constantTemperature_; }
+    double getConstantTemperature( )
+    {
+        return constantTemperature_;
+    }
 
     //! Get specific gas constant.
     /*!
@@ -117,7 +113,10 @@ public:
      * due to the assumption of constant atmospheric composition.
      * \return Specific gas constant in exponential atmosphere.
      */
-    double getSpecificGasConstant( ) { return specificGasConstant_; }
+    double getSpecificGasConstant( )
+    {
+        return specificGasConstant_;
+    }
 
     //! Get ratio of specific heats.
     /*!
@@ -125,7 +124,10 @@ public:
      * due to the assumption of constant atmospheric composition.
      * \return Ratio of specific heats exponential atmosphere.
      */
-    double getRatioOfSpecificHeats( ) { return ratioOfSpecificHeats_; }
+    double getRatioOfSpecificHeats( )
+    {
+        return ratioOfSpecificHeats_;
+    }
 
     //! Get local density.
     /*!
@@ -139,8 +141,7 @@ public:
      * consistency with base class interface).
      * \return Atmospheric density at specified altitude.
      */
-    double getDensity( const double altitude, const double longitude = 0.0,
-                       const double latitude = 0.0, const double time = 0.0 )
+    double getDensity( const double altitude, const double longitude = 0.0, const double latitude = 0.0, const double time = 0.0 )
     {
         TUDAT_UNUSED_PARAMETER( longitude );
         TUDAT_UNUSED_PARAMETER( latitude );
@@ -160,8 +161,7 @@ public:
      * consistency with base class interface).
      * \return Atmospheric pressure at specified altitude.
      */
-    double getPressure( const double altitude, const double longitude = 0.0,
-                        const double latitude = 0.0, const double time = 0.0 )
+    double getPressure( const double altitude, const double longitude = 0.0, const double latitude = 0.0, const double time = 0.0 )
     {
         if( constantTemperature_ != constantTemperature_ )
         {
@@ -191,8 +191,7 @@ public:
      * consistency with base class interface).
      * \return constantTemperature Atmospheric temperature at specified altitude.
      */
-    double getTemperature( const double altitude, const double longitude = 0.0,
-                           const double latitude = 0.0, const double time = 0.0 )
+    double getTemperature( const double altitude, const double longitude = 0.0, const double latitude = 0.0, const double time = 0.0 )
     {
         if( constantTemperature_ != constantTemperature_ )
         {
@@ -217,8 +216,7 @@ public:
      * consistency with base class interface).
      * \return Atmospheric speed of sounds at specified altitude.
      */
-    double getSpeedOfSound( const double altitude, const double longitude = 0.0,
-                            const double latitude = 0.0, const double time = 0.0 )
+    double getSpeedOfSound( const double altitude, const double longitude = 0.0, const double latitude = 0.0, const double time = 0.0 )
     {
         if( specificGasConstant_ != specificGasConstant_ )
         {
@@ -230,15 +228,11 @@ public:
             throw std::runtime_error( "Error, exponential atmosphere ratio of specific heats not defined" );
         }
 
-        return computeSpeedOfSound(
-                    getTemperature( altitude, longitude, latitude, time ), ratioOfSpecificHeats_,
-                    specificGasConstant_ );
+        return computeSpeedOfSound( getTemperature( altitude, longitude, latitude, time ), ratioOfSpecificHeats_, specificGasConstant_ );
     }
 
 protected:
-
 private:
-
     //! Scale altitude.
     /*!
      * Scale altitude (property of exponential atmosphere) in meters.
@@ -260,7 +254,7 @@ private:
     //! Specific gas constant.
     /*!
      * Specific gas constant of the atmosphere, its value is assumed constant, due to the assumption of
-     * constant atmospheric composition.    
+     * constant atmospheric composition.
      */
     double specificGasConstant_;
 
@@ -270,14 +264,13 @@ private:
      *  This value is set to a constant, implying constant atmospheric composition.
      */
     double ratioOfSpecificHeats_;
-
 };
 
 //! Typedef for shared-pointer to ExponentialAtmosphere object.
 typedef std::shared_ptr< ExponentialAtmosphere > ExponentialAtmospherePointer;
 
-} // namespace aerodynamics
+}  // namespace aerodynamics
 
-} // namespace tudat
+}  // namespace tudat
 
-#endif // TUDAT_EXPONENTIAL_ATMOSPHERE_H
+#endif  // TUDAT_EXPONENTIAL_ATMOSPHERE_H

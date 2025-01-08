@@ -9,20 +9,17 @@
  *
  */
 
+#include <Eigen/Core>
+#include <boost/math/constants/constants.hpp>
 #include <cmath>
 #include <limits>
 #include <stdexcept>
 
-#include <boost/math/constants/constants.hpp>
-
-#include <Eigen/Core>
-
-#include "tudat/math/basic/mathematicalConstants.h"
-
 #include "tudat/astro/basic_astro/stateVectorIndices.h"
 #include "tudat/astro/gravitation/centralGravityModel.h"
-//#include "tudat/astro/gravitation/centralJ2GravityModel.h"
-//#include "tudat/astro/gravitation/centralJ2J3GravityModel.h"
+#include "tudat/math/basic/mathematicalConstants.h"
+// #include "tudat/astro/gravitation/centralJ2GravityModel.h"
+// #include "tudat/astro/gravitation/centralJ2J3GravityModel.h"
 #include "tudat/astro/gravitation/sphericalHarmonicsGravityModel.h"
 #include "tudat/math/basic/coordinateConversions.h"
 #include "tudat/math/basic/legendrePolynomials.h"
@@ -34,6 +31,6 @@ namespace tudat
 namespace gravitation
 {
 
-} // namespace gravitation
+}  // namespace gravitation
 
-} // namespace tudat
+}  // namespace tudat

@@ -12,10 +12,9 @@
 #ifndef TUDAT_BASIC_STATISTICS_H
 #define TUDAT_BASIC_STATISTICS_H
 
+#include <Eigen/Core>
 #include <map>
 #include <vector>
-
-#include <Eigen/Core>
 
 namespace tudat
 {
@@ -129,8 +128,8 @@ Eigen::VectorXd computeMovingAverage( const Eigen::VectorXd& sampleData, const u
  *      the moving average. Needs to be an odd number.
  *  \return Vector containing the moving average of the data.
  */
-std::vector< Eigen::Vector3d > computeMovingAverage(
-        const std::vector< Eigen::Vector3d >& sampleData, const unsigned int numberOfAveragingPoints = 5 );
+std::vector< Eigen::Vector3d > computeMovingAverage( const std::vector< Eigen::Vector3d >& sampleData,
+                                                     const unsigned int numberOfAveragingPoints = 5 );
 
 //! Compute moving average of a set of Eigen vectors in a map.
 /*!
@@ -142,11 +141,11 @@ std::vector< Eigen::Vector3d > computeMovingAverage(
  *      the moving average. Needs to be an odd number.
  *  \return Map of data after moving average is applied.
  */
-std::map< double, Eigen::VectorXd > computeMovingAverage(
-        const std::map< double, Eigen::VectorXd >& sampleData, const unsigned int numberOfAveragingPoints = 5 );
+std::map< double, Eigen::VectorXd > computeMovingAverage( const std::map< double, Eigen::VectorXd >& sampleData,
+                                                          const unsigned int numberOfAveragingPoints = 5 );
 
-} // namespace statistics
+}  // namespace statistics
 
-} // namespace tudat
+}  // namespace tudat
 
-#endif // TUDAT_BASIC_STATISTICS_H
+#endif  // TUDAT_BASIC_STATISTICS_H

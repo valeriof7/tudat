@@ -12,13 +12,11 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
+#include <Eigen/Core>
+#include <boost/test/unit_test.hpp>
 #include <cmath>
 #include <iostream>
 #include <limits>
-
-#include <boost/test/unit_test.hpp>
-
-#include <Eigen/Core>
 
 #include "tudat/basics/utilityMacros.h"
 #include "tudat/math/integrators/numericalIntegrator.h"
@@ -41,8 +39,7 @@ using numerical_integrators::NumericalIntegrator;
  * \param state State at which the state derivative needs to be evalated.
  * \return Zero vector with length equal to state.
  */
-Eigen::VectorXd computeZeroStateDerivative( const double time,
-                                            const Eigen::VectorXd& state )
+Eigen::VectorXd computeZeroStateDerivative( const double time, const Eigen::VectorXd& state )
 {
     TUDAT_UNUSED_PARAMETER( time );
     return Eigen::VectorXd::Zero( state.rows( ) );
@@ -52,20 +49,16 @@ Eigen::VectorXd computeZeroStateDerivative( const double time,
 /*!
  * Dummy numerical integrator that keeps track of the amount of steps made.
  */
-class DummyNumericalIntegrator :
-        public NumericalIntegrator< double, Eigen::VectorXd, Eigen::VectorXd >
+class DummyNumericalIntegrator : public NumericalIntegrator< double, Eigen::VectorXd, Eigen::VectorXd >
 {
 public:
-
     //! Default constructor.
     /*!
      * Default constructor, setting zeroDerivative as the state derivative function.
      */
-    DummyNumericalIntegrator( const double intervalStart, const Eigen::VectorXd& initialState )
-        : NumericalIntegrator< >( &computeZeroStateDerivative ),
-          numberOfSteps( 0 ),
-          currentIndependentVariable_( intervalStart ),
-          currentState_( initialState )
+    DummyNumericalIntegrator( const double intervalStart, const Eigen::VectorXd& initialState ):
+        NumericalIntegrator<>( &computeZeroStateDerivative ), numberOfSteps( 0 ), currentIndependentVariable_( intervalStart ),
+        currentState_( initialState )
     { }
 
     //! Get step size of the next step.
@@ -73,21 +66,30 @@ public:
      * Returns the step size of the next step.
      * \return Step size to be used for the next step.
      */
-    virtual double getNextStepSize( ) const { return stepSize_; }
+    virtual double getNextStepSize( ) const
+    {
+        return stepSize_;
+    }
 
     //! Get current state.
     /*!
      * Returns the current state stored interally by the integrator.
      * \return Current state.
      */
-    virtual Eigen::VectorXd getCurrentState( ) const { return currentState_; }
+    virtual Eigen::VectorXd getCurrentState( ) const
+    {
+        return currentState_;
+    }
 
     //! Get current independent variable.
     /*!
      * Returns the current value of the independent variable stored interally by the integrator.
      * \return Current independent variable.
      */
-    virtual double getCurrentIndependentVariable( ) const { return currentIndependentVariable_; }
+    virtual double getCurrentIndependentVariable( ) const
+    {
+        return currentIndependentVariable_;
+    }
 
     //! Rollback the internal state to the last state.
     /*!
@@ -97,7 +99,10 @@ public:
      * return true if the rollback was succesful, and false otherwise.
      * \return True if the rollback was successful.
      */
-    virtual bool rollbackToPreviousState( ) { return true; }
+    virtual bool rollbackToPreviousState( )
+    {
+        return true;
+    }
 
     //! Perform a single integration step that does not do anything.
     /*!
@@ -124,7 +129,6 @@ public:
     int numberOfSteps;
 
 protected:
-
     //! Last used step size by this integrator.
     /*!
      * Last used step size by this integrator.
@@ -153,7 +157,8 @@ protected:
  * \param stepSize The step size to take.
  * \return True if actual number of steps is equal to actual number of steps; false otherwise.
  */
-bool testIntegrateToFunction( const double intervalStart, const double intervalEnd,
+bool testIntegrateToFunction( const double intervalStart,
+                              const double intervalEnd,
                               const Eigen::VectorXd& initialState,
                               const double stepSize )
 {
@@ -161,19 +166,18 @@ bool testIntegrateToFunction( const double intervalStart, const double intervalE
     Eigen::VectorXd integratedState = integrator.integrateTo( intervalEnd, stepSize );
 
     // Calculate expected number of steps.
-    int expectedNumberOfSteps = static_cast< int >(
-                std::ceil( ( intervalEnd - intervalStart ) / stepSize ) );
+    int expectedNumberOfSteps = static_cast< int >( std::ceil( ( intervalEnd - intervalStart ) / stepSize ) );
 
     // Check if the integrated state is equal to the initial state.
     // This is an exact comparison, because no arithmetics are performed on the state.
-    if ( integratedState != initialState )
+    if( integratedState != initialState )
     {
         std::cerr << "DummyNumericalIntegrator was not a dummy integrator!" << std::endl;
         return false;
     }
 
     // Check if the actual number of steps is equal to the expected number of steps.
-    if ( integrator.numberOfSteps != expectedNumberOfSteps )
+    if( integrator.numberOfSteps != expectedNumberOfSteps )
     {
         return false;
     }
@@ -205,5 +209,5 @@ BOOST_AUTO_TEST_CASE( testNumberOfStepsUsingNumericalIntegrator )
 
 BOOST_AUTO_TEST_SUITE_END( )
 
-} // namespace unit_tests
-} // namespace tudat
+}  // namespace unit_tests
+}  // namespace tudat

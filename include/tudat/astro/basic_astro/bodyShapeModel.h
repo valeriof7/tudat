@@ -17,11 +17,10 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-
 #include <functional>
 #include <memory>
 
-//#include "tudat/astro/basic_astro/bodyDeformationModel.h"
+// #include "tudat/astro/basic_astro/bodyDeformationModel.h"
 
 namespace tudat
 {
@@ -38,7 +37,6 @@ namespace basic_astrodynamics
 class BodyShapeModel
 {
 public:
-
     //! Default constructor.
     BodyShapeModel( ) { }
 
@@ -64,10 +62,9 @@ public:
     virtual double getAverageRadius( ) = 0;
 
 protected:
-
 };
 
-    //! Function to calculate the altitude of a point over a central body from positions of both the
+//! Function to calculate the altitude of a point over a central body from positions of both the
 //! point and the body (in any frame)
 /*!
  *  Function to calculate the altitude of a point over a central body from positions of both the
@@ -79,11 +76,10 @@ protected:
  *  \param toBodyFixedFrame Rotation from frame in which input vectors are given to body-fixed frame.
  *  \return Altitude above body shape.
  */
-double getAltitudeFromNonBodyFixedPosition(
-        const std::shared_ptr< BodyShapeModel > bodyShapeModel,
-        const Eigen::Vector3d& position,
-        const Eigen::Vector3d& bodyPosition,
-        const Eigen::Quaterniond& toBodyFixedFrame );
+double getAltitudeFromNonBodyFixedPosition( const std::shared_ptr< BodyShapeModel > bodyShapeModel,
+                                            const Eigen::Vector3d& position,
+                                            const Eigen::Vector3d& bodyPosition,
+                                            const Eigen::Quaterniond& toBodyFixedFrame );
 
 //! Function to calculate the altitude of a point over a central body from positions of both the
 //! point and the body (in any frame)
@@ -101,15 +97,13 @@ double getAltitudeFromNonBodyFixedPosition(
  *  given to body-fixed frame.
  *  \return Altitude above body shape.
  */
-double getAltitudeFromNonBodyFixedPositionFunctions(
-        const std::shared_ptr< BodyShapeModel > bodyShapeModel,
-        const Eigen::Vector3d& position,
-        const std::function< Eigen::Vector3d( ) > bodyPositionFunction,
-        const std::function< Eigen::Quaterniond( ) > toBodyFixedFrameFunction );
+double getAltitudeFromNonBodyFixedPositionFunctions( const std::shared_ptr< BodyShapeModel > bodyShapeModel,
+                                                     const Eigen::Vector3d& position,
+                                                     const std::function< Eigen::Vector3d( ) > bodyPositionFunction,
+                                                     const std::function< Eigen::Quaterniond( ) > toBodyFixedFrameFunction );
 
+}  // namespace basic_astrodynamics
 
-} // namespace basic_astrodynamics
+}  // namespace tudat
 
-} // namespace tudat
-
-#endif // TUDAT_BODYSHAPEMODEL_H
+#endif  // TUDAT_BODYSHAPEMODEL_H

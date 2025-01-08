@@ -16,30 +16,26 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
-#include <string>
-
-
-#include <boost/test/unit_test.hpp>
-
 #include <Eigen/Core>
+#include <boost/test/unit_test.hpp>
+#include <string>
 
 #include "tudat/io/basicInputOutput.h"
 #include "tudat/io/matrixTextFileReader.h"
-
 #include "tudat/math/integrators/numericalIntegrator.h"
+#include "tudat/math/integrators/numericalIntegratorTestFunctions.h"
 #include "tudat/math/integrators/reinitializableNumericalIntegrator.h"
 #include "tudat/math/integrators/rungeKutta4Integrator.h"
 #include "tudat/support/numericalIntegratorTests.h"
-#include "tudat/math/integrators/numericalIntegratorTestFunctions.h"
 
 namespace tudat
 {
 namespace unit_tests
 {
 
-using numerical_integrators::RungeKutta4IntegratorXd;
 using numerical_integrators::NumericalIntegratorXdPointer;
 using numerical_integrators::ReinitializableNumericalIntegratorXdPointer;
+using numerical_integrators::RungeKutta4IntegratorXd;
 
 using numerical_integrator_test_functions::computeNonAutonomousModelStateDerivative;
 
@@ -52,32 +48,25 @@ BOOST_AUTO_TEST_CASE( testRungeKutta4IntegratorUsingMatlabData )
 
     // Read in benchmark data (generated using Symbolic Math Toolbox in Matlab
     // (The MathWorks, 2012)). This data is generated using the RK4 numerical integrator.
-    const std::string pathToForwardIntegrationOutputFile = paths::getTudatTestDataPath( )
-            + "/matlabOutputRungeKutta4Forwards.txt";
-    const std::string pathToBackwardIntegrationOutputFile = paths::getTudatTestDataPath( )
-            + "/matlabOutputRungeKutta4Backwards.txt";
-    const std::string pathToDiscreteEventIntegrationOutputFile = paths::getTudatTestDataPath( )
-            + "/matlabOutputRungeKutta4DiscreteEvent.txt";
+    const std::string pathToForwardIntegrationOutputFile = paths::getTudatTestDataPath( ) + "/matlabOutputRungeKutta4Forwards.txt";
+    const std::string pathToBackwardIntegrationOutputFile = paths::getTudatTestDataPath( ) + "/matlabOutputRungeKutta4Backwards.txt";
+    const std::string pathToDiscreteEventIntegrationOutputFile =
+            paths::getTudatTestDataPath( ) + "/matlabOutputRungeKutta4DiscreteEvent.txt";
 
     // Store benchmark data in matrix.
-    const Eigen::MatrixXd matlabForwardIntegrationData =
-            input_output::readMatrixFromFile( pathToForwardIntegrationOutputFile, "," );
-    const Eigen::MatrixXd matlabBackwardIntegrationData =
-            input_output::readMatrixFromFile( pathToBackwardIntegrationOutputFile, "," );
+    const Eigen::MatrixXd matlabForwardIntegrationData = input_output::readMatrixFromFile( pathToForwardIntegrationOutputFile, "," );
+    const Eigen::MatrixXd matlabBackwardIntegrationData = input_output::readMatrixFromFile( pathToBackwardIntegrationOutputFile, "," );
     const Eigen::MatrixXd matlabDiscreteEventIntegrationData =
             input_output::readMatrixFromFile( pathToDiscreteEventIntegrationOutputFile, "," );
 
     // Case 1: Execute integrateTo() to integrate one step forward in time.
     {
         // Declare integrator with all necessary settings.
-        NumericalIntegratorXdPointer integrator
-                = std::make_shared< RungeKutta4IntegratorXd >(
-                    &computeNonAutonomousModelStateDerivative,
-                    matlabForwardIntegrationData( FIRST_ROW, TIME_COLUMN_INDEX ),
-                    ( Eigen::VectorXd( 1 )
-                      << matlabForwardIntegrationData( FIRST_ROW,
-                                                       STATE_COLUMN_INDEX ) ).finished( ),
-                    TUDAT_NAN );
+        NumericalIntegratorXdPointer integrator = std::make_shared< RungeKutta4IntegratorXd >(
+                &computeNonAutonomousModelStateDerivative,
+                matlabForwardIntegrationData( FIRST_ROW, TIME_COLUMN_INDEX ),
+                ( Eigen::VectorXd( 1 ) << matlabForwardIntegrationData( FIRST_ROW, STATE_COLUMN_INDEX ) ).finished( ),
+                TUDAT_NAN );
 
         executeOneIntegrateToStep( matlabForwardIntegrationData, 1.0e-15, integrator );
     }
@@ -86,70 +75,58 @@ BOOST_AUTO_TEST_CASE( testRungeKutta4IntegratorUsingMatlabData )
     //         time.
     {
         // Declare integrator with all necessary settings.
-        NumericalIntegratorXdPointer integrator
-                = std::make_shared< RungeKutta4IntegratorXd >(
-                    &computeNonAutonomousModelStateDerivative,
-                    matlabForwardIntegrationData( FIRST_ROW, TIME_COLUMN_INDEX ),
-                    ( Eigen::VectorXd( 1 )
-                      << matlabForwardIntegrationData( FIRST_ROW,
-                                                       STATE_COLUMN_INDEX ) ).finished( ),
-                    TUDAT_NAN );
+        NumericalIntegratorXdPointer integrator = std::make_shared< RungeKutta4IntegratorXd >(
+                &computeNonAutonomousModelStateDerivative,
+                matlabForwardIntegrationData( FIRST_ROW, TIME_COLUMN_INDEX ),
+                ( Eigen::VectorXd( 1 ) << matlabForwardIntegrationData( FIRST_ROW, STATE_COLUMN_INDEX ) ).finished( ),
+                TUDAT_NAN );
 
-        performIntegrationStepToSpecifiedTime( matlabForwardIntegrationData,
-                                               1.0e-15,  1.0e-14, integrator );
+        performIntegrationStepToSpecifiedTime( matlabForwardIntegrationData, 1.0e-15, 1.0e-14, integrator );
     }
 
     // Case 3: Execute performIntegrationStep() to perform multiple integration steps until initial
     //         time (backwards).
     {
         // Declare integrator with all necessary settings.
-        NumericalIntegratorXdPointer integrator
-                = std::make_shared< RungeKutta4IntegratorXd >(
-                    &computeNonAutonomousModelStateDerivative,
-                    matlabBackwardIntegrationData( FIRST_ROW, TIME_COLUMN_INDEX ),
-                    ( Eigen::VectorXd( 1 )
-                      << matlabBackwardIntegrationData( FIRST_ROW,
-                                                        STATE_COLUMN_INDEX ) ).finished( ), TUDAT_NAN );
+        NumericalIntegratorXdPointer integrator = std::make_shared< RungeKutta4IntegratorXd >(
+                &computeNonAutonomousModelStateDerivative,
+                matlabBackwardIntegrationData( FIRST_ROW, TIME_COLUMN_INDEX ),
+                ( Eigen::VectorXd( 1 ) << matlabBackwardIntegrationData( FIRST_ROW, STATE_COLUMN_INDEX ) ).finished( ),
+                TUDAT_NAN );
 
-        performIntegrationStepToSpecifiedTime( matlabBackwardIntegrationData,
-                                               1.0e-15, 1.0e-14, integrator );
+        performIntegrationStepToSpecifiedTime( matlabBackwardIntegrationData, 1.0e-15, 1.0e-14, integrator );
     }
 
     // Case 4: Execute integrateTo() to integrate to specified time in one step.
     {
         // Declare integrator with all necessary settings.
-        NumericalIntegratorXdPointer integrator
-                = std::make_shared< RungeKutta4IntegratorXd >(
-                    &computeNonAutonomousModelStateDerivative,
-                    matlabForwardIntegrationData( FIRST_ROW, TIME_COLUMN_INDEX ),
-                    ( Eigen::VectorXd( 1 )
-                      << matlabForwardIntegrationData( FIRST_ROW,
-                                                       STATE_COLUMN_INDEX ) ).finished( ), TUDAT_NAN );
+        NumericalIntegratorXdPointer integrator = std::make_shared< RungeKutta4IntegratorXd >(
+                &computeNonAutonomousModelStateDerivative,
+                matlabForwardIntegrationData( FIRST_ROW, TIME_COLUMN_INDEX ),
+                ( Eigen::VectorXd( 1 ) << matlabForwardIntegrationData( FIRST_ROW, STATE_COLUMN_INDEX ) ).finished( ),
+                TUDAT_NAN );
 
-        executeIntegrateToToSpecifiedTime( matlabForwardIntegrationData, 1.0e-14, integrator,
-                                           matlabForwardIntegrationData(
-                                               matlabForwardIntegrationData.rows( ) - 1,
-                                               TIME_COLUMN_INDEX ) );
+        executeIntegrateToToSpecifiedTime( matlabForwardIntegrationData,
+                                           1.0e-14,
+                                           integrator,
+                                           matlabForwardIntegrationData( matlabForwardIntegrationData.rows( ) - 1, TIME_COLUMN_INDEX ) );
     }
 
     // Case 5: Execute performIntegrationstep() to integrate to specified time in multiple steps,
     //         including discrete events.
     {
         // Declare integrator with all necessary settings.
-        ReinitializableNumericalIntegratorXdPointer integrator
-                = std::make_shared< RungeKutta4IntegratorXd >(
-                    &computeNonAutonomousModelStateDerivative,
-                    matlabDiscreteEventIntegrationData( FIRST_ROW, TIME_COLUMN_INDEX ),
-                    ( Eigen::VectorXd( 1 )
-                      << matlabDiscreteEventIntegrationData( FIRST_ROW,
-                                                             STATE_COLUMN_INDEX ) ).finished( ), TUDAT_NAN );
+        ReinitializableNumericalIntegratorXdPointer integrator = std::make_shared< RungeKutta4IntegratorXd >(
+                &computeNonAutonomousModelStateDerivative,
+                matlabDiscreteEventIntegrationData( FIRST_ROW, TIME_COLUMN_INDEX ),
+                ( Eigen::VectorXd( 1 ) << matlabDiscreteEventIntegrationData( FIRST_ROW, STATE_COLUMN_INDEX ) ).finished( ),
+                TUDAT_NAN );
 
-        performIntegrationStepToSpecifiedTimeWithEvents( matlabDiscreteEventIntegrationData,
-                                                         1.0e-15, 1.0e-13, integrator );
+        performIntegrationStepToSpecifiedTimeWithEvents( matlabDiscreteEventIntegrationData, 1.0e-15, 1.0e-13, integrator );
     }
 }
 
 BOOST_AUTO_TEST_SUITE_END( )
 
-} // namespace unit_tests
-} // namespace tudat
+}  // namespace unit_tests
+}  // namespace tudat

@@ -15,19 +15,16 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
+#include <boost/test/unit_test.hpp>
 #include <stdexcept>
 #include <string>
 #include <utility>
 
-#include <boost/test/unit_test.hpp>
-
-
-#include "tudat/math/basic/coordinateConversions.h"
-
 #include "tudat/astro/basic_astro/stateVectorIndices.h"
 #include "tudat/astro/ephemerides/keplerStateExtractor.h"
-#include "tudat/io/parsedDataVectorUtilities.h"
 #include "tudat/basics/basicTypedefs.h"
+#include "tudat/io/parsedDataVectorUtilities.h"
+#include "tudat/math/basic/coordinateConversions.h"
 
 namespace tudat
 {
@@ -50,8 +47,7 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_Extract )
 
     // Create parsed data line map pointer.
     // Define a new type: pair of field type and pointer to value.
-    typedef std::pair< input_output::FieldType,
-            parsed_data_vector_utilities::FieldValuePtr > FieldDataPair;
+    typedef std::pair< input_output::FieldType, parsed_data_vector_utilities::FieldValuePtr > FieldDataPair;
 
     // Create test strings, based on Earth orbital elements at JD = 2456074.5 in SI units [1].
     std::string testSemiMajorAxis = "149641767.7265875";
@@ -65,72 +61,49 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_Extract )
     const double expectedSemiMajorAxis = std::stod( testSemiMajorAxis );
     const double expectedEccentricity = std::stod( testEccentricity );
     const double expectedInclination = std::stod( testInclination );
-    const double expectedLongitudeOfAscendingNode = std::stod(
-                testLongitudeOfAscendingNode );
-    const double expectedArgumentOfPeriapsis = std::stod(
-                testArgumentOfPeriapsis );
+    const double expectedLongitudeOfAscendingNode = std::stod( testLongitudeOfAscendingNode );
+    const double expectedArgumentOfPeriapsis = std::stod( testArgumentOfPeriapsis );
     const double expectedTrueAnomaly = std::stod( testTrueAnomaly );
 
     // Store strings as field values.
     parsed_data_vector_utilities::FieldValuePtr testFieldValueSemiMajorAxis(
-                new input_output::FieldValue( field_types::state::semiMajorAxis,
-                                              testSemiMajorAxis ) );
+            new input_output::FieldValue( field_types::state::semiMajorAxis, testSemiMajorAxis ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueEccentricity(
-                new input_output::FieldValue( field_types::state::eccentricity,
-                                              testEccentricity ) );
+            new input_output::FieldValue( field_types::state::eccentricity, testEccentricity ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueInclination(
-                new input_output::FieldValue( field_types::state::inclination,
-                                              testInclination ) );
+            new input_output::FieldValue( field_types::state::inclination, testInclination ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueLongitudeOfAscendingNode(
-                new input_output::FieldValue( field_types::state::longitudeOfAscendingNode,
-                                              testLongitudeOfAscendingNode ) );
+            new input_output::FieldValue( field_types::state::longitudeOfAscendingNode, testLongitudeOfAscendingNode ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueArgumentOfPeriapsis(
-                new input_output::FieldValue( field_types::state::argumentOfPeriapsis,
-                                              testArgumentOfPeriapsis ) );
+            new input_output::FieldValue( field_types::state::argumentOfPeriapsis, testArgumentOfPeriapsis ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueTrueAnomaly(
-                new input_output::FieldValue( field_types::state::trueAnomaly,
-                                              testTrueAnomaly ) );
+            new input_output::FieldValue( field_types::state::trueAnomaly, testTrueAnomaly ) );
 
     // Create a new pointer to data map.
-    parsed_data_vector_utilities::ParsedDataLineMapPtr testDataMap =
-            std::make_shared< parsed_data_vector_utilities::ParsedDataLineMap >(
-                std::map< input_output::FieldType,
-                parsed_data_vector_utilities::FieldValuePtr >( ) );
+    parsed_data_vector_utilities::ParsedDataLineMapPtr testDataMap = std::make_shared< parsed_data_vector_utilities::ParsedDataLineMap >(
+            std::map< input_output::FieldType, parsed_data_vector_utilities::FieldValuePtr >( ) );
 
     // Store field values in data map.
-    testDataMap->insert( FieldDataPair( field_types::state::semiMajorAxis,
-                                        testFieldValueSemiMajorAxis ) );
-    testDataMap->insert( FieldDataPair( field_types::state::eccentricity,
-                                        testFieldValueEccentricity ) );
-    testDataMap->insert( FieldDataPair( field_types::state::inclination,
-                                        testFieldValueInclination ) );
-    testDataMap->insert( FieldDataPair( field_types::state::longitudeOfAscendingNode,
-                                        testFieldValueLongitudeOfAscendingNode ) );
-    testDataMap->insert( FieldDataPair( field_types::state::argumentOfPeriapsis,
-                                        testFieldValueArgumentOfPeriapsis ) );
-    testDataMap->insert( FieldDataPair( field_types::state::trueAnomaly,
-                                        testFieldValueTrueAnomaly ) );
+    testDataMap->insert( FieldDataPair( field_types::state::semiMajorAxis, testFieldValueSemiMajorAxis ) );
+    testDataMap->insert( FieldDataPair( field_types::state::eccentricity, testFieldValueEccentricity ) );
+    testDataMap->insert( FieldDataPair( field_types::state::inclination, testFieldValueInclination ) );
+    testDataMap->insert( FieldDataPair( field_types::state::longitudeOfAscendingNode, testFieldValueLongitudeOfAscendingNode ) );
+    testDataMap->insert( FieldDataPair( field_types::state::argumentOfPeriapsis, testFieldValueArgumentOfPeriapsis ) );
+    testDataMap->insert( FieldDataPair( field_types::state::trueAnomaly, testFieldValueTrueAnomaly ) );
 
     // Create Cartesian state extractor.
     KeplerStateExtractor testKeplerStateExtractor;
 
     // Extract test data map.
-    std::shared_ptr< Vector6d > returnedKeplerianElements =
-            testKeplerStateExtractor.extract( testDataMap );
+    std::shared_ptr< Vector6d > returnedKeplerianElements = testKeplerStateExtractor.extract( testDataMap );
 
     // Verify that the returned values correspond to the expected values.
-    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( semiMajorAxisIndex ),
-                       expectedSemiMajorAxis );
-    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( eccentricityIndex ),
-                       expectedEccentricity );
-    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( inclinationIndex ),
-                       expectedInclination );
-    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( argumentOfPeriapsisIndex ),
-                       expectedArgumentOfPeriapsis );
-    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( longitudeOfAscendingNodeIndex ),
-                       expectedLongitudeOfAscendingNode );
-    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( trueAnomalyIndex ),
-                       expectedTrueAnomaly );
+    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( semiMajorAxisIndex ), expectedSemiMajorAxis );
+    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( eccentricityIndex ), expectedEccentricity );
+    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( inclinationIndex ), expectedInclination );
+    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( argumentOfPeriapsisIndex ), expectedArgumentOfPeriapsis );
+    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( longitudeOfAscendingNodeIndex ), expectedLongitudeOfAscendingNode );
+    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( trueAnomalyIndex ), expectedTrueAnomaly );
 }
 
 //! Test the extract function with mean anomaly as input.
@@ -143,8 +116,7 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_ExtractWithMeanAnomaly )
 
     // Create parsed data line map pointer.
     // Define a new type: pair of field type and pointer to value.
-    typedef std::pair< input_output::FieldType,
-            parsed_data_vector_utilities::FieldValuePtr > FieldDataPair;
+    typedef std::pair< input_output::FieldType, parsed_data_vector_utilities::FieldValuePtr > FieldDataPair;
 
     // Create test strings, based on Earth orbital elements at JD = 2456074.5 in SI units [1].
     std::string testSemiMajorAxis = "149641767.7265875";
@@ -158,8 +130,7 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_ExtractWithMeanAnomaly )
     double expectedSemiMajorAxis = std::stod( testSemiMajorAxis );
     double expectedEccentricity = std::stod( testEccentricity );
     double expectedInclination = std::stod( testInclination );
-    double expectedLongitudeOfAscendingNode = std::stod(
-                testLongitudeOfAscendingNode );
+    double expectedLongitudeOfAscendingNode = std::stod( testLongitudeOfAscendingNode );
     double expectedArgumentOfPeriapsis = std::stod( testArgumentOfPeriapsis );
 
     // Set expected true anomaly.
@@ -167,66 +138,45 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_ExtractWithMeanAnomaly )
 
     // Store strings as field values.
     parsed_data_vector_utilities::FieldValuePtr testFieldValueSemiMajorAxis(
-                new input_output::FieldValue( field_types::state::semiMajorAxis,
-                                              testSemiMajorAxis ) );
+            new input_output::FieldValue( field_types::state::semiMajorAxis, testSemiMajorAxis ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueEccentricity(
-                new input_output::FieldValue( field_types::state::eccentricity,
-                                              testEccentricity ) );
+            new input_output::FieldValue( field_types::state::eccentricity, testEccentricity ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueInclination(
-                new input_output::FieldValue( field_types::state::inclination,
-                                              testInclination ) );
+            new input_output::FieldValue( field_types::state::inclination, testInclination ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueLongitudeOfAscendingNode(
-                new input_output::FieldValue( field_types::state::longitudeOfAscendingNode,
-                                              testLongitudeOfAscendingNode ) );
+            new input_output::FieldValue( field_types::state::longitudeOfAscendingNode, testLongitudeOfAscendingNode ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueArgumentOfPeriapsis(
-                new input_output::FieldValue( field_types::state::argumentOfPeriapsis,
-                                              testArgumentOfPeriapsis ) );
+            new input_output::FieldValue( field_types::state::argumentOfPeriapsis, testArgumentOfPeriapsis ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueMeanAnomaly(
-                new input_output::FieldValue( field_types::state::meanAnomaly,
-                                              testMeanAnomaly ) );
+            new input_output::FieldValue( field_types::state::meanAnomaly, testMeanAnomaly ) );
 
     // Create a new pointer to data map.
-    parsed_data_vector_utilities::ParsedDataLineMapPtr testDataMap =
-            std::make_shared< parsed_data_vector_utilities::ParsedDataLineMap >(
-                std::map< input_output::FieldType,
-                parsed_data_vector_utilities::FieldValuePtr >( ) );
+    parsed_data_vector_utilities::ParsedDataLineMapPtr testDataMap = std::make_shared< parsed_data_vector_utilities::ParsedDataLineMap >(
+            std::map< input_output::FieldType, parsed_data_vector_utilities::FieldValuePtr >( ) );
 
     // Store field values in data map.
-    testDataMap->insert( FieldDataPair( field_types::state::semiMajorAxis,
-                                        testFieldValueSemiMajorAxis ) );
-    testDataMap->insert( FieldDataPair( field_types::state::eccentricity,
-                                        testFieldValueEccentricity ) );
-    testDataMap->insert( FieldDataPair( field_types::state::inclination,
-                                        testFieldValueInclination ) );
-    testDataMap->insert( FieldDataPair( field_types::state::longitudeOfAscendingNode,
-                                        testFieldValueLongitudeOfAscendingNode ) );
-    testDataMap->insert( FieldDataPair( field_types::state::argumentOfPeriapsis,
-                                        testFieldValueArgumentOfPeriapsis ) );
-    testDataMap->insert( FieldDataPair( field_types::state::meanAnomaly,
-                                        testFieldValueMeanAnomaly ) );
+    testDataMap->insert( FieldDataPair( field_types::state::semiMajorAxis, testFieldValueSemiMajorAxis ) );
+    testDataMap->insert( FieldDataPair( field_types::state::eccentricity, testFieldValueEccentricity ) );
+    testDataMap->insert( FieldDataPair( field_types::state::inclination, testFieldValueInclination ) );
+    testDataMap->insert( FieldDataPair( field_types::state::longitudeOfAscendingNode, testFieldValueLongitudeOfAscendingNode ) );
+    testDataMap->insert( FieldDataPair( field_types::state::argumentOfPeriapsis, testFieldValueArgumentOfPeriapsis ) );
+    testDataMap->insert( FieldDataPair( field_types::state::meanAnomaly, testFieldValueMeanAnomaly ) );
 
     // Create Cartesian state extractor.
     KeplerStateExtractor testKeplerStateExtractor;
 
     // Extract test data map.
-    std::shared_ptr< Vector6d > returnedKeplerianElements =
-            testKeplerStateExtractor.extract( testDataMap );
+    std::shared_ptr< Vector6d > returnedKeplerianElements = testKeplerStateExtractor.extract( testDataMap );
 
     // Verify that the returned values correspond to the expected values.
-    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( semiMajorAxisIndex ),
-                       expectedSemiMajorAxis );
-    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( eccentricityIndex ),
-                       expectedEccentricity );
-    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( inclinationIndex ),
-                       expectedInclination );
-    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( argumentOfPeriapsisIndex ),
-                       expectedArgumentOfPeriapsis );
-    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( longitudeOfAscendingNodeIndex ),
-                       expectedLongitudeOfAscendingNode );
+    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( semiMajorAxisIndex ), expectedSemiMajorAxis );
+    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( eccentricityIndex ), expectedEccentricity );
+    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( inclinationIndex ), expectedInclination );
+    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( argumentOfPeriapsisIndex ), expectedArgumentOfPeriapsis );
+    BOOST_CHECK_EQUAL( ( *returnedKeplerianElements )( longitudeOfAscendingNodeIndex ), expectedLongitudeOfAscendingNode );
 
-    BOOST_CHECK_CLOSE_FRACTION( ( *returnedKeplerianElements )( trueAnomalyIndex ),
-                                expectedTrueAnomaly,
-                                std::numeric_limits< double >::epsilon( ) );
+    BOOST_CHECK_CLOSE_FRACTION(
+            ( *returnedKeplerianElements )( trueAnomalyIndex ), expectedTrueAnomaly, std::numeric_limits< double >::epsilon( ) );
 }
 
 //! Test if the extract function throws the necessary exceptions.
@@ -238,8 +188,7 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingSemiMajorAxis )
 
     // Create parsed data line map pointer.
     // Define a new type: pair of field type and pointer to value.
-    typedef std::pair< input_output::FieldType,
-            parsed_data_vector_utilities::FieldValuePtr > FieldDataPair;
+    typedef std::pair< input_output::FieldType, parsed_data_vector_utilities::FieldValuePtr > FieldDataPair;
 
     // Create test strings, based on Earth orbital elements at JD = 2456074.5 in SI units [1].
     std::string testEccentricity = "0.01625818315929578";
@@ -250,38 +199,26 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingSemiMajorAxis )
 
     // Store strings as field values.
     parsed_data_vector_utilities::FieldValuePtr testFieldValueEccentricity(
-                new input_output::FieldValue( field_types::state::eccentricity,
-                                              testEccentricity ) );
+            new input_output::FieldValue( field_types::state::eccentricity, testEccentricity ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueInclination(
-                new input_output::FieldValue( field_types::state::inclination,
-                                              testInclination ) );
+            new input_output::FieldValue( field_types::state::inclination, testInclination ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueLongitudeOfAscendingNode(
-                new input_output::FieldValue( field_types::state::longitudeOfAscendingNode,
-                                              testLongitudeOfAscendingNode ) );
+            new input_output::FieldValue( field_types::state::longitudeOfAscendingNode, testLongitudeOfAscendingNode ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueArgumentOfPeriapsis(
-                new input_output::FieldValue( field_types::state::argumentOfPeriapsis,
-                                              testArgumentOfPeriapsis ) );
+            new input_output::FieldValue( field_types::state::argumentOfPeriapsis, testArgumentOfPeriapsis ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueTrueAnomaly(
-                new input_output::FieldValue( field_types::state::trueAnomaly,
-                                              testTrueAnomaly ) );
+            new input_output::FieldValue( field_types::state::trueAnomaly, testTrueAnomaly ) );
 
     // Create a new pointer to data map.
-    parsed_data_vector_utilities::ParsedDataLineMapPtr testDataMap =
-            std::make_shared< parsed_data_vector_utilities::ParsedDataLineMap >(
-                std::map< input_output::FieldType,
-                parsed_data_vector_utilities::FieldValuePtr >( ) );
+    parsed_data_vector_utilities::ParsedDataLineMapPtr testDataMap = std::make_shared< parsed_data_vector_utilities::ParsedDataLineMap >(
+            std::map< input_output::FieldType, parsed_data_vector_utilities::FieldValuePtr >( ) );
 
     // Store field values in data map.
-    testDataMap->insert( FieldDataPair( field_types::state::eccentricity,
-                                        testFieldValueEccentricity ) );
-    testDataMap->insert( FieldDataPair( field_types::state::inclination,
-                                        testFieldValueInclination ) );
-    testDataMap->insert( FieldDataPair( field_types::state::longitudeOfAscendingNode,
-                                        testFieldValueLongitudeOfAscendingNode ) );
-    testDataMap->insert( FieldDataPair( field_types::state::argumentOfPeriapsis,
-                                        testFieldValueArgumentOfPeriapsis ) );
-    testDataMap->insert( FieldDataPair( field_types::state::trueAnomaly,
-                                        testFieldValueTrueAnomaly ) );
+    testDataMap->insert( FieldDataPair( field_types::state::eccentricity, testFieldValueEccentricity ) );
+    testDataMap->insert( FieldDataPair( field_types::state::inclination, testFieldValueInclination ) );
+    testDataMap->insert( FieldDataPair( field_types::state::longitudeOfAscendingNode, testFieldValueLongitudeOfAscendingNode ) );
+    testDataMap->insert( FieldDataPair( field_types::state::argumentOfPeriapsis, testFieldValueArgumentOfPeriapsis ) );
+    testDataMap->insert( FieldDataPair( field_types::state::trueAnomaly, testFieldValueTrueAnomaly ) );
 
     // Create Cartesian state extractor.
     KeplerStateExtractor testKeplerStateExtractor;
@@ -293,8 +230,7 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingSemiMajorAxis )
     try
     {
         // Extract test data map.
-        std::shared_ptr< Vector6d > returnedKeplerianElements =
-                testKeplerStateExtractor.extract( testDataMap );
+        std::shared_ptr< Vector6d > returnedKeplerianElements = testKeplerStateExtractor.extract( testDataMap );
     }
 
     // Catch the expected runtime error, and set the boolean flag to false.
@@ -317,8 +253,7 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingEccentricity )
 
     // Create parsed data line map pointer.
     // Define a new type: pair of field type and pointer to value.
-    typedef std::pair< input_output::FieldType,
-                       parsed_data_vector_utilities::FieldValuePtr > FieldDataPair;
+    typedef std::pair< input_output::FieldType, parsed_data_vector_utilities::FieldValuePtr > FieldDataPair;
 
     // Create test strings, based on Earth orbital elements at JD = 2456074.5 in SI units [1].
     std::string testSemiMajorAxis = "149641767.7265875";
@@ -329,38 +264,26 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingEccentricity )
 
     // Store strings as field values.
     parsed_data_vector_utilities::FieldValuePtr testFieldValueSemiMajorAxis(
-                new input_output::FieldValue( field_types::state::semiMajorAxis,
-                                                     testSemiMajorAxis ) );
+            new input_output::FieldValue( field_types::state::semiMajorAxis, testSemiMajorAxis ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueInclination(
-                new input_output::FieldValue( field_types::state::inclination,
-                                                     testInclination ) );
+            new input_output::FieldValue( field_types::state::inclination, testInclination ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueLongitudeOfAscendingNode(
-                new input_output::FieldValue( field_types::state::longitudeOfAscendingNode,
-                                                     testLongitudeOfAscendingNode ) );
+            new input_output::FieldValue( field_types::state::longitudeOfAscendingNode, testLongitudeOfAscendingNode ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueArgumentOfPeriapsis(
-                new input_output::FieldValue( field_types::state::argumentOfPeriapsis,
-                                                     testArgumentOfPeriapsis ) );
+            new input_output::FieldValue( field_types::state::argumentOfPeriapsis, testArgumentOfPeriapsis ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueTrueAnomaly(
-                new input_output::FieldValue( field_types::state::trueAnomaly,
-                                                     testTrueAnomaly ) );
+            new input_output::FieldValue( field_types::state::trueAnomaly, testTrueAnomaly ) );
 
     // Create a new pointer to data map.
-    parsed_data_vector_utilities::ParsedDataLineMapPtr testDataMap =
-            std::make_shared< parsed_data_vector_utilities::ParsedDataLineMap >(
-                std::map< input_output::FieldType,
-                          parsed_data_vector_utilities::FieldValuePtr >( ) );
+    parsed_data_vector_utilities::ParsedDataLineMapPtr testDataMap = std::make_shared< parsed_data_vector_utilities::ParsedDataLineMap >(
+            std::map< input_output::FieldType, parsed_data_vector_utilities::FieldValuePtr >( ) );
 
     // Store field values in data map.
-    testDataMap->insert( FieldDataPair( field_types::state::semiMajorAxis,
-                                        testFieldValueSemiMajorAxis ) );
-    testDataMap->insert( FieldDataPair( field_types::state::inclination,
-                                        testFieldValueInclination ) );
-    testDataMap->insert( FieldDataPair( field_types::state::longitudeOfAscendingNode,
-                                        testFieldValueLongitudeOfAscendingNode ) );
-    testDataMap->insert( FieldDataPair( field_types::state::argumentOfPeriapsis,
-                                        testFieldValueArgumentOfPeriapsis ) );
-    testDataMap->insert( FieldDataPair( field_types::state::trueAnomaly,
-                                        testFieldValueTrueAnomaly ) );
+    testDataMap->insert( FieldDataPair( field_types::state::semiMajorAxis, testFieldValueSemiMajorAxis ) );
+    testDataMap->insert( FieldDataPair( field_types::state::inclination, testFieldValueInclination ) );
+    testDataMap->insert( FieldDataPair( field_types::state::longitudeOfAscendingNode, testFieldValueLongitudeOfAscendingNode ) );
+    testDataMap->insert( FieldDataPair( field_types::state::argumentOfPeriapsis, testFieldValueArgumentOfPeriapsis ) );
+    testDataMap->insert( FieldDataPair( field_types::state::trueAnomaly, testFieldValueTrueAnomaly ) );
 
     // Create Cartesian state extractor.
     KeplerStateExtractor testKeplerStateExtractor;
@@ -372,8 +295,7 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingEccentricity )
     try
     {
         // Extract test data map.
-        std::shared_ptr< Vector6d > returnedKeplerianElements =
-                testKeplerStateExtractor.extract( testDataMap );
+        std::shared_ptr< Vector6d > returnedKeplerianElements = testKeplerStateExtractor.extract( testDataMap );
     }
 
     // Catch the expected runtime error, and set the boolean flag to false.
@@ -396,8 +318,7 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingInclination )
 
     // Create parsed data line map pointer.
     // Define a new type: pair of field type and pointer to value.
-    typedef std::pair< input_output::FieldType,
-                       parsed_data_vector_utilities::FieldValuePtr > FieldDataPair;
+    typedef std::pair< input_output::FieldType, parsed_data_vector_utilities::FieldValuePtr > FieldDataPair;
 
     // Create test strings, based on Earth orbital elements at JD = 2456074.5 in SI units [1].
     std::string testSemiMajorAxis = "149641767.7265875";
@@ -408,38 +329,26 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingInclination )
 
     // Store strings as field values.
     parsed_data_vector_utilities::FieldValuePtr testFieldValueSemiMajorAxis(
-                new input_output::FieldValue( field_types::state::semiMajorAxis,
-                                                     testSemiMajorAxis ) );
+            new input_output::FieldValue( field_types::state::semiMajorAxis, testSemiMajorAxis ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueEccentricity(
-                new input_output::FieldValue( field_types::state::eccentricity,
-                                                     testEccentricity ) );
+            new input_output::FieldValue( field_types::state::eccentricity, testEccentricity ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueLongitudeOfAscendingNode(
-                new input_output::FieldValue( field_types::state::longitudeOfAscendingNode,
-                                                     testLongitudeOfAscendingNode ) );
+            new input_output::FieldValue( field_types::state::longitudeOfAscendingNode, testLongitudeOfAscendingNode ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueArgumentOfPeriapsis(
-                new input_output::FieldValue( field_types::state::argumentOfPeriapsis,
-                                                     testArgumentOfPeriapsis ) );
+            new input_output::FieldValue( field_types::state::argumentOfPeriapsis, testArgumentOfPeriapsis ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueTrueAnomaly(
-                new input_output::FieldValue( field_types::state::trueAnomaly,
-                                                     testTrueAnomaly ) );
+            new input_output::FieldValue( field_types::state::trueAnomaly, testTrueAnomaly ) );
 
     // Create a new pointer to data map.
-    parsed_data_vector_utilities::ParsedDataLineMapPtr testDataMap =
-            std::make_shared< parsed_data_vector_utilities::ParsedDataLineMap >(
-                std::map< input_output::FieldType,
-                          parsed_data_vector_utilities::FieldValuePtr >( ) );
+    parsed_data_vector_utilities::ParsedDataLineMapPtr testDataMap = std::make_shared< parsed_data_vector_utilities::ParsedDataLineMap >(
+            std::map< input_output::FieldType, parsed_data_vector_utilities::FieldValuePtr >( ) );
 
     // Store field values in data map.
-    testDataMap->insert( FieldDataPair( field_types::state::semiMajorAxis,
-                                        testFieldValueSemiMajorAxis ) );
-    testDataMap->insert( FieldDataPair( field_types::state::eccentricity,
-                                        testFieldValueEccentricity ) );
-    testDataMap->insert( FieldDataPair( field_types::state::longitudeOfAscendingNode,
-                                        testFieldValueLongitudeOfAscendingNode ) );
-    testDataMap->insert( FieldDataPair( field_types::state::argumentOfPeriapsis,
-                                        testFieldValueArgumentOfPeriapsis ) );
-    testDataMap->insert( FieldDataPair( field_types::state::trueAnomaly,
-                                        testFieldValueTrueAnomaly ) );
+    testDataMap->insert( FieldDataPair( field_types::state::semiMajorAxis, testFieldValueSemiMajorAxis ) );
+    testDataMap->insert( FieldDataPair( field_types::state::eccentricity, testFieldValueEccentricity ) );
+    testDataMap->insert( FieldDataPair( field_types::state::longitudeOfAscendingNode, testFieldValueLongitudeOfAscendingNode ) );
+    testDataMap->insert( FieldDataPair( field_types::state::argumentOfPeriapsis, testFieldValueArgumentOfPeriapsis ) );
+    testDataMap->insert( FieldDataPair( field_types::state::trueAnomaly, testFieldValueTrueAnomaly ) );
 
     // Create Cartesian state extractor.
     KeplerStateExtractor testKeplerStateExtractor;
@@ -451,8 +360,7 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingInclination )
     try
     {
         // Extract test data map.
-        std::shared_ptr< Vector6d > returnedKeplerianElements =
-                testKeplerStateExtractor.extract( testDataMap );
+        std::shared_ptr< Vector6d > returnedKeplerianElements = testKeplerStateExtractor.extract( testDataMap );
     }
 
     // Catch the expected runtime error, and set the boolean flag to false.
@@ -475,8 +383,7 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingLongitudeOfAscendingNode )
 
     // Create parsed data line map pointer.
     // Define a new type: pair of field type and pointer to value.
-    typedef std::pair< input_output::FieldType,
-                       parsed_data_vector_utilities::FieldValuePtr > FieldDataPair;
+    typedef std::pair< input_output::FieldType, parsed_data_vector_utilities::FieldValuePtr > FieldDataPair;
 
     // Create test strings, based on Earth orbital elements at JD = 2456074.5 in SI units [1].
     std::string testSemiMajorAxis = "149641767.7265875";
@@ -487,38 +394,26 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingLongitudeOfAscendingNode )
 
     // Store strings as field values.
     parsed_data_vector_utilities::FieldValuePtr testFieldValueSemiMajorAxis(
-                new input_output::FieldValue( field_types::state::semiMajorAxis,
-                                                     testSemiMajorAxis ) );
+            new input_output::FieldValue( field_types::state::semiMajorAxis, testSemiMajorAxis ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueEccentricity(
-                new input_output::FieldValue( field_types::state::eccentricity,
-                                                     testEccentricity ) );
+            new input_output::FieldValue( field_types::state::eccentricity, testEccentricity ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueInclination(
-                new input_output::FieldValue( field_types::state::inclination,
-                                                     testInclination ) );
+            new input_output::FieldValue( field_types::state::inclination, testInclination ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueArgumentOfPeriapsis(
-                new input_output::FieldValue( field_types::state::argumentOfPeriapsis,
-                                                     testArgumentOfPeriapsis ) );
+            new input_output::FieldValue( field_types::state::argumentOfPeriapsis, testArgumentOfPeriapsis ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueTrueAnomaly(
-                new input_output::FieldValue( field_types::state::trueAnomaly,
-                                                     testTrueAnomaly ) );
+            new input_output::FieldValue( field_types::state::trueAnomaly, testTrueAnomaly ) );
 
     // Create a new pointer to data map.
-    parsed_data_vector_utilities::ParsedDataLineMapPtr testDataMap =
-            std::make_shared< parsed_data_vector_utilities::ParsedDataLineMap >(
-                std::map< input_output::FieldType,
-                          parsed_data_vector_utilities::FieldValuePtr >( ) );
+    parsed_data_vector_utilities::ParsedDataLineMapPtr testDataMap = std::make_shared< parsed_data_vector_utilities::ParsedDataLineMap >(
+            std::map< input_output::FieldType, parsed_data_vector_utilities::FieldValuePtr >( ) );
 
     // Store field values in data map.
-    testDataMap->insert( FieldDataPair( field_types::state::semiMajorAxis,
-                                        testFieldValueSemiMajorAxis ) );
-    testDataMap->insert( FieldDataPair( field_types::state::eccentricity,
-                                        testFieldValueEccentricity ) );
-    testDataMap->insert( FieldDataPair( field_types::state::inclination,
-                                        testFieldValueInclination ) );
-    testDataMap->insert( FieldDataPair( field_types::state::argumentOfPeriapsis,
-                                        testFieldValueArgumentOfPeriapsis ) );
-    testDataMap->insert( FieldDataPair( field_types::state::trueAnomaly,
-                                        testFieldValueTrueAnomaly ) );
+    testDataMap->insert( FieldDataPair( field_types::state::semiMajorAxis, testFieldValueSemiMajorAxis ) );
+    testDataMap->insert( FieldDataPair( field_types::state::eccentricity, testFieldValueEccentricity ) );
+    testDataMap->insert( FieldDataPair( field_types::state::inclination, testFieldValueInclination ) );
+    testDataMap->insert( FieldDataPair( field_types::state::argumentOfPeriapsis, testFieldValueArgumentOfPeriapsis ) );
+    testDataMap->insert( FieldDataPair( field_types::state::trueAnomaly, testFieldValueTrueAnomaly ) );
 
     // Create Cartesian state extractor.
     KeplerStateExtractor testKeplerStateExtractor;
@@ -530,8 +425,7 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingLongitudeOfAscendingNode )
     try
     {
         // Extract test data map.
-        std::shared_ptr< Vector6d > returnedKeplerianElements =
-                testKeplerStateExtractor.extract( testDataMap );
+        std::shared_ptr< Vector6d > returnedKeplerianElements = testKeplerStateExtractor.extract( testDataMap );
     }
 
     // Catch the expected runtime error, and set the boolean flag to false.
@@ -554,8 +448,7 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingArgumentOfPeriapsis )
 
     // Create parsed data line map pointer.
     // Define a new type: pair of field type and pointer to value.
-    typedef std::pair< input_output::FieldType,
-                       parsed_data_vector_utilities::FieldValuePtr > FieldDataPair;
+    typedef std::pair< input_output::FieldType, parsed_data_vector_utilities::FieldValuePtr > FieldDataPair;
 
     // Create test strings, based on Earth orbital elements at JD = 2456074.5 in SI units [1].
     std::string testSemiMajorAxis = "149641767.7265875";
@@ -566,38 +459,26 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingArgumentOfPeriapsis )
 
     // Store strings as field values.
     parsed_data_vector_utilities::FieldValuePtr testFieldValueSemiMajorAxis(
-                new input_output::FieldValue( field_types::state::semiMajorAxis,
-                                                     testSemiMajorAxis ) );
+            new input_output::FieldValue( field_types::state::semiMajorAxis, testSemiMajorAxis ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueEccentricity(
-                new input_output::FieldValue( field_types::state::eccentricity,
-                                                     testEccentricity ) );
+            new input_output::FieldValue( field_types::state::eccentricity, testEccentricity ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueInclination(
-                new input_output::FieldValue( field_types::state::inclination,
-                                                     testInclination ) );
+            new input_output::FieldValue( field_types::state::inclination, testInclination ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueLongitudeOfAscendingNode(
-                new input_output::FieldValue( field_types::state::longitudeOfAscendingNode,
-                                                     testLongitudeOfAscendingNode ) );
+            new input_output::FieldValue( field_types::state::longitudeOfAscendingNode, testLongitudeOfAscendingNode ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueTrueAnomaly(
-                new input_output::FieldValue( field_types::state::trueAnomaly,
-                                                     testTrueAnomaly ) );
+            new input_output::FieldValue( field_types::state::trueAnomaly, testTrueAnomaly ) );
 
     // Create a new pointer to data map.
-    parsed_data_vector_utilities::ParsedDataLineMapPtr testDataMap =
-            std::make_shared< parsed_data_vector_utilities::ParsedDataLineMap >(
-                std::map< input_output::FieldType,
-                          parsed_data_vector_utilities::FieldValuePtr >( ) );
+    parsed_data_vector_utilities::ParsedDataLineMapPtr testDataMap = std::make_shared< parsed_data_vector_utilities::ParsedDataLineMap >(
+            std::map< input_output::FieldType, parsed_data_vector_utilities::FieldValuePtr >( ) );
 
     // Store field values in data map.
-    testDataMap->insert( FieldDataPair( field_types::state::semiMajorAxis,
-                                        testFieldValueSemiMajorAxis ) );
-    testDataMap->insert( FieldDataPair( field_types::state::eccentricity,
-                                        testFieldValueEccentricity ) );
-    testDataMap->insert( FieldDataPair( field_types::state::inclination,
-                                        testFieldValueInclination ) );
-    testDataMap->insert( FieldDataPair( field_types::state::longitudeOfAscendingNode,
-                                        testFieldValueLongitudeOfAscendingNode ) );
-    testDataMap->insert( FieldDataPair( field_types::state::trueAnomaly,
-                                        testFieldValueTrueAnomaly ) );
+    testDataMap->insert( FieldDataPair( field_types::state::semiMajorAxis, testFieldValueSemiMajorAxis ) );
+    testDataMap->insert( FieldDataPair( field_types::state::eccentricity, testFieldValueEccentricity ) );
+    testDataMap->insert( FieldDataPair( field_types::state::inclination, testFieldValueInclination ) );
+    testDataMap->insert( FieldDataPair( field_types::state::longitudeOfAscendingNode, testFieldValueLongitudeOfAscendingNode ) );
+    testDataMap->insert( FieldDataPair( field_types::state::trueAnomaly, testFieldValueTrueAnomaly ) );
 
     // Create Cartesian state extractor.
     KeplerStateExtractor testKeplerStateExtractor;
@@ -609,8 +490,7 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingArgumentOfPeriapsis )
     try
     {
         // Extract test data map.
-        std::shared_ptr< Vector6d > returnedKeplerianElements =
-                testKeplerStateExtractor.extract( testDataMap );
+        std::shared_ptr< Vector6d > returnedKeplerianElements = testKeplerStateExtractor.extract( testDataMap );
     }
 
     // Catch the expected runtime error, and set the boolean flag to false.
@@ -633,8 +513,7 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingTrueOrMeanAnomaly )
 
     // Create parsed data line map pointer.
     // Define a new type: pair of field type and pointer to value.
-    typedef std::pair< input_output::FieldType,
-                       parsed_data_vector_utilities::FieldValuePtr > FieldDataPair;
+    typedef std::pair< input_output::FieldType, parsed_data_vector_utilities::FieldValuePtr > FieldDataPair;
 
     // Create test strings, based on Earth orbital elements at JD = 2456074.5 in SI units [1].
     std::string testSemiMajorAxis = "149641767.7265875";
@@ -645,38 +524,26 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingTrueOrMeanAnomaly )
 
     // Store strings as field values.
     parsed_data_vector_utilities::FieldValuePtr testFieldValueSemiMajorAxis(
-                new input_output::FieldValue( field_types::state::semiMajorAxis,
-                                                     testSemiMajorAxis ) );
+            new input_output::FieldValue( field_types::state::semiMajorAxis, testSemiMajorAxis ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueEccentricity(
-                new input_output::FieldValue( field_types::state::eccentricity,
-                                                     testEccentricity ) );
+            new input_output::FieldValue( field_types::state::eccentricity, testEccentricity ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueInclination(
-                new input_output::FieldValue( field_types::state::inclination,
-                                                     testInclination ) );
+            new input_output::FieldValue( field_types::state::inclination, testInclination ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueLongitudeOfAscendingNode(
-                new input_output::FieldValue( field_types::state::longitudeOfAscendingNode,
-                                                     testLongitudeOfAscendingNode ) );
+            new input_output::FieldValue( field_types::state::longitudeOfAscendingNode, testLongitudeOfAscendingNode ) );
     parsed_data_vector_utilities::FieldValuePtr testFieldValueArgumentOfPeriapsis(
-                new input_output::FieldValue( field_types::state::argumentOfPeriapsis,
-                                                     testArgumentOfPeriapsis ) );
+            new input_output::FieldValue( field_types::state::argumentOfPeriapsis, testArgumentOfPeriapsis ) );
 
     // Create a new pointer to data map.
-    parsed_data_vector_utilities::ParsedDataLineMapPtr testDataMap =
-            std::make_shared< parsed_data_vector_utilities::ParsedDataLineMap >(
-                std::map< input_output::FieldType,
-                          parsed_data_vector_utilities::FieldValuePtr >( ) );
+    parsed_data_vector_utilities::ParsedDataLineMapPtr testDataMap = std::make_shared< parsed_data_vector_utilities::ParsedDataLineMap >(
+            std::map< input_output::FieldType, parsed_data_vector_utilities::FieldValuePtr >( ) );
 
     // Store field values in data map.
-    testDataMap->insert( FieldDataPair( field_types::state::semiMajorAxis,
-                                        testFieldValueSemiMajorAxis ) );
-    testDataMap->insert( FieldDataPair( field_types::state::eccentricity,
-                                        testFieldValueEccentricity ) );
-    testDataMap->insert( FieldDataPair( field_types::state::inclination,
-                                        testFieldValueInclination ) );
-    testDataMap->insert( FieldDataPair( field_types::state::longitudeOfAscendingNode,
-                                        testFieldValueLongitudeOfAscendingNode ) );
-    testDataMap->insert( FieldDataPair( field_types::state::argumentOfPeriapsis,
-                                        testFieldValueArgumentOfPeriapsis ) );
+    testDataMap->insert( FieldDataPair( field_types::state::semiMajorAxis, testFieldValueSemiMajorAxis ) );
+    testDataMap->insert( FieldDataPair( field_types::state::eccentricity, testFieldValueEccentricity ) );
+    testDataMap->insert( FieldDataPair( field_types::state::inclination, testFieldValueInclination ) );
+    testDataMap->insert( FieldDataPair( field_types::state::longitudeOfAscendingNode, testFieldValueLongitudeOfAscendingNode ) );
+    testDataMap->insert( FieldDataPair( field_types::state::argumentOfPeriapsis, testFieldValueArgumentOfPeriapsis ) );
 
     // Create Cartesian state extractor.
     KeplerStateExtractor testKeplerStateExtractor;
@@ -688,8 +555,7 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingTrueOrMeanAnomaly )
     try
     {
         // Extract test data map.
-        std::shared_ptr< Vector6d > returnedKeplerianElements =
-                testKeplerStateExtractor.extract( testDataMap );
+        std::shared_ptr< Vector6d > returnedKeplerianElements = testKeplerStateExtractor.extract( testDataMap );
     }
 
     // Catch the expected runtime error, and set the boolean flag to false.
@@ -705,5 +571,5 @@ BOOST_AUTO_TEST_CASE( keplerStateExtractor_MissingTrueOrMeanAnomaly )
 
 BOOST_AUTO_TEST_SUITE_END( )
 
-} // namespace unit_tests
-} // namespace tudat
+}  // namespace unit_tests
+}  // namespace tudat

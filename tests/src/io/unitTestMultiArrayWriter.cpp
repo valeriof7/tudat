@@ -11,30 +11,27 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
+#include <Eigen/Core>
 #include <algorithm>
-#include <cmath>
-#include <map>
-#include <string>
-#include <vector>
-
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/test/unit_test.hpp>
-
-#include <Eigen/Core>
+#include <cmath>
+#include <map>
+#include <string>
+#include <vector>
 
 #include "tudat/basics/testMacros.h"
-#include "tudat/io/streamFilters.h"
 #include "tudat/basics/utilities.h"
-
 #include "tudat/io/basicInputOutput.h"
-#include "tudat/io/multiDimensionalArrayWriter.h"
-#include "tudat/io/multiDimensionalArrayReader.h"
-#include "tudat/io/matrixTextFileReader.h"
 #include "tudat/io/mapTextFileReader.h"
+#include "tudat/io/matrixTextFileReader.h"
+#include "tudat/io/multiDimensionalArrayReader.h"
+#include "tudat/io/multiDimensionalArrayWriter.h"
+#include "tudat/io/streamFilters.h"
 
 namespace tudat
 {
@@ -46,17 +43,14 @@ BOOST_AUTO_TEST_SUITE( test_multi_array_writer )
 // Test if multi-array file writer is working correctly, if 1 dimension is used
 BOOST_AUTO_TEST_CASE( testMultiArrayWriterOneIndependentVariable )
 {
-
     // Test first method of writing 1-dimensional files: one dependent variable per file
     {
         // Define tolerance for equality
         const double equalityTolerance = 1e-8;
 
         // Read 1-dimensional multi-array
-        std::string inFileName1 = tudat::paths::getTudatTestDataPath( )
-                + "/tabulatedDragCoefficient.txt";
-        std::string inFileName2 = tudat::paths::getTudatTestDataPath( )
-                + "/tabulatedDragCoefficient.txt";
+        std::string inFileName1 = tudat::paths::getTudatTestDataPath( ) + "/tabulatedDragCoefficient.txt";
+        std::string inFileName2 = tudat::paths::getTudatTestDataPath( ) + "/tabulatedDragCoefficient.txt";
 
         // Extract drag coefficient data
         Eigen::MatrixXd fileContents1 = tudat::input_output::readMatrixFromFile( inFileName1 );
@@ -70,7 +64,7 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterOneIndependentVariable )
 
         // Check that independent variables are equal
         BOOST_CHECK_EQUAL( independentVariables1Before.size( ), independentVariables2Before.size( ) );
-        for ( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
         {
             BOOST_CHECK_EQUAL( independentVariables1Before[ i ], independentVariables2Before[ i ] );
         }
@@ -78,7 +72,7 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterOneIndependentVariable )
         // Create multi-array of aerodynamic coefficients
         Eigen::Vector6d currentCoefficients = Eigen::Vector6d::Zero( );
         boost::multi_array< Eigen::Vector6d, 1 > aerodynamicCoefficients( boost::extents[ independentVariables1Before.size( ) ] );
-        for ( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
         {
             currentCoefficients[ 0 ] = dragCoefficientsBefore[ i ];
             currentCoefficients[ 2 ] = liftCoefficientsBefore[ i ];
@@ -96,7 +90,7 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterOneIndependentVariable )
 
         // Write multi-array to new files
         tudat::input_output::MultiArrayFileWriter< 1, 6 >::writeMultiArrayAndIndependentVariablesToFiles(
-                    outFileNamesMap, independentVariables, aerodynamicCoefficients );
+                outFileNamesMap, independentVariables, aerodynamicCoefficients );
 
         // Read files once more
         // Extract drag coefficient data
@@ -111,23 +105,21 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterOneIndependentVariable )
 
         // Check that independent variables are equal
         BOOST_CHECK_EQUAL( independentVariables1Before.size( ), independentVariables1After.size( ) );
-        for ( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
         {
             BOOST_CHECK_EQUAL( independentVariables1Before[ i ], independentVariables1After[ i ] );
         }
         BOOST_CHECK_EQUAL( independentVariables2Before.size( ), independentVariables2After.size( ) );
-        for ( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
         {
             BOOST_CHECK_EQUAL( independentVariables2Before[ i ], independentVariables2After[ i ] );
         }
 
         // Check that coefficients are equal
-        for ( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
         {
-            BOOST_CHECK_CLOSE_FRACTION( dragCoefficientsAfter[ i ], dragCoefficientsBefore[ i ],
-                                        equalityTolerance );
-            BOOST_CHECK_CLOSE_FRACTION( liftCoefficientsAfter[ i ], liftCoefficientsBefore[ i ],
-                                        equalityTolerance );
+            BOOST_CHECK_CLOSE_FRACTION( dragCoefficientsAfter[ i ], dragCoefficientsBefore[ i ], equalityTolerance );
+            BOOST_CHECK_CLOSE_FRACTION( liftCoefficientsAfter[ i ], liftCoefficientsBefore[ i ], equalityTolerance );
         }
     }
 
@@ -137,10 +129,8 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterOneIndependentVariable )
         const double equalityTolerance = 1e-8;
 
         // Read 1-dimensional multi-array
-        std::string inFileName1 = tudat::paths::getTudatTestDataPath( )
-                + "/tabulatedDragCoefficient.txt";
-        std::string inFileName2 = tudat::paths::getTudatTestDataPath( )
-                + "/tabulatedDragCoefficient.txt";
+        std::string inFileName1 = tudat::paths::getTudatTestDataPath( ) + "/tabulatedDragCoefficient.txt";
+        std::string inFileName2 = tudat::paths::getTudatTestDataPath( ) + "/tabulatedDragCoefficient.txt";
 
         // Extract drag coefficient data
         Eigen::MatrixXd fileContents1 = tudat::input_output::readMatrixFromFile( inFileName1 );
@@ -154,7 +144,7 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterOneIndependentVariable )
 
         // Check that independent variables are equal
         BOOST_CHECK_EQUAL( independentVariables1Before.size( ), independentVariables2Before.size( ) );
-        for ( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
         {
             BOOST_CHECK_EQUAL( independentVariables1Before[ i ], independentVariables2Before[ i ] );
         }
@@ -162,7 +152,7 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterOneIndependentVariable )
         // Create multi-array of aerodynamic coefficients
         Eigen::Vector6d currentCoefficients = Eigen::Vector6d::Zero( );
         boost::multi_array< Eigen::Vector6d, 1 > aerodynamicCoefficients( boost::extents[ independentVariables1Before.size( ) ] );
-        for ( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
         {
             currentCoefficients[ 0 ] = dragCoefficientsBefore[ i ];
             currentCoefficients[ 2 ] = liftCoefficientsBefore[ i ];
@@ -178,7 +168,7 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterOneIndependentVariable )
 
         // Write multi-array to new files
         tudat::input_output::MultiArrayFileWriter< 1, 6 >::writeMultiArrayAndIndependentVariablesToFiles(
-                    outFileName, { 0, 2 }, independentVariables, aerodynamicCoefficients );
+                outFileName, { 0, 2 }, independentVariables, aerodynamicCoefficients );
 
         // Read files once more
         fileContents1 = tudat::input_output::readMatrixFromFile( outFileName );
@@ -188,18 +178,16 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterOneIndependentVariable )
 
         // Check that independent variables are equal
         BOOST_CHECK_EQUAL( independentVariables1Before.size( ), independentVariables1After.size( ) );
-        for ( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
         {
             BOOST_CHECK_EQUAL( independentVariables1Before[ i ], independentVariables1After[ i ] );
         }
 
         // Check that coefficients are equal
-        for ( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
         {
-            BOOST_CHECK_CLOSE_FRACTION( dragCoefficientsAfter[ i ], dragCoefficientsBefore[ i ],
-                                        equalityTolerance );
-            BOOST_CHECK_CLOSE_FRACTION( liftCoefficientsAfter[ i ], liftCoefficientsBefore[ i ],
-                                        equalityTolerance );
+            BOOST_CHECK_CLOSE_FRACTION( dragCoefficientsAfter[ i ], dragCoefficientsBefore[ i ], equalityTolerance );
+            BOOST_CHECK_CLOSE_FRACTION( liftCoefficientsAfter[ i ], liftCoefficientsBefore[ i ], equalityTolerance );
         }
     }
 }
@@ -213,10 +201,8 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterMultiIndependentVariables )
         const double equalityTolerance = 1e-8;
 
         // Read 2-dimensional multi-array
-        std::string inFileName1 = tudat::paths::getTudatTestDataPath( )
-                + "/aurora_CD.txt";
-        std::string inFileName2 = tudat::paths::getTudatTestDataPath( )
-                + "/aurora_CL.txt";
+        std::string inFileName1 = tudat::paths::getTudatTestDataPath( ) + "/aurora_CD.txt";
+        std::string inFileName2 = tudat::paths::getTudatTestDataPath( ) + "/aurora_CL.txt";
 
         // Extract drag coefficient data
         std::pair< boost::multi_array< double, 2 >, std::vector< std::vector< double > > > fileContents1 =
@@ -232,24 +218,23 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterMultiIndependentVariables )
 
         // Check that independent variables are equal
         BOOST_CHECK_EQUAL( independentVariables1Before.size( ), independentVariables2Before.size( ) );
-        for ( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
         {
             BOOST_CHECK_EQUAL( independentVariables1Before.at( i ).size( ), independentVariables2Before.at( i ).size( ) );
-            for ( unsigned int j = 0; j < independentVariables1Before.at( i ).size( ); j++ )
+            for( unsigned int j = 0; j < independentVariables1Before.at( i ).size( ); j++ )
             {
-                BOOST_CHECK_CLOSE_FRACTION( independentVariables1Before.at( i ).at( j ),
-                                            independentVariables2Before.at( i ).at( j ),
-                                            equalityTolerance );
+                BOOST_CHECK_CLOSE_FRACTION(
+                        independentVariables1Before.at( i ).at( j ), independentVariables2Before.at( i ).at( j ), equalityTolerance );
             }
         }
 
         // Create multi-array of aerodynamic coefficients
         Eigen::Vector6d currentCoefficients = Eigen::Vector6d::Zero( );
         boost::multi_array< Eigen::Vector6d, 2 > aerodynamicCoefficients(
-                    boost::extents[ independentVariables1Before.at( 0 ).size( ) ][ independentVariables1Before.at( 1 ).size( ) ] );
-        for ( unsigned int i = 0; i < independentVariables1Before.at( 0 ).size( ); i++ )
+                boost::extents[ independentVariables1Before.at( 0 ).size( ) ][ independentVariables1Before.at( 1 ).size( ) ] );
+        for( unsigned int i = 0; i < independentVariables1Before.at( 0 ).size( ); i++ )
         {
-            for ( unsigned int j = 0; j < independentVariables1Before.at( 1 ).size( ); j++ )
+            for( unsigned int j = 0; j < independentVariables1Before.at( 1 ).size( ); j++ )
             {
                 currentCoefficients[ 0 ] = dragCoefficientsBefore[ i ][ j ];
                 currentCoefficients[ 2 ] = liftCoefficientsBefore[ i ][ j ];
@@ -264,7 +249,7 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterMultiIndependentVariables )
 
         // Write multi-array to new files
         tudat::input_output::MultiArrayFileWriter< 2, 6 >::writeMultiArrayAndIndependentVariablesToFiles(
-                    outFileNamesMap, independentVariables1Before, aerodynamicCoefficients );
+                outFileNamesMap, independentVariables1Before, aerodynamicCoefficients );
 
         // Read files once more
         // Extract drag coefficient data
@@ -279,37 +264,33 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterMultiIndependentVariables )
 
         // Check that independent variables are equal
         BOOST_CHECK_EQUAL( independentVariables1Before.size( ), independentVariables1After.size( ) );
-        for ( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
         {
             BOOST_CHECK_EQUAL( independentVariables1Before.at( i ).size( ), independentVariables1After.at( i ).size( ) );
-            for ( unsigned int j = 0; j < independentVariables1Before.at( i ).size( ); j++ )
+            for( unsigned int j = 0; j < independentVariables1Before.at( i ).size( ); j++ )
             {
-                BOOST_CHECK_CLOSE_FRACTION( independentVariables1Before.at( i ).at( j ),
-                                            independentVariables1After.at( i ).at( j ),
-                                            equalityTolerance );
+                BOOST_CHECK_CLOSE_FRACTION(
+                        independentVariables1Before.at( i ).at( j ), independentVariables1After.at( i ).at( j ), equalityTolerance );
             }
         }
         BOOST_CHECK_EQUAL( independentVariables2Before.size( ), independentVariables2After.size( ) );
-        for ( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
         {
             BOOST_CHECK_EQUAL( independentVariables2Before.at( i ).size( ), independentVariables2After.at( i ).size( ) );
-            for ( unsigned int j = 0; j < independentVariables1Before.at( i ).size( ); j++ )
+            for( unsigned int j = 0; j < independentVariables1Before.at( i ).size( ); j++ )
             {
-                BOOST_CHECK_CLOSE_FRACTION( independentVariables2Before.at( i ).at( j ),
-                                            independentVariables2After.at( i ).at( j ),
-                                            equalityTolerance );
+                BOOST_CHECK_CLOSE_FRACTION(
+                        independentVariables2Before.at( i ).at( j ), independentVariables2After.at( i ).at( j ), equalityTolerance );
             }
         }
 
         // Check that coefficients are equal
-        for ( unsigned int i = 0; i < independentVariables1Before.at( 0 ).size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.at( 0 ).size( ); i++ )
         {
-            for ( unsigned int j = 0; j < independentVariables1Before.at( 1 ).size( ); j++ )
+            for( unsigned int j = 0; j < independentVariables1Before.at( 1 ).size( ); j++ )
             {
-                BOOST_CHECK_CLOSE_FRACTION( dragCoefficientsAfter[ i ][ j ], dragCoefficientsBefore[ i ][ j ],
-                                            equalityTolerance );
-                BOOST_CHECK_CLOSE_FRACTION( liftCoefficientsAfter[ i ][ j ], liftCoefficientsBefore[ i ][ j ],
-                                            equalityTolerance );
+                BOOST_CHECK_CLOSE_FRACTION( dragCoefficientsAfter[ i ][ j ], dragCoefficientsBefore[ i ][ j ], equalityTolerance );
+                BOOST_CHECK_CLOSE_FRACTION( liftCoefficientsAfter[ i ][ j ], liftCoefficientsBefore[ i ][ j ], equalityTolerance );
             }
         }
     }
@@ -320,10 +301,8 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterMultiIndependentVariables )
         const double equalityTolerance = 1e-8;
 
         // Read 3-dimensional multi-array
-        std::string inFileName1 = tudat::paths::getTudatTestDataPath( )
-                + "/dCDwTest.txt";
-        std::string inFileName2 = tudat::paths::getTudatTestDataPath( )
-                + "/dCDwTest.txt";
+        std::string inFileName1 = tudat::paths::getTudatTestDataPath( ) + "/dCDwTest.txt";
+        std::string inFileName2 = tudat::paths::getTudatTestDataPath( ) + "/dCDwTest.txt";
 
         // Extract drag coefficient data
         std::pair< boost::multi_array< double, 3 >, std::vector< std::vector< double > > > fileContents1 =
@@ -339,27 +318,26 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterMultiIndependentVariables )
 
         // Check that independent variables are equal
         BOOST_CHECK_EQUAL( independentVariables1Before.size( ), independentVariables2Before.size( ) );
-        for ( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
         {
             BOOST_CHECK_EQUAL( independentVariables1Before.at( i ).size( ), independentVariables2Before.at( i ).size( ) );
-            for ( unsigned int j = 0; j < independentVariables1Before.at( i ).size( ); j++ )
+            for( unsigned int j = 0; j < independentVariables1Before.at( i ).size( ); j++ )
             {
-                BOOST_CHECK_CLOSE_FRACTION( independentVariables1Before.at( i ).at( j ),
-                                            independentVariables2Before.at( i ).at( j ),
-                                            equalityTolerance );
+                BOOST_CHECK_CLOSE_FRACTION(
+                        independentVariables1Before.at( i ).at( j ), independentVariables2Before.at( i ).at( j ), equalityTolerance );
             }
         }
 
         // Create multi-array of aerodynamic coefficients
         Eigen::Vector6d currentCoefficients = Eigen::Vector6d::Zero( );
         boost::multi_array< Eigen::Vector6d, 3 > aerodynamicCoefficients(
-                    boost::extents[ independentVariables1Before.at( 0 ).size( ) ][
-                independentVariables1Before.at( 1 ).size( ) ][ independentVariables1Before.at( 2 ).size( ) ] );
-        for ( unsigned int i = 0; i < independentVariables1Before.at( 0 ).size( ); i++ )
+                boost::extents[ independentVariables1Before.at( 0 ).size( ) ][ independentVariables1Before.at( 1 ).size( ) ]
+                              [ independentVariables1Before.at( 2 ).size( ) ] );
+        for( unsigned int i = 0; i < independentVariables1Before.at( 0 ).size( ); i++ )
         {
-            for ( unsigned int j = 0; j < independentVariables1Before.at( 1 ).size( ); j++ )
+            for( unsigned int j = 0; j < independentVariables1Before.at( 1 ).size( ); j++ )
             {
-                for ( unsigned int k = 0; k < independentVariables1Before.at( 2 ).size( ); k++ )
+                for( unsigned int k = 0; k < independentVariables1Before.at( 2 ).size( ); k++ )
                 {
                     currentCoefficients[ 0 ] = dragCoefficientsBefore[ i ][ j ][ k ];
                     currentCoefficients[ 2 ] = liftCoefficientsBefore[ i ][ j ][ k ];
@@ -375,7 +353,7 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterMultiIndependentVariables )
 
         // Write multi-array to new files
         tudat::input_output::MultiArrayFileWriter< 3, 6 >::writeMultiArrayAndIndependentVariablesToFiles(
-                    outFileNamesMap, independentVariables1Before, aerodynamicCoefficients );
+                outFileNamesMap, independentVariables1Before, aerodynamicCoefficients );
 
         // Read files once more
         // Extract drag coefficient data
@@ -390,39 +368,37 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterMultiIndependentVariables )
 
         // Check that independent variables are equal
         BOOST_CHECK_EQUAL( independentVariables1Before.size( ), independentVariables1After.size( ) );
-        for ( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
         {
             BOOST_CHECK_EQUAL( independentVariables1Before.at( i ).size( ), independentVariables1After.at( i ).size( ) );
-            for ( unsigned int j = 0; j < independentVariables1Before.at( i ).size( ); j++ )
+            for( unsigned int j = 0; j < independentVariables1Before.at( i ).size( ); j++ )
             {
-                BOOST_CHECK_CLOSE_FRACTION( independentVariables1Before.at( i ).at( j ),
-                                            independentVariables1After.at( i ).at( j ),
-                                            equalityTolerance );
+                BOOST_CHECK_CLOSE_FRACTION(
+                        independentVariables1Before.at( i ).at( j ), independentVariables1After.at( i ).at( j ), equalityTolerance );
             }
         }
         BOOST_CHECK_EQUAL( independentVariables2Before.size( ), independentVariables2After.size( ) );
-        for ( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.size( ); i++ )
         {
             BOOST_CHECK_EQUAL( independentVariables2Before.at( i ).size( ), independentVariables2After.at( i ).size( ) );
-            for ( unsigned int j = 0; j < independentVariables1Before.at( i ).size( ); j++ )
+            for( unsigned int j = 0; j < independentVariables1Before.at( i ).size( ); j++ )
             {
-                BOOST_CHECK_CLOSE_FRACTION( independentVariables2Before.at( i ).at( j ),
-                                            independentVariables2After.at( i ).at( j ),
-                                            equalityTolerance );
+                BOOST_CHECK_CLOSE_FRACTION(
+                        independentVariables2Before.at( i ).at( j ), independentVariables2After.at( i ).at( j ), equalityTolerance );
             }
         }
 
         // Check that coefficients are equal
-        for ( unsigned int i = 0; i < independentVariables1Before.at( 0 ).size( ); i++ )
+        for( unsigned int i = 0; i < independentVariables1Before.at( 0 ).size( ); i++ )
         {
-            for ( unsigned int j = 0; j < independentVariables1Before.at( 1 ).size( ); j++ )
+            for( unsigned int j = 0; j < independentVariables1Before.at( 1 ).size( ); j++ )
             {
-                for ( unsigned int k = 0; k < independentVariables1Before.at( 2 ).size( ); k++ )
+                for( unsigned int k = 0; k < independentVariables1Before.at( 2 ).size( ); k++ )
                 {
-                    BOOST_CHECK_CLOSE_FRACTION( dragCoefficientsAfter[ i ][ j ][ k ], dragCoefficientsBefore[ i ][ j ][ k ],
-                                                equalityTolerance );
-                    BOOST_CHECK_CLOSE_FRACTION( liftCoefficientsAfter[ i ][ j ][ k ], liftCoefficientsBefore[ i ][ j ][ k ],
-                                                equalityTolerance );
+                    BOOST_CHECK_CLOSE_FRACTION(
+                            dragCoefficientsAfter[ i ][ j ][ k ], dragCoefficientsBefore[ i ][ j ][ k ], equalityTolerance );
+                    BOOST_CHECK_CLOSE_FRACTION(
+                            liftCoefficientsAfter[ i ][ j ][ k ], liftCoefficientsBefore[ i ][ j ][ k ], equalityTolerance );
                 }
             }
         }
@@ -431,6 +407,5 @@ BOOST_AUTO_TEST_CASE( testMultiArrayWriterMultiIndependentVariables )
 
 BOOST_AUTO_TEST_SUITE_END( )
 
-} // namespace unit_tests
-} // namespace tudat
-
+}  // namespace unit_tests
+}  // namespace tudat

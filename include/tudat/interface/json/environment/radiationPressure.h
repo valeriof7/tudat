@@ -11,21 +11,19 @@
 #ifndef TUDAT_JSONINTERFACE_RADIATIONPRESSURE_H
 #define TUDAT_JSONINTERFACE_RADIATIONPRESSURE_H
 
-#include "tudat/simulation/environment_setup/createRadiationPressureInterface.h"
 #include "tudat/interface/json/support/valueAccess.h"
 #include "tudat/interface/json/support/valueConversions.h"
+#include "tudat/simulation/environment_setup/createRadiationPressureInterface.h"
 
 namespace tudat
 {
 
 namespace simulation_setup
 {
-//RP-OLD
+// RP-OLD
 //! Map of `RadiationPressureType`s string representations.
-static std::map< RadiationPressureType, std::string > radiationPressureTypes =
-{
-    { cannon_ball_radiation_pressure_interface, "cannonBall" }
-};
+static std::map< RadiationPressureType, std::string > radiationPressureTypes = { { cannon_ball_radiation_pressure_interface,
+                                                                                   "cannonBall" } };
 
 //! `RadiationPressureType`s not supported by `json_interface`.
 static std::vector< RadiationPressureType > unsupportedRadiationPressureTypes = { };
@@ -43,15 +41,14 @@ inline void from_json( const nlohmann::json& jsonObject, RadiationPressureType& 
 }
 
 //! Create a `json` object from a shared pointer to a `RadiationPressureInterfaceSettings` object.
-void to_json( nlohmann::json& jsonObject,
-              const std::shared_ptr< RadiationPressureInterfaceSettings >& radiationPressureInterfaceSettings );
+void to_json( nlohmann::json& jsonObject, const std::shared_ptr< RadiationPressureInterfaceSettings >& radiationPressureInterfaceSettings );
 
 //! Create a `json` object from a shared pointer to a `RadiationPressureInterfaceSettings` object.
 void from_json( const nlohmann::json& jsonObject,
                 std::shared_ptr< RadiationPressureInterfaceSettings >& radiationPressureInterfaceSettings );
 
-} // namespace simulation_setup
+}  // namespace simulation_setup
 
-} // namespace tudat
+}  // namespace tudat
 
-#endif // TUDAT_JSONINTERFACE_RADIATIONPRESSURE_H
+#endif  // TUDAT_JSONINTERFACE_RADIATIONPRESSURE_H

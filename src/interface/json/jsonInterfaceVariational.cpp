@@ -8,9 +8,9 @@
  *    http://tudat.tudelft.nl/LICENSE.
  */
 
-#include <getopt.h>
-
 #include "tudat/interface/json/jsonInterfaceVariational.h"
+
+#include <getopt.h>
 
 namespace tudat
 {
@@ -18,14 +18,14 @@ namespace tudat
 namespace json_interface
 {
 
-//template class JsonVariationalEquationsSimulationManager< double, double >;
+// template class JsonVariationalEquationsSimulationManager< double, double >;
 
 #if( TUDAT_BUILD_WITH_EXTENDED_PRECISION_PROPAGATION_TOOLS )
 ////template class JsonVariationalEquationsSimulationManager< Time, double >;
-//template class JsonVariationalEquationsSimulationManager< double, long double >;
+// template class JsonVariationalEquationsSimulationManager< double, long double >;
 ////template class JsonVariationalEquationsSimulationManager< Time, long double >;
 #endif
 
-}
+}  // namespace json_interface
 
-}
+}  // namespace tudat

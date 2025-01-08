@@ -11,17 +11,16 @@
 #ifndef TUDAT_ONEWAYRANGEPARTIAL_H
 #define TUDAT_ONEWAYRANGEPARTIAL_H
 
-#include <functional>
-
 #include <Eigen/Core>
+#include <functional>
 
 #include "tudat/astro/basic_astro/physicalConstants.h"
 #include "tudat/astro/ephemerides/ephemeris.h"
+#include "tudat/astro/observation_models/linkTypeDefs.h"
 #include "tudat/astro/orbit_determination/estimatable_parameters/estimatableParameter.h"
+#include "tudat/astro/orbit_determination/observation_partials/lightTimeCorrectionPartial.h"
 #include "tudat/astro/orbit_determination/observation_partials/observationPartial.h"
 #include "tudat/astro/orbit_determination/observation_partials/positionPartials.h"
-#include "tudat/astro/orbit_determination/observation_partials/lightTimeCorrectionPartial.h"
-#include "tudat/astro/observation_models/linkTypeDefs.h"
 
 namespace tudat
 {
@@ -34,14 +33,13 @@ namespace observation_partials
  *  Derived class for scaling three-dimensional position partial to one-way range observable partial. Implementation is taken
  *  from Moyer(2000) and is separately implemented for fixed receiver and transmitter.
  */
-class OneWayRangeScaling: public DirectPositionPartialScaling< 1 >
+class OneWayRangeScaling : public DirectPositionPartialScaling< 1 >
 {
 public:
-
-    OneWayRangeScaling( ): DirectPositionPartialScaling< 1 >( observation_models::one_way_range ){ }
+    OneWayRangeScaling( ): DirectPositionPartialScaling< 1 >( observation_models::one_way_range ) { }
 
     //! Destructor
-    ~OneWayRangeScaling( ){ }
+    ~OneWayRangeScaling( ) { }
 
     //! Update the scaling object to the current times and states
     /*!
@@ -81,7 +79,7 @@ public:
      */
     Eigen::Vector1d getLightTimePartialScalingFactor( )
     {
-       return ( Eigen::Vector1d( ) << referenceLightTimeCorrectionScaling_ ).finished( );
+        return ( Eigen::Vector1d( ) << referenceLightTimeCorrectionScaling_ ).finished( );
     }
 
     //! Function to get the fixed link end for last computation of update() function.
@@ -95,7 +93,6 @@ public:
     }
 
 private:
-
     //! Computed scaling factor (at receiver)
     Eigen::Matrix< double, 1, 3 > referenceScalingFactor_;
 
@@ -106,13 +103,10 @@ private:
 
     //! Fixed link end for last computation of update() function.
     observation_models::LinkEndType currentLinkEndType_;
-
 };
 
-}
+}  // namespace observation_partials
 
-}
+}  // namespace tudat
 
-
-
-#endif // TUDAT_ONEWAYRANGEPARTIAL_H
+#endif  // TUDAT_ONEWAYRANGEPARTIAL_H

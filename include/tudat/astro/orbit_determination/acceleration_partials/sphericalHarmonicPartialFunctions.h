@@ -11,9 +11,8 @@
 #ifndef TUDAT_SPHERICALHARMONICPARTIALFUNCTIONS_H
 #define TUDAT_SPHERICALHARMONICPARTIALFUNCTIONS_H
 
-#include <memory>
-
 #include <Eigen/Core>
+#include <memory>
 
 #include "tudat/math/basic/sphericalHarmonics.h"
 
@@ -47,22 +46,21 @@ namespace acceleration_partials
  *  the sine of the latitude angle.
  *  \param sphericalHessian Hessian of potential term in spherical coordinates (returned by reference).
  */
-void computePotentialSphericalHessian(
-        const double distance,
-        const double radiusPowerTerm,
-        const double cosineOfOrderLongitude,
-        const double sineOfOrderLongitude,
-        const double cosineOfLatitude,
-        const double sineOfLatitude,
-        const double preMultiplier,
-        const int degree,
-        const int order,
-        const double cosineHarmonicCoefficient,
-        const double sineHarmonicCoefficient,
-        const double legendrePolynomial,
-        const double legendrePolynomialDerivative,
-        const double legendrePolynomialSecondDerivative,
-        Eigen::Matrix3d& sphericalHessian );
+void computePotentialSphericalHessian( const double distance,
+                                       const double radiusPowerTerm,
+                                       const double cosineOfOrderLongitude,
+                                       const double sineOfOrderLongitude,
+                                       const double cosineOfLatitude,
+                                       const double sineOfLatitude,
+                                       const double preMultiplier,
+                                       const int degree,
+                                       const int order,
+                                       const double cosineHarmonicCoefficient,
+                                       const double sineHarmonicCoefficient,
+                                       const double legendrePolynomial,
+                                       const double legendrePolynomialDerivative,
+                                       const double legendrePolynomialSecondDerivative,
+                                       Eigen::Matrix3d& sphericalHessian );
 
 //! Function to compute the spherical Hessian of a single term of a spherical harmonic potential
 /*!
@@ -85,18 +83,17 @@ void computePotentialSphericalHessian(
  *  the sine of the latitude angle.
  *  \param sphericalHessian Hessian of potential term in spherical coordinates (returned by reference).
  */
-void computePotentialSphericalHessian(
-        const Eigen::Vector3d& sphericalPosition,
-        const double referenceRadius,
-        const double preMultiplier,
-        const int degree,
-        const int order,
-        const double cosineHarmonicCoefficient,
-        const double sineHarmonicCoefficient,
-        const double legendrePolynomial,
-        const double legendrePolynomialDerivative,
-        const double legendrePolynomialSecondDerivative,
-        Eigen::Matrix3d& sphericalHessian );
+void computePotentialSphericalHessian( const Eigen::Vector3d& sphericalPosition,
+                                       const double referenceRadius,
+                                       const double preMultiplier,
+                                       const int degree,
+                                       const int order,
+                                       const double cosineHarmonicCoefficient,
+                                       const double sineHarmonicCoefficient,
+                                       const double legendrePolynomial,
+                                       const double legendrePolynomialDerivative,
+                                       const double legendrePolynomialSecondDerivative,
+                                       Eigen::Matrix3d& sphericalHessian );
 
 //! Function to compute the spherical Hessian of a single term of a spherical harmonic potential
 /*!
@@ -113,15 +110,14 @@ void computePotentialSphericalHessian(
  *  \param sphericalHarmonicsCache Cache object containing precomputed spherical harmonics terms.
  *  \param sphericalHessian Hessian of potential term in spherical coordinates (returned by reference).
  */
-void computePotentialSphericalHessian(
-        const Eigen::Vector3d& sphericalPosition,
-        const double preMultiplier,
-        const int degree,
-        const int order,
-        const double cosineHarmonicCoefficient,
-        const double sineHarmonicCoefficient,
-        const std::shared_ptr< basic_mathematics::SphericalHarmonicsCache > sphericalHarmonicsCache,
-        Eigen::Matrix3d& sphericalHessian );
+void computePotentialSphericalHessian( const Eigen::Vector3d& sphericalPosition,
+                                       const double preMultiplier,
+                                       const int degree,
+                                       const int order,
+                                       const double cosineHarmonicCoefficient,
+                                       const double sineHarmonicCoefficient,
+                                       const std::shared_ptr< basic_mathematics::SphericalHarmonicsCache > sphericalHarmonicsCache,
+                                       Eigen::Matrix3d& sphericalHessian );
 
 //! Function to compute the spherical Hessian of a full spherical harmonic potential
 /*!
@@ -257,10 +253,10 @@ void calculateSphericalHarmonicGravityWrtSCoefficients(
         const Eigen::Matrix3d& bodyFixedToIntegrationFrame,
         Eigen::MatrixXd& partialsMatrix,
         const int maximumAccelerationDegree,
-        const int maximumAccelerationOrder  );
+        const int maximumAccelerationOrder );
 
-} // namespace acceleration_partials
+}  // namespace acceleration_partials
 
-} // namespace tudat
+}  // namespace tudat
 
-#endif // TUDAT_SPHERICALHARMONICPARTIALFUNCTIONS_H
+#endif  // TUDAT_SPHERICALHARMONICPARTIALFUNCTIONS_H

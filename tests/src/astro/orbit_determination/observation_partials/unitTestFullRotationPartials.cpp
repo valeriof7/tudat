@@ -11,18 +11,17 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
 
-#include <limits>
-#include <boost/test/unit_test.hpp>
-
 #include <boost/lambda/lambda.hpp>
+#include <boost/test/unit_test.hpp>
+#include <limits>
 
-#include "tudat/interface/spice/spiceInterface.h"
-#include "tudat/simulation/estimation_setup/createCartesianStatePartials.h"
-#include "tudat/astro/orbit_determination/observation_partials/rotationMatrixPartial.h"
 #include "tudat/astro/ephemerides/fullPlanetaryRotationModel.h"
-#include "tudat/simulation/environment_setup/defaultBodies.h"
-#include "tudat/simulation/environment_setup/createRotationModel.h"
+#include "tudat/astro/orbit_determination/observation_partials/rotationMatrixPartial.h"
+#include "tudat/interface/spice/spiceInterface.h"
 #include "tudat/io/basicInputOutput.h"
+#include "tudat/simulation/environment_setup/createRotationModel.h"
+#include "tudat/simulation/environment_setup/defaultBodies.h"
+#include "tudat/simulation/estimation_setup/createCartesianStatePartials.h"
 
 namespace tudat
 {
@@ -51,11 +50,9 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
     SystemOfBodies bodies;
     bodies.createEmptyBody( "Mars" );
 
-    std::shared_ptr< RotationModelSettings > defaultMarsRotationSettings =
-            getHighAccuracyMarsRotationModel( );
+    std::shared_ptr< RotationModelSettings > defaultMarsRotationSettings = getHighAccuracyMarsRotationModel( );
 
-    std::shared_ptr< RotationalEphemeris > marsRotationModel =
-            createRotationModel( defaultMarsRotationSettings, "Mars" );
+    std::shared_ptr< RotationalEphemeris > marsRotationModel = createRotationModel( defaultMarsRotationSettings, "Mars" );
 
     std::shared_ptr< PlanetaryRotationModelSettings > marsRotationModelSettings =
             std::dynamic_pointer_cast< PlanetaryRotationModelSettings >( defaultMarsRotationSettings );
@@ -64,23 +61,19 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
 
     double freeCoreNutationRate = marsRotationModelSettings->getFreeCoreNutationRate( );
 
-    std::map< double, std::pair< double, double > > rotationRateCorrections =
-            marsRotationModelSettings -> getRotationRateCorrections( );
+    std::map< double, std::pair< double, double > > rotationRateCorrections = marsRotationModelSettings->getRotationRateCorrections( );
 
-    std::map< double, std::pair< double, double > > xPolarMotionCoefficients =
-            marsRotationModelSettings -> getxPolarMotionCoefficients( );
+    std::map< double, std::pair< double, double > > xPolarMotionCoefficients = marsRotationModelSettings->getxPolarMotionCoefficients( );
 
-    std::map< double, std::pair< double, double > > yPolarMotionCoefficients =
-            marsRotationModelSettings -> getyPolarMotionCoefficients( );
+    std::map< double, std::pair< double, double > > yPolarMotionCoefficients = marsRotationModelSettings->getyPolarMotionCoefficients( );
 
-    //Test for Rotation Matrix Partial wrt Periodic Spin Variations
+    // Test for Rotation Matrix Partial wrt Periodic Spin Variations
     {
-
         // Create partial object.
 
         std::shared_ptr< RotationMatrixPartialWrtPeriodicSpinVariations > rotationMatrixPartialObject =
                 std::make_shared< RotationMatrixPartialWrtPeriodicSpinVariations >(
-                    std::dynamic_pointer_cast< PlanetaryRotationModel >( marsRotationModel ) );
+                        std::dynamic_pointer_cast< PlanetaryRotationModel >( marsRotationModel ) );
 
         // Compute partial analytically
 
@@ -96,7 +89,7 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
         {
             // Compute partial for Phi_cj numerically
             {
-//                std::cout << std::endl<< std::endl << "Phi_cj:" << std::endl;
+                //                std::cout << std::endl<< std::endl << "Phi_cj:" << std::endl;
 
                 double perturbation = 1.0E-4;
 
@@ -105,30 +98,30 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                 std::map< double, std::pair< double, double > > downperturbateRotationRateCorrections;
 
                 for( std::map< double, std::pair< double, double > >::iterator correctionIterator = rotationRateCorrections.begin( );
-                     correctionIterator != rotationRateCorrections.end( ); correctionIterator++ )
+                     correctionIterator != rotationRateCorrections.end( );
+                     correctionIterator++ )
                 {
-                    upperturbateRotationRateCorrections[ correctionIterator->first ] = std::make_pair(
-                                correctionIterator->second.first + perturbation, correctionIterator->second.second );
+                    upperturbateRotationRateCorrections[ correctionIterator->first ] =
+                            std::make_pair( correctionIterator->second.first + perturbation, correctionIterator->second.second );
 
-                    downperturbateRotationRateCorrections[ correctionIterator->first ] = std::make_pair(
-                                correctionIterator->second.first - perturbation, correctionIterator->second.second );
+                    downperturbateRotationRateCorrections[ correctionIterator->first ] =
+                            std::make_pair( correctionIterator->second.first - perturbation, correctionIterator->second.second );
 
-                    if ( correctionIterator->first > 1.0 )
+                    if( correctionIterator->first > 1.0 )
                     {
-                        upperturbateRotationRateCorrections[ correctionIterator->first ] = std::make_pair(
-                                    correctionIterator->second.first, correctionIterator->second.second  );
+                        upperturbateRotationRateCorrections[ correctionIterator->first ] =
+                                std::make_pair( correctionIterator->second.first, correctionIterator->second.second );
 
-                        downperturbateRotationRateCorrections[ correctionIterator->first ] = std::make_pair(
-                                    correctionIterator->second.first, correctionIterator->second.second);
+                        downperturbateRotationRateCorrections[ correctionIterator->first ] =
+                                std::make_pair( correctionIterator->second.first, correctionIterator->second.second );
                     }
                 }
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            upperturbateRotationRateCorrections,
-                            xPolarMotionCoefficients,
-                            yPolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           upperturbateRotationRateCorrections,
+                                                           xPolarMotionCoefficients,
+                                                           yPolarMotionCoefficients );
 
                 std::shared_ptr< RotationalEphemeris > upperturbatedMarsRotationModel =
                         createRotationModel( marsRotationModelSettings, "Mars" );
@@ -139,12 +132,11 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                 Eigen::Matrix3d upperturbedRotationMatrixDerivative =
                         upperturbatedMarsRotationModel->getDerivativeOfRotationToBaseFrame( testTime );
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            downperturbateRotationRateCorrections,
-                            xPolarMotionCoefficients,
-                            yPolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           downperturbateRotationRateCorrections,
+                                                           xPolarMotionCoefficients,
+                                                           yPolarMotionCoefficients );
 
                 std::shared_ptr< RotationalEphemeris > downperturbatedMarsRotationModel =
                         createRotationModel( marsRotationModelSettings, "Mars" );
@@ -159,17 +151,17 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                         ( upperturbedRotationMatrix - downperturbedRotationMatrix ) / ( 2.0 * perturbation );
 
                 Eigen::Matrix3d numericalRotationMatrixDerivativePartial =
-                        ( upperturbedRotationMatrixDerivative - downperturbedRotationMatrixDerivative ) /
-                        ( 2.0 * perturbation );
+                        ( upperturbedRotationMatrixDerivative - downperturbedRotationMatrixDerivative ) / ( 2.0 * perturbation );
 
                 Eigen::Matrix3d matrixDifference = rotationMatrixPartials.at( 0 ) - numericalRotationMatrixPartial;
 
-//                std::cout << "analitical Rotation Matrix Partial"<< std::endl << rotationMatrixPartials.at(0) << std::endl;
+                //                std::cout << "analitical Rotation Matrix Partial"<< std::endl << rotationMatrixPartials.at(0) <<
+                //                std::endl;
 
-//                std::cout << "numerical Rotation Matrix Partial"<< std::endl << numericalRotationMatrixPartial << std::endl;
+                //                std::cout << "numerical Rotation Matrix Partial"<< std::endl << numericalRotationMatrixPartial <<
+                //                std::endl;
 
-//                std::cout << "rotation Matrix Partial difference"<< std::endl << matrixDifference << std::endl;
-
+                //                std::cout << "rotation Matrix Partial difference"<< std::endl << matrixDifference << std::endl;
 
                 // Compare analytical and numerical result.
 
@@ -183,16 +175,16 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
 
                 matrixDifference = rotationMatrixDerivativePartials.at( 0 ) - numericalRotationMatrixDerivativePartial;
 
-//                std::cout << "analitical Rotation Matrix derivative Partial"<< std::endl <<
-//                             rotationMatrixDerivativePartials.at(0) << std::endl;
+                //                std::cout << "analitical Rotation Matrix derivative Partial"<< std::endl <<
+                //                             rotationMatrixDerivativePartials.at(0) << std::endl;
 
-//                std::cout << "numerical Rotation Matrix derivative Partial"<< std::endl <<
-//                             numericalRotationMatrixDerivativePartial << std::endl;
+                //                std::cout << "numerical Rotation Matrix derivative Partial"<< std::endl <<
+                //                             numericalRotationMatrixDerivativePartial << std::endl;
 
-//                std::cout << "rotation Matrix derivative Partial difference"<< std::endl <<
-//                             matrixDifference << std::endl << std::endl<< std::endl;
+                //                std::cout << "rotation Matrix derivative Partial difference"<< std::endl <<
+                //                             matrixDifference << std::endl << std::endl<< std::endl;
 
-                //Compare analytical and numerical result.
+                // Compare analytical and numerical result.
 
                 for( unsigned int i = 0; i < 3; i++ )
                 {
@@ -202,17 +194,16 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                     }
                 }
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            rotationRateCorrections,
-                            xPolarMotionCoefficients,
-                            yPolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           rotationRateCorrections,
+                                                           xPolarMotionCoefficients,
+                                                           yPolarMotionCoefficients );
             }
 
-            //Compute partial for Phi_sj numerically
+            // Compute partial for Phi_sj numerically
             {
-//                std::cout << std::endl<< std::endl<< "Phi_sj:" << std::endl;
+                //                std::cout << std::endl<< std::endl<< "Phi_sj:" << std::endl;
 
                 double perturbation = 9.0E-5;
 
@@ -221,30 +212,30 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                 std::map< double, std::pair< double, double > > downperturbateRotationRateCorrections;
 
                 for( std::map< double, std::pair< double, double > >::iterator correctionIterator = rotationRateCorrections.begin( );
-                     correctionIterator != rotationRateCorrections.end( ); correctionIterator++ )
+                     correctionIterator != rotationRateCorrections.end( );
+                     correctionIterator++ )
                 {
-                    upperturbateRotationRateCorrections[ correctionIterator->first ] = std::make_pair(
-                                correctionIterator->second.first, correctionIterator->second.second + perturbation );
+                    upperturbateRotationRateCorrections[ correctionIterator->first ] =
+                            std::make_pair( correctionIterator->second.first, correctionIterator->second.second + perturbation );
 
-                    downperturbateRotationRateCorrections[ correctionIterator->first ] = std::make_pair(
-                                correctionIterator->second.first, correctionIterator->second.second - perturbation );
+                    downperturbateRotationRateCorrections[ correctionIterator->first ] =
+                            std::make_pair( correctionIterator->second.first, correctionIterator->second.second - perturbation );
 
-                    if ( correctionIterator->first > 1.0 )
+                    if( correctionIterator->first > 1.0 )
                     {
-                        upperturbateRotationRateCorrections[ correctionIterator->first ] = std::make_pair(
-                                    correctionIterator->second.first, correctionIterator->second.second  );
+                        upperturbateRotationRateCorrections[ correctionIterator->first ] =
+                                std::make_pair( correctionIterator->second.first, correctionIterator->second.second );
 
-                        downperturbateRotationRateCorrections[ correctionIterator->first ] = std::make_pair(
-                                    correctionIterator->second.first, correctionIterator->second.second);
+                        downperturbateRotationRateCorrections[ correctionIterator->first ] =
+                                std::make_pair( correctionIterator->second.first, correctionIterator->second.second );
                     }
                 }
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            upperturbateRotationRateCorrections,
-                            xPolarMotionCoefficients,
-                            yPolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           upperturbateRotationRateCorrections,
+                                                           xPolarMotionCoefficients,
+                                                           yPolarMotionCoefficients );
 
                 std::shared_ptr< RotationalEphemeris > upperturbatedMarsRotationModel =
                         createRotationModel( marsRotationModelSettings, "Mars" );
@@ -252,16 +243,14 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                 Eigen::Matrix3d upperturbedRotationMatrix =
                         upperturbatedMarsRotationModel->getRotationToBaseFrame( testTime ).toRotationMatrix( );
 
-
                 Eigen::Matrix3d upperturbedRotationMatrixDerivative =
                         upperturbatedMarsRotationModel->getDerivativeOfRotationToBaseFrame( testTime );
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            downperturbateRotationRateCorrections,
-                            xPolarMotionCoefficients,
-                            yPolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           downperturbateRotationRateCorrections,
+                                                           xPolarMotionCoefficients,
+                                                           yPolarMotionCoefficients );
 
                 std::shared_ptr< RotationalEphemeris > downperturbatedMarsRotationModel =
                         createRotationModel( marsRotationModelSettings, "Mars" );
@@ -276,16 +265,17 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                         ( upperturbedRotationMatrix - downperturbedRotationMatrix ) / ( 2.0 * perturbation );
 
                 Eigen::Matrix3d numericalRotationMatrixDerivativePartial =
-                        ( upperturbedRotationMatrixDerivative - downperturbedRotationMatrixDerivative ) /
-                        ( 2.0 * perturbation );
+                        ( upperturbedRotationMatrixDerivative - downperturbedRotationMatrixDerivative ) / ( 2.0 * perturbation );
 
                 Eigen::Matrix3d matrixDifference = rotationMatrixPartials.at( 1 ) - numericalRotationMatrixPartial;
 
-//                std::cout << "analitical Rotation Matrix Partial"<< std::endl << rotationMatrixPartials.at( 1 ) << std::endl;
+                //                std::cout << "analitical Rotation Matrix Partial"<< std::endl << rotationMatrixPartials.at( 1 ) <<
+                //                std::endl;
 
-//                std::cout << "numerical Rotation Matrix Partial"<< std::endl << numericalRotationMatrixPartial << std::endl;
+                //                std::cout << "numerical Rotation Matrix Partial"<< std::endl << numericalRotationMatrixPartial <<
+                //                std::endl;
 
-//                std::cout << "rotation Matrix Partial difference"<< std::endl << matrixDifference << std::endl;
+                //                std::cout << "rotation Matrix Partial difference"<< std::endl << matrixDifference << std::endl;
 
                 // Compare analytical and numerical result.
 
@@ -299,16 +289,16 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
 
                 matrixDifference = rotationMatrixDerivativePartials.at( 1 ) - numericalRotationMatrixDerivativePartial;
 
-//                std::cout << "analitical Rotation Matrix derivative Partial"<< std::endl <<
-//                             rotationMatrixDerivativePartials.at( 1 ) << std::endl;
+                //                std::cout << "analitical Rotation Matrix derivative Partial"<< std::endl <<
+                //                             rotationMatrixDerivativePartials.at( 1 ) << std::endl;
 
-//                std::cout << "numerical Rotation Matrix derivative Partial"<< std::endl <<
-//                             numericalRotationMatrixDerivativePartial << std::endl;
+                //                std::cout << "numerical Rotation Matrix derivative Partial"<< std::endl <<
+                //                             numericalRotationMatrixDerivativePartial << std::endl;
 
-//                std::cout << "rotation Matrix derivative Partial difference"<< std::endl <<
-//                             matrixDifference << std::endl << std::endl<< std::endl;
+                //                std::cout << "rotation Matrix derivative Partial difference"<< std::endl <<
+                //                             matrixDifference << std::endl << std::endl<< std::endl;
 
-                //Compare analytical and numerical result.
+                // Compare analytical and numerical result.
 
                 for( unsigned int i = 0; i < 3; i++ )
                 {
@@ -318,23 +308,22 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                     }
                 }
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            rotationRateCorrections,
-                            xPolarMotionCoefficients,
-                            yPolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           rotationRateCorrections,
+                                                           xPolarMotionCoefficients,
+                                                           yPolarMotionCoefficients );
             }
         }
     }
 
-    //Test for Rotation Matrix Partial Wrt Polar motion amplitude
+    // Test for Rotation Matrix Partial Wrt Polar motion amplitude
     {
         // Create partial object.
 
         std::shared_ptr< RotationMatrixPartialWrtPolarMotionAmplitude > rotationMatrixPartialObject =
                 std::make_shared< RotationMatrixPartialWrtPolarMotionAmplitude >(
-                    std::dynamic_pointer_cast< PlanetaryRotationModel >( marsRotationModel ) );
+                        std::dynamic_pointer_cast< PlanetaryRotationModel >( marsRotationModel ) );
 
         // Compute partial analytically
 
@@ -348,9 +337,9 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
 
         // Compute partial numerically
         {
-            //Compute partial wrt X_cj numerically
+            // Compute partial wrt X_cj numerically
             {
-//                std::cout << std::endl<< std::endl << "X_cj:" << std::endl;
+                //                std::cout << std::endl<< std::endl << "X_cj:" << std::endl;
 
                 double perturbation = 1.0E-5;
 
@@ -359,46 +348,45 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                 std::map< double, std::pair< double, double > > downperturbatePolarMotionCoefficients;
 
                 for( std::map< double, std::pair< double, double > >::iterator correctionIterator = xPolarMotionCoefficients.begin( );
-                     correctionIterator != xPolarMotionCoefficients.end( ); correctionIterator++ )
+                     correctionIterator != xPolarMotionCoefficients.end( );
+                     correctionIterator++ )
                 {
-                    upperturbatePolarMotionCoefficients[ correctionIterator->first ] = std::make_pair(
-                                correctionIterator->second.first + perturbation , correctionIterator->second.second );
+                    upperturbatePolarMotionCoefficients[ correctionIterator->first ] =
+                            std::make_pair( correctionIterator->second.first + perturbation, correctionIterator->second.second );
 
-                    downperturbatePolarMotionCoefficients[ correctionIterator->first ] = std::make_pair(
-                                correctionIterator->second.first - perturbation , correctionIterator->second.second );
+                    downperturbatePolarMotionCoefficients[ correctionIterator->first ] =
+                            std::make_pair( correctionIterator->second.first - perturbation, correctionIterator->second.second );
 
-                    if ( correctionIterator->first > 1.0 )
+                    if( correctionIterator->first > 1.0 )
                     {
-                        upperturbatePolarMotionCoefficients[ correctionIterator->first ] = std::make_pair(
-                                    correctionIterator->second.first, correctionIterator->second.second  );
+                        upperturbatePolarMotionCoefficients[ correctionIterator->first ] =
+                                std::make_pair( correctionIterator->second.first, correctionIterator->second.second );
 
-                        downperturbatePolarMotionCoefficients[ correctionIterator->first ] = std::make_pair(
-                                    correctionIterator->second.first, correctionIterator->second.second);
+                        downperturbatePolarMotionCoefficients[ correctionIterator->first ] =
+                                std::make_pair( correctionIterator->second.first, correctionIterator->second.second );
                     }
                 }
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            rotationRateCorrections,
-                            upperturbatePolarMotionCoefficients,
-                            yPolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           rotationRateCorrections,
+                                                           upperturbatePolarMotionCoefficients,
+                                                           yPolarMotionCoefficients );
 
                 std::shared_ptr< RotationalEphemeris > upperturbatedMarsRotationModel =
                         createRotationModel( marsRotationModelSettings, "Mars" );
 
-                Eigen::Matrix3d upperturbedRotationMatrix = upperturbatedMarsRotationModel->getRotationToBaseFrame(
-                            testTime).toRotationMatrix( );
+                Eigen::Matrix3d upperturbedRotationMatrix =
+                        upperturbatedMarsRotationModel->getRotationToBaseFrame( testTime ).toRotationMatrix( );
 
-                Eigen::Matrix3d upperturbedRotationMatrixDerivative = upperturbatedMarsRotationModel->getDerivativeOfRotationToBaseFrame(
-                            testTime );
+                Eigen::Matrix3d upperturbedRotationMatrixDerivative =
+                        upperturbatedMarsRotationModel->getDerivativeOfRotationToBaseFrame( testTime );
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            rotationRateCorrections,
-                            downperturbatePolarMotionCoefficients,
-                            yPolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           rotationRateCorrections,
+                                                           downperturbatePolarMotionCoefficients,
+                                                           yPolarMotionCoefficients );
 
                 std::shared_ptr< RotationalEphemeris > downperturbatedMarsRotationModel =
                         createRotationModel( marsRotationModelSettings, "Mars" );
@@ -413,16 +401,17 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                         ( upperturbedRotationMatrix - downperturbedRotationMatrix ) / ( 2.0 * perturbation );
 
                 Eigen::Matrix3d numericalRotationMatrixDerivativePartial =
-                        ( upperturbedRotationMatrixDerivative - downperturbedRotationMatrixDerivative ) /
-                        ( 2.0 * perturbation );
+                        ( upperturbedRotationMatrixDerivative - downperturbedRotationMatrixDerivative ) / ( 2.0 * perturbation );
 
                 Eigen::Matrix3d matrixDifference = rotationMatrixPartials.at( 0 ) - numericalRotationMatrixPartial;
 
-//                std::cout << "analitical Rotation Matrix Partial"<< std::endl << rotationMatrixPartials.at( 0 ) << std::endl;
+                //                std::cout << "analitical Rotation Matrix Partial"<< std::endl << rotationMatrixPartials.at( 0 ) <<
+                //                std::endl;
 
-//                std::cout << "numerical Rotation Matrix Partial"<< std::endl << numericalRotationMatrixPartial << std::endl;
+                //                std::cout << "numerical Rotation Matrix Partial"<< std::endl << numericalRotationMatrixPartial <<
+                //                std::endl;
 
-//                std::cout << "rotation Matrix Partial difference"<< std::endl << matrixDifference << std::endl;
+                //                std::cout << "rotation Matrix Partial difference"<< std::endl << matrixDifference << std::endl;
 
                 // Compare analytical and numerical result.
 
@@ -436,15 +425,15 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
 
                 matrixDifference = rotationMatrixDerivativePartials.at( 0 ) - numericalRotationMatrixDerivativePartial;
 
-//                std::cout << "analitical Rotation Matrix derivative Partial"<< std::endl <<
-//                             rotationMatrixDerivativePartials.at( 0 ) << std::endl;
+                //                std::cout << "analitical Rotation Matrix derivative Partial"<< std::endl <<
+                //                             rotationMatrixDerivativePartials.at( 0 ) << std::endl;
 
-//                std::cout << "numerical Rotation Matrix derivative Partial"<< std::endl <<
-//                             numericalRotationMatrixDerivativePartial << std::endl;
+                //                std::cout << "numerical Rotation Matrix derivative Partial"<< std::endl <<
+                //                             numericalRotationMatrixDerivativePartial << std::endl;
 
-//                std::cout << "rotation Matrix derivative Partial difference"<< std::endl << matrixDifference << std::endl;
+                //                std::cout << "rotation Matrix derivative Partial difference"<< std::endl << matrixDifference << std::endl;
 
-                //Compare analytical and numerical result.
+                // Compare analytical and numerical result.
 
                 for( unsigned int i = 0; i < 3; i++ )
                 {
@@ -454,17 +443,16 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                     }
                 }
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            rotationRateCorrections,
-                            xPolarMotionCoefficients,
-                            yPolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           rotationRateCorrections,
+                                                           xPolarMotionCoefficients,
+                                                           yPolarMotionCoefficients );
             }
 
             // Compute partial wrt X_sj numerically
             {
-//                std::cout << std::endl<< std::endl << "X_sj:" << std::endl;
+                //                std::cout << std::endl<< std::endl << "X_sj:" << std::endl;
 
                 double perturbation = 9.0E-5;
 
@@ -473,46 +461,45 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                 std::map< double, std::pair< double, double > > downperturbatePolarMotionCoefficients;
 
                 for( std::map< double, std::pair< double, double > >::iterator correctionIterator = xPolarMotionCoefficients.begin( );
-                     correctionIterator != xPolarMotionCoefficients.end( ); correctionIterator++ )
+                     correctionIterator != xPolarMotionCoefficients.end( );
+                     correctionIterator++ )
                 {
-                    upperturbatePolarMotionCoefficients[ correctionIterator->first ] = std::make_pair(
-                                correctionIterator->second.first , correctionIterator->second.second + perturbation );
+                    upperturbatePolarMotionCoefficients[ correctionIterator->first ] =
+                            std::make_pair( correctionIterator->second.first, correctionIterator->second.second + perturbation );
 
-                    downperturbatePolarMotionCoefficients[ correctionIterator->first ] = std::make_pair(
-                                correctionIterator->second.first , correctionIterator->second.second - perturbation );
+                    downperturbatePolarMotionCoefficients[ correctionIterator->first ] =
+                            std::make_pair( correctionIterator->second.first, correctionIterator->second.second - perturbation );
 
-                    if ( correctionIterator->first > 1.0 )
+                    if( correctionIterator->first > 1.0 )
                     {
-                        upperturbatePolarMotionCoefficients[ correctionIterator->first ] = std::make_pair(
-                                    correctionIterator->second.first, correctionIterator->second.second  );
+                        upperturbatePolarMotionCoefficients[ correctionIterator->first ] =
+                                std::make_pair( correctionIterator->second.first, correctionIterator->second.second );
 
-                        downperturbatePolarMotionCoefficients[ correctionIterator->first ] = std::make_pair(
-                                    correctionIterator->second.first, correctionIterator->second.second);
+                        downperturbatePolarMotionCoefficients[ correctionIterator->first ] =
+                                std::make_pair( correctionIterator->second.first, correctionIterator->second.second );
                     }
                 }
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            rotationRateCorrections,
-                            upperturbatePolarMotionCoefficients,
-                            yPolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           rotationRateCorrections,
+                                                           upperturbatePolarMotionCoefficients,
+                                                           yPolarMotionCoefficients );
 
                 std::shared_ptr< RotationalEphemeris > upperturbatedMarsRotationModel =
                         createRotationModel( marsRotationModelSettings, "Mars" );
 
-                Eigen::Matrix3d upperturbedRotationMatrix = upperturbatedMarsRotationModel->getRotationToBaseFrame(
-                            testTime).toRotationMatrix( );
+                Eigen::Matrix3d upperturbedRotationMatrix =
+                        upperturbatedMarsRotationModel->getRotationToBaseFrame( testTime ).toRotationMatrix( );
 
-                Eigen::Matrix3d upperturbedRotationMatrixDerivative = upperturbatedMarsRotationModel->getDerivativeOfRotationToBaseFrame(
-                            testTime );
+                Eigen::Matrix3d upperturbedRotationMatrixDerivative =
+                        upperturbatedMarsRotationModel->getDerivativeOfRotationToBaseFrame( testTime );
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            rotationRateCorrections,
-                            downperturbatePolarMotionCoefficients,
-                            yPolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           rotationRateCorrections,
+                                                           downperturbatePolarMotionCoefficients,
+                                                           yPolarMotionCoefficients );
 
                 std::shared_ptr< RotationalEphemeris > downperturbatedMarsRotationModel =
                         createRotationModel( marsRotationModelSettings, "Mars" );
@@ -527,16 +514,17 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                         ( upperturbedRotationMatrix - downperturbedRotationMatrix ) / ( 2.0 * perturbation );
 
                 Eigen::Matrix3d numericalRotationMatrixDerivativePartial =
-                        ( upperturbedRotationMatrixDerivative - downperturbedRotationMatrixDerivative ) /
-                        ( 2.0 * perturbation );
+                        ( upperturbedRotationMatrixDerivative - downperturbedRotationMatrixDerivative ) / ( 2.0 * perturbation );
 
                 Eigen::Matrix3d matrixDifference = rotationMatrixPartials.at( 1 ) - numericalRotationMatrixPartial;
 
-//                std::cout << "analitical Rotation Matrix Partial"<< std::endl << rotationMatrixPartials.at( 1 ) << std::endl;
+                //                std::cout << "analitical Rotation Matrix Partial"<< std::endl << rotationMatrixPartials.at( 1 ) <<
+                //                std::endl;
 
-//                std::cout << "numerical Rotation Matrix Partial"<< std::endl << numericalRotationMatrixPartial << std::endl;
+                //                std::cout << "numerical Rotation Matrix Partial"<< std::endl << numericalRotationMatrixPartial <<
+                //                std::endl;
 
-//                std::cout << "rotation Matrix Partial difference"<< std::endl << matrixDifference << std::endl;
+                //                std::cout << "rotation Matrix Partial difference"<< std::endl << matrixDifference << std::endl;
 
                 // Compare analytical and numerical result.
 
@@ -550,16 +538,16 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
 
                 matrixDifference = rotationMatrixDerivativePartials.at( 1 ) - numericalRotationMatrixDerivativePartial;
 
-//                std::cout << "analitical Rotation Matrix derivative Partial"<< std::endl <<
-//                             rotationMatrixDerivativePartials.at( 1 ) << std::endl;
+                //                std::cout << "analitical Rotation Matrix derivative Partial"<< std::endl <<
+                //                             rotationMatrixDerivativePartials.at( 1 ) << std::endl;
 
-//                std::cout << "numerical Rotation Matrix derivative Partial"<< std::endl <<
-//                             numericalRotationMatrixDerivativePartial << std::endl;
+                //                std::cout << "numerical Rotation Matrix derivative Partial"<< std::endl <<
+                //                             numericalRotationMatrixDerivativePartial << std::endl;
 
-//                std::cout << "rotation Matrix derivative Partial difference"<< std::endl <<
-//                             matrixDifference << std::endl;
+                //                std::cout << "rotation Matrix derivative Partial difference"<< std::endl <<
+                //                             matrixDifference << std::endl;
 
-                //Compare analytical and numerical result.
+                // Compare analytical and numerical result.
 
                 for( unsigned int i = 0; i < 3; i++ )
                 {
@@ -569,17 +557,16 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                     }
                 }
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            rotationRateCorrections,
-                            xPolarMotionCoefficients,
-                            yPolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           rotationRateCorrections,
+                                                           xPolarMotionCoefficients,
+                                                           yPolarMotionCoefficients );
             }
 
             // Compute partial wrt Y_cj numerically
             {
-//                std::cout << std::endl<< std::endl << "Y_cj:" << std::endl;
+                //                std::cout << std::endl<< std::endl << "Y_cj:" << std::endl;
 
                 double perturbation = 9.0E-7;
 
@@ -588,30 +575,30 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                 std::map< double, std::pair< double, double > > downperturbatePolarMotionCoefficients;
 
                 for( std::map< double, std::pair< double, double > >::iterator correctionIterator = yPolarMotionCoefficients.begin( );
-                     correctionIterator != yPolarMotionCoefficients.end( ); correctionIterator++ )
+                     correctionIterator != yPolarMotionCoefficients.end( );
+                     correctionIterator++ )
                 {
-                    upperturbatePolarMotionCoefficients[ correctionIterator->first ] = std::make_pair(
-                                correctionIterator->second.first + perturbation , correctionIterator->second.second );
+                    upperturbatePolarMotionCoefficients[ correctionIterator->first ] =
+                            std::make_pair( correctionIterator->second.first + perturbation, correctionIterator->second.second );
 
-                    downperturbatePolarMotionCoefficients[ correctionIterator->first ] = std::make_pair(
-                                correctionIterator->second.first - perturbation , correctionIterator->second.second );
+                    downperturbatePolarMotionCoefficients[ correctionIterator->first ] =
+                            std::make_pair( correctionIterator->second.first - perturbation, correctionIterator->second.second );
 
-                    if ( correctionIterator->first > 1.0 )
+                    if( correctionIterator->first > 1.0 )
                     {
-                        upperturbatePolarMotionCoefficients[ correctionIterator->first ] = std::make_pair(
-                                    correctionIterator->second.first, correctionIterator->second.second  );
+                        upperturbatePolarMotionCoefficients[ correctionIterator->first ] =
+                                std::make_pair( correctionIterator->second.first, correctionIterator->second.second );
 
-                        downperturbatePolarMotionCoefficients[ correctionIterator->first ] = std::make_pair(
-                                    correctionIterator->second.first, correctionIterator->second.second);
+                        downperturbatePolarMotionCoefficients[ correctionIterator->first ] =
+                                std::make_pair( correctionIterator->second.first, correctionIterator->second.second );
                     }
                 }
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            rotationRateCorrections,
-                            xPolarMotionCoefficients,
-                            upperturbatePolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           rotationRateCorrections,
+                                                           xPolarMotionCoefficients,
+                                                           upperturbatePolarMotionCoefficients );
 
                 std::shared_ptr< RotationalEphemeris > upperturbatedMarsRotationModel =
                         createRotationModel( marsRotationModelSettings, "Mars" );
@@ -622,12 +609,11 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                 Eigen::Matrix3d upperturbedRotationMatrixDerivative =
                         upperturbatedMarsRotationModel->getDerivativeOfRotationToBaseFrame( testTime );
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            rotationRateCorrections,
-                            xPolarMotionCoefficients,
-                            downperturbatePolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           rotationRateCorrections,
+                                                           xPolarMotionCoefficients,
+                                                           downperturbatePolarMotionCoefficients );
 
                 std::shared_ptr< RotationalEphemeris > downperturbatedMarsRotationModel =
                         createRotationModel( marsRotationModelSettings, "Mars" );
@@ -642,16 +628,17 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                         ( upperturbedRotationMatrix - downperturbedRotationMatrix ) / ( 2.0 * perturbation );
 
                 Eigen::Matrix3d numericalRotationMatrixDerivativePartial =
-                        ( upperturbedRotationMatrixDerivative - downperturbedRotationMatrixDerivative ) /
-                        ( 2.0 * perturbation );
+                        ( upperturbedRotationMatrixDerivative - downperturbedRotationMatrixDerivative ) / ( 2.0 * perturbation );
 
                 Eigen::Matrix3d matrixDifference = rotationMatrixPartials.at( 2 ) - numericalRotationMatrixPartial;
 
-////                std::cout << "analitical Rotation Matrix Partial"<< std::endl << rotationMatrixPartials.at( 2 ) << std::endl;
+                ////                std::cout << "analitical Rotation Matrix Partial"<< std::endl << rotationMatrixPartials.at( 2 ) <<
+                /// std::endl;
 
-////                std::cout << "numerical Rotation Matrix Partial"<< std::endl << numericalRotationMatrixPartial << std::endl;
+                ////                std::cout << "numerical Rotation Matrix Partial"<< std::endl << numericalRotationMatrixPartial <<
+                /// std::endl;
 
-////                std::cout << "rotation Matrix Partial difference"<< std::endl << matrixDifference << std::endl;
+                ////                std::cout << "rotation Matrix Partial difference"<< std::endl << matrixDifference << std::endl;
 
                 // Compare analytical and numerical result.
 
@@ -665,15 +652,16 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
 
                 matrixDifference = rotationMatrixDerivativePartials.at( 2 ) - numericalRotationMatrixDerivativePartial;
 
-////                std::cout << "analitical Rotation Matrix derivative Partial"<< std::endl <<
-////                             rotationMatrixDerivativePartials.at( 2 ) << std::endl;
+                ////                std::cout << "analitical Rotation Matrix derivative Partial"<< std::endl <<
+                ////                             rotationMatrixDerivativePartials.at( 2 ) << std::endl;
 
-////                std::cout << "numerical Rotation Matrix derivative Partial"<< std::endl <<
-////                             numericalRotationMatrixDerivativePartial << std::endl;
+                ////                std::cout << "numerical Rotation Matrix derivative Partial"<< std::endl <<
+                ////                             numericalRotationMatrixDerivativePartial << std::endl;
 
-////                std::cout << "rotation Matrix derivative Partial difference"<< std::endl << matrixDifference << std::endl;
+                ////                std::cout << "rotation Matrix derivative Partial difference"<< std::endl << matrixDifference <<
+                /// std::endl;
 
-                //Compare analytical and numerical result.
+                // Compare analytical and numerical result.
 
                 for( unsigned int i = 0; i < 3; i++ )
                 {
@@ -683,17 +671,16 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                     }
                 }
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            rotationRateCorrections,
-                            xPolarMotionCoefficients,
-                            yPolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           rotationRateCorrections,
+                                                           xPolarMotionCoefficients,
+                                                           yPolarMotionCoefficients );
             }
 
             // Compute partial wrt Y_sj numerically
             {
-//                std::cout << std::endl<< std::endl << "Y_sj:" << std::endl;
+                //                std::cout << std::endl<< std::endl << "Y_sj:" << std::endl;
 
                 double perturbation = 5.0E-5;
 
@@ -702,30 +689,30 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                 std::map< double, std::pair< double, double > > downperturbatePolarMotionCoefficients;
 
                 for( std::map< double, std::pair< double, double > >::iterator correctionIterator = yPolarMotionCoefficients.begin( );
-                     correctionIterator != yPolarMotionCoefficients.end( ); correctionIterator++ )
+                     correctionIterator != yPolarMotionCoefficients.end( );
+                     correctionIterator++ )
                 {
-                    upperturbatePolarMotionCoefficients[ correctionIterator->first ] = std::make_pair(
-                                correctionIterator->second.first , correctionIterator->second.second + perturbation );
+                    upperturbatePolarMotionCoefficients[ correctionIterator->first ] =
+                            std::make_pair( correctionIterator->second.first, correctionIterator->second.second + perturbation );
 
-                    downperturbatePolarMotionCoefficients[ correctionIterator->first ] = std::make_pair(
-                                correctionIterator->second.first , correctionIterator->second.second - perturbation );
+                    downperturbatePolarMotionCoefficients[ correctionIterator->first ] =
+                            std::make_pair( correctionIterator->second.first, correctionIterator->second.second - perturbation );
 
-                    if ( correctionIterator->first > 1.0 )
+                    if( correctionIterator->first > 1.0 )
                     {
-                        upperturbatePolarMotionCoefficients[ correctionIterator->first ] = std::make_pair(
-                                    correctionIterator->second.first, correctionIterator->second.second  );
+                        upperturbatePolarMotionCoefficients[ correctionIterator->first ] =
+                                std::make_pair( correctionIterator->second.first, correctionIterator->second.second );
 
-                        downperturbatePolarMotionCoefficients[ correctionIterator->first ] = std::make_pair(
-                                    correctionIterator->second.first, correctionIterator->second.second);
+                        downperturbatePolarMotionCoefficients[ correctionIterator->first ] =
+                                std::make_pair( correctionIterator->second.first, correctionIterator->second.second );
                     }
                 }
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            rotationRateCorrections,
-                            xPolarMotionCoefficients,
-                            upperturbatePolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           rotationRateCorrections,
+                                                           xPolarMotionCoefficients,
+                                                           upperturbatePolarMotionCoefficients );
 
                 std::shared_ptr< RotationalEphemeris > upperturbatedMarsRotationModel =
                         createRotationModel( marsRotationModelSettings, "Mars" );
@@ -736,12 +723,11 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                 Eigen::Matrix3d upperturbedRotationMatrixDerivative =
                         upperturbatedMarsRotationModel->getDerivativeOfRotationToBaseFrame( testTime );
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            rotationRateCorrections,
-                            xPolarMotionCoefficients,
-                            downperturbatePolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           rotationRateCorrections,
+                                                           xPolarMotionCoefficients,
+                                                           downperturbatePolarMotionCoefficients );
 
                 std::shared_ptr< RotationalEphemeris > downperturbatedMarsRotationModel =
                         createRotationModel( marsRotationModelSettings, "Mars" );
@@ -756,16 +742,17 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                         ( upperturbedRotationMatrix - downperturbedRotationMatrix ) / ( 2.0 * perturbation );
 
                 Eigen::Matrix3d numericalRotationMatrixDerivativePartial =
-                        ( upperturbedRotationMatrixDerivative - downperturbedRotationMatrixDerivative ) /
-                        ( 2.0 * perturbation );
+                        ( upperturbedRotationMatrixDerivative - downperturbedRotationMatrixDerivative ) / ( 2.0 * perturbation );
 
                 Eigen::Matrix3d matrixDifference = rotationMatrixPartials.at( 3 ) - numericalRotationMatrixPartial;
 
-//                std::cout << "analitical Rotation Matrix Partial"<< std::endl << rotationMatrixPartials.at( 3 ) << std::endl;
+                //                std::cout << "analitical Rotation Matrix Partial"<< std::endl << rotationMatrixPartials.at( 3 ) <<
+                //                std::endl;
 
-//                std::cout << "numerical Rotation Matrix Partial"<< std::endl << numericalRotationMatrixPartial << std::endl;
+                //                std::cout << "numerical Rotation Matrix Partial"<< std::endl << numericalRotationMatrixPartial <<
+                //                std::endl;
 
-//                std::cout << "rotation Matrix Partial difference"<< std::endl << matrixDifference << std::endl;
+                //                std::cout << "rotation Matrix Partial difference"<< std::endl << matrixDifference << std::endl;
 
                 // Compare analytical and numerical result.
 
@@ -779,15 +766,15 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
 
                 matrixDifference = rotationMatrixDerivativePartials.at( 3 ) - numericalRotationMatrixDerivativePartial;
 
-//                std::cout << "analitical Rotation Matrix derivative Partial"<< std::endl <<
-//                             rotationMatrixDerivativePartials.at( 3 ) << std::endl;
+                //                std::cout << "analitical Rotation Matrix derivative Partial"<< std::endl <<
+                //                             rotationMatrixDerivativePartials.at( 3 ) << std::endl;
 
-//                std::cout << "numerical Rotation Matrix derivative Partial"<< std::endl <<
-//                             numericalRotationMatrixDerivativePartial << std::endl;
+                //                std::cout << "numerical Rotation Matrix derivative Partial"<< std::endl <<
+                //                             numericalRotationMatrixDerivativePartial << std::endl;
 
-//                std::cout << "rotation Matrix derivative Partial difference"<< std::endl << matrixDifference << std::endl;
+                //                std::cout << "rotation Matrix derivative Partial difference"<< std::endl << matrixDifference << std::endl;
 
-                //Compare analytical and numerical result.
+                // Compare analytical and numerical result.
 
                 for( unsigned int i = 0; i < 3; i++ )
                 {
@@ -797,25 +784,24 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                     }
                 }
 
-                marsRotationModelSettings->setPeriodTerms(
-                            marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
-                            marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
-                            rotationRateCorrections,
-                            xPolarMotionCoefficients,
-                            yPolarMotionCoefficients );
+                marsRotationModelSettings->setPeriodTerms( marsRotationModelSettings->getMeanMotionDirectNutationCorrections( ),
+                                                           marsRotationModelSettings->getMeanMotionTimeDependentPhaseNutationCorrections( ),
+                                                           rotationRateCorrections,
+                                                           xPolarMotionCoefficients,
+                                                           yPolarMotionCoefficients );
             }
         }
     }
 
-    //Test for Rotation Matrix Partial wrt Core Factor
+    // Test for Rotation Matrix Partial wrt Core Factor
     {
-//        std::cout << std::endl << std::endl << "Core Factor" << std::endl;
+        //        std::cout << std::endl << std::endl << "Core Factor" << std::endl;
 
         // Create partial object.
 
         std::shared_ptr< RotationMatrixPartialWrtCoreFactor > rotationMatrixPartialObject =
                 std::make_shared< RotationMatrixPartialWrtCoreFactor >(
-                    std::dynamic_pointer_cast< PlanetaryRotationModel >( marsRotationModel ) );
+                        std::dynamic_pointer_cast< PlanetaryRotationModel >( marsRotationModel ) );
 
         // Compute partial analytically
 
@@ -831,12 +817,11 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
         {
             double perturbation = 9.0E-2;
 
-            double upperturbateCoreFactor = coreFactor + perturbation ;
+            double upperturbateCoreFactor = coreFactor + perturbation;
 
-            double downperturbateCoreFactor = coreFactor - perturbation ;
+            double downperturbateCoreFactor = coreFactor - perturbation;
 
-            marsRotationModelSettings->setCoreFactorAndFreeCoreNutation(
-                        upperturbateCoreFactor, freeCoreNutationRate );
+            marsRotationModelSettings->setCoreFactorAndFreeCoreNutation( upperturbateCoreFactor, freeCoreNutationRate );
 
             std::shared_ptr< RotationalEphemeris > upperturbatedMarsRotationModel =
                     createRotationModel( marsRotationModelSettings, "Mars" );
@@ -845,10 +830,9 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                     upperturbatedMarsRotationModel->getRotationToBaseFrame( testTime ).toRotationMatrix( );
 
             Eigen::Matrix3d upperturbedRotationMatrixDerivative =
-                    upperturbatedMarsRotationModel->getDerivativeOfRotationToBaseFrame(  testTime );
+                    upperturbatedMarsRotationModel->getDerivativeOfRotationToBaseFrame( testTime );
 
-            marsRotationModelSettings->setCoreFactorAndFreeCoreNutation(
-                        downperturbateCoreFactor, freeCoreNutationRate );
+            marsRotationModelSettings->setCoreFactorAndFreeCoreNutation( downperturbateCoreFactor, freeCoreNutationRate );
 
             std::shared_ptr< RotationalEphemeris > downperturbatedMarsRotationModel =
                     createRotationModel( marsRotationModelSettings, "Mars" );
@@ -863,16 +847,15 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
                     ( upperturbedRotationMatrix - downperturbedRotationMatrix ) / ( 2.0 * perturbation );
 
             Eigen::Matrix3d numericalRotationMatrixDerivativePartial =
-                    ( upperturbedRotationMatrixDerivative - downperturbedRotationMatrixDerivative ) /
-                    ( 2.0 * perturbation );
+                    ( upperturbedRotationMatrixDerivative - downperturbedRotationMatrixDerivative ) / ( 2.0 * perturbation );
 
             Eigen::Matrix3d matrixDifference = rotationMatrixPartials.at( 0 ) - numericalRotationMatrixPartial;
 
-//            std::cout << "analitical Rotation Matrix Partial"<< std::endl << rotationMatrixPartials.at( 0 ) << std::endl;
+            //            std::cout << "analitical Rotation Matrix Partial"<< std::endl << rotationMatrixPartials.at( 0 ) << std::endl;
 
-//            std::cout << "numerical Rotation Matrix Partial"<< std::endl << numericalRotationMatrixPartial << std::endl;
+            //            std::cout << "numerical Rotation Matrix Partial"<< std::endl << numericalRotationMatrixPartial << std::endl;
 
-//            std::cout << "rotation Matrix Partial difference"<< std::endl << matrixDifference << std::endl;
+            //            std::cout << "rotation Matrix Partial difference"<< std::endl << matrixDifference << std::endl;
 
             // Compare analytical and numerical result.
 
@@ -886,15 +869,15 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
 
             matrixDifference = rotationMatrixDerivativePartials.at( 0 ) - numericalRotationMatrixDerivativePartial;
 
-//            std::cout << "analitical Rotation Matrix derivative Partial"<< std::endl <<
-//                         rotationMatrixDerivativePartials.at( 0 ) << std::endl;
+            //            std::cout << "analitical Rotation Matrix derivative Partial"<< std::endl <<
+            //                         rotationMatrixDerivativePartials.at( 0 ) << std::endl;
 
-//            std::cout << "numerical Rotation Matrix derivative Partial"<< std::endl <<
-//                         numericalRotationMatrixDerivativePartial << std::endl;
+            //            std::cout << "numerical Rotation Matrix derivative Partial"<< std::endl <<
+            //                         numericalRotationMatrixDerivativePartial << std::endl;
 
-//            std::cout << "rotation Matrix derivative Partial difference"<< std::endl << matrixDifference << std::endl;
+            //            std::cout << "rotation Matrix derivative Partial difference"<< std::endl << matrixDifference << std::endl;
 
-            //Compare analytical and numerical result.
+            // Compare analytical and numerical result.
 
             for( unsigned int i = 0; i < 3; i++ )
             {
@@ -906,15 +889,15 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
         }
     }
 
-    //Test for Rotation Matrix Partial wrt Free Core Nutation
+    // Test for Rotation Matrix Partial wrt Free Core Nutation
     {
-//        std::cout << std::endl << std::endl << "Free Core Nutation" << std::endl;
+        //        std::cout << std::endl << std::endl << "Free Core Nutation" << std::endl;
 
         // Create partial object.
 
         std::shared_ptr< RotationMatrixPartialWrtFreeCoreNutationRate > rotationMatrixPartialObject =
                 std::make_shared< RotationMatrixPartialWrtFreeCoreNutationRate >(
-                    std::dynamic_pointer_cast< PlanetaryRotationModel >( marsRotationModel ) );
+                        std::dynamic_pointer_cast< PlanetaryRotationModel >( marsRotationModel ) );
 
         // Compute partial analytically
 
@@ -930,12 +913,11 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
         {
             double perturbation = 5.0E-11;
 
-            double upperturbateFreeCoreNutationRate = freeCoreNutationRate + perturbation ;
+            double upperturbateFreeCoreNutationRate = freeCoreNutationRate + perturbation;
 
+            double downperturbateFreeCoreNutationRate = freeCoreNutationRate - perturbation;
 
-            double downperturbateFreeCoreNutationRate = freeCoreNutationRate - perturbation ;
-
-            marsRotationModelSettings->setCoreFactorAndFreeCoreNutation( coreFactor , upperturbateFreeCoreNutationRate );
+            marsRotationModelSettings->setCoreFactorAndFreeCoreNutation( coreFactor, upperturbateFreeCoreNutationRate );
 
             std::shared_ptr< RotationalEphemeris > upperturbatedMarsRotationModel =
                     createRotationModel( marsRotationModelSettings, "Mars" );
@@ -960,16 +942,15 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
             Eigen::Matrix3d numericalRotationMatrixPartial =
                     ( upperturbedRotationMatrix - downperturbedRotationMatrix ) / ( 2.0 * perturbation );
             Eigen::Matrix3d numericalRotationMatrixDerivativePartial =
-                    ( upperturbedRotationMatrixDerivative - downperturbedRotationMatrixDerivative ) /
-                    ( 2.0 * perturbation );
+                    ( upperturbedRotationMatrixDerivative - downperturbedRotationMatrixDerivative ) / ( 2.0 * perturbation );
 
             Eigen::Matrix3d matrixDifference = rotationMatrixPartials.at( 0 ) - numericalRotationMatrixPartial;
 
-//            std::cout << "analitical Rotation Matrix Partial"<< std::endl << rotationMatrixPartials.at( 0 ) << std::endl;
+            //            std::cout << "analitical Rotation Matrix Partial"<< std::endl << rotationMatrixPartials.at( 0 ) << std::endl;
 
-//            std::cout << "numerical Rotation Matrix Partial"<< std::endl << numericalRotationMatrixPartial << std::endl;
+            //            std::cout << "numerical Rotation Matrix Partial"<< std::endl << numericalRotationMatrixPartial << std::endl;
 
-//            std::cout << "rotation Matrix Partial difference"<< std::endl << matrixDifference << std::endl;
+            //            std::cout << "rotation Matrix Partial difference"<< std::endl << matrixDifference << std::endl;
 
             // Compare analytical and numerical result.
 
@@ -983,15 +964,15 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
 
             matrixDifference = rotationMatrixDerivativePartials.at( 0 ) - numericalRotationMatrixDerivativePartial;
 
-//            std::cout << "analitical Rotation Matrix derivative Partial"<< std::endl <<
-//                         rotationMatrixDerivativePartials.at( 0 ) << std::endl;
+            //            std::cout << "analitical Rotation Matrix derivative Partial"<< std::endl <<
+            //                         rotationMatrixDerivativePartials.at( 0 ) << std::endl;
 
-//            std::cout << "numerical Rotation Matrix derivative Partial"<< std::endl <<
-//                         numericalRotationMatrixDerivativePartial << std::endl;
+            //            std::cout << "numerical Rotation Matrix derivative Partial"<< std::endl <<
+            //                         numericalRotationMatrixDerivativePartial << std::endl;
 
-//            std::cout << "rotation Matrix derivative Partial difference"<< std::endl << matrixDifference << std::endl;
+            //            std::cout << "rotation Matrix derivative Partial difference"<< std::endl << matrixDifference << std::endl;
 
-            //Compare analytical and numerical result.
+            // Compare analytical and numerical result.
 
             for( unsigned int i = 0; i < 3; i++ )
             {
@@ -1002,15 +983,9 @@ BOOST_AUTO_TEST_CASE( testPlanetaryRotationModelEphemerisPartials )
             }
         }
     }
-
 }
 BOOST_AUTO_TEST_SUITE_END( )
 
-} // namespace unit_tests
+}  // namespace unit_tests
 
-} // namespace tudat
-
-
-
-
-
+}  // namespace tudat

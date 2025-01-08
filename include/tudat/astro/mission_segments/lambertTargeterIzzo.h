@@ -24,9 +24,8 @@
 #ifndef TUDAT_LAMBERT_TARGETER_IZZO_H
 #define TUDAT_LAMBERT_TARGETER_IZZO_H
 
-#include <memory>
-
 #include <Eigen/Core>
+#include <memory>
 
 #include "tudat/astro/mission_segments/lambertTargeter.h"
 
@@ -42,7 +41,6 @@ namespace mission_segments
 class LambertTargeterIzzo : public LambertTargeter
 {
 public:
-
     //! Constructor with immediate definition of parameters and execution of the algorithm.
     /*!
      * Constructor with immediate definition of parameters and execution of the algorithm.
@@ -63,14 +61,10 @@ public:
                          const double aGravitationalParameter,
                          const bool isRetrograde = false,
                          const double convergenceTolerance = 1e-9,
-                         const int maximumNumberOfIterations = 50 )
-        : LambertTargeter( aCartesianPositionAtDeparture,
-                           aCartesianPositionAtArrival,
-                           aTimeOfFlight,
-                           aGravitationalParameter ),
-          isRetrograde_( isRetrograde ),
-          convergenceTolerance_( convergenceTolerance ),
-          maximumNumberOfIterations_( maximumNumberOfIterations )
+                         const int maximumNumberOfIterations = 50 ):
+        LambertTargeter( aCartesianPositionAtDeparture, aCartesianPositionAtArrival, aTimeOfFlight, aGravitationalParameter ),
+        isRetrograde_( isRetrograde ), convergenceTolerance_( convergenceTolerance ),
+        maximumNumberOfIterations_( maximumNumberOfIterations )
     {
         // Execute algorithm.
         execute( );
@@ -112,7 +106,6 @@ public:
     double getSemiMajorAxis( );
 
 protected:
-
     //! Execute Lambert targeting algorithm.
     /*!
      * Executes the Lambert targeting algorithm.
@@ -120,7 +113,6 @@ protected:
     void execute( );
 
 private:
-
     //! Retrograde motion flag.
     /*!
      * Retrograde motion flag.
@@ -143,7 +135,7 @@ private:
 //! Typedef for shared-pointer to LambertTargeterIzzo object.
 typedef std::shared_ptr< LambertTargeterIzzo > LambertTargeterIzzoPointer;
 
-} // namespace mission_segments
-} // namespace tudat
+}  // namespace mission_segments
+}  // namespace tudat
 
-#endif // TUDAT_LAMBERT_TARGETER_IZZO_H
+#endif  // TUDAT_LAMBERT_TARGETER_IZZO_H

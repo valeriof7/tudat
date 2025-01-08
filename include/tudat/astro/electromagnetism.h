@@ -14,15 +14,14 @@
 #include "electromagnetism/basicElectroMagnetism.h"
 #include "electromagnetism/lorentzStaticMagneticAcceleration.h"
 #include "electromagnetism/lorentzStaticMagneticForce.h"
-#include "electromagnetism/radiationPressureInterface.h"
-
-#include "electromagnetism/radiationSourceModel.h"
 #include "electromagnetism/luminosityModel.h"
-#include "electromagnetism/sourcePanelRadiosityModel.h"
-#include "electromagnetism/radiationPressureTargetModel.h"
-#include "electromagnetism/radiationPressureAcceleration.h"
-#include "electromagnetism/reflectionLaw.h"
 #include "electromagnetism/occultationModel.h"
+#include "electromagnetism/radiationPressureAcceleration.h"
+#include "electromagnetism/radiationPressureInterface.h"
+#include "electromagnetism/radiationPressureTargetModel.h"
+#include "electromagnetism/radiationSourceModel.h"
+#include "electromagnetism/reflectionLaw.h"
+#include "electromagnetism/sourcePanelRadiosityModel.h"
 #include "electromagnetism/surfacePropertyDistribution.h"
 
-#endif // TUDAT_ELECTROMAGNETISM_H
+#endif  // TUDAT_ELECTROMAGNETISM_H

@@ -9,9 +9,9 @@
  *
  */
 
-#include "tudat/astro/electromagnetism/lorentzStaticMagneticForce.h"
 #include "tudat/astro/electromagnetism/lorentzStaticMagneticAcceleration.h"
 
+#include "tudat/astro/electromagnetism/lorentzStaticMagneticForce.h"
 
 namespace tudat
 {
@@ -19,16 +19,15 @@ namespace electromagnetism
 {
 
 //! Compute acceleration due to static magnetic field
-Eigen::Vector3d computeLorentzAccelerationDueToStaticMagneticField(
-        const Eigen::Vector3d& velocityOfBodySubjectToAcceleration,
-        const Eigen::Vector3d& localMagneticField,
-        const double chargeOfBodySubjectToAcceleration,
-        const double massOfBodySubjectToAcceleration )
+Eigen::Vector3d computeLorentzAccelerationDueToStaticMagneticField( const Eigen::Vector3d& velocityOfBodySubjectToAcceleration,
+                                                                    const Eigen::Vector3d& localMagneticField,
+                                                                    const double chargeOfBodySubjectToAcceleration,
+                                                                    const double massOfBodySubjectToAcceleration )
 {
     return computeLorentzForceDueToStaticMagneticField(
-                velocityOfBodySubjectToAcceleration, localMagneticField,
-                chargeOfBodySubjectToAcceleration ) / massOfBodySubjectToAcceleration;
+                   velocityOfBodySubjectToAcceleration, localMagneticField, chargeOfBodySubjectToAcceleration ) /
+            massOfBodySubjectToAcceleration;
 }
 
-} // namespace electromagnetism
-} // namespace tudat
+}  // namespace electromagnetism
+}  // namespace tudat
