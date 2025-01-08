@@ -33,7 +33,7 @@ namespace basic_astrodynamics
 Eigen::Vector3d calculateDegreeTwoBasicTidalDisplacement( 
     const double gravitationalParameterRatio,
     const Eigen::Vector3d& stationPositionUnitVector,
-                                                          const Eigen::Vector3d& relativeBodyState,
+    const Eigen::Vector3d& relativeBodyState,
                                                           const double bodyEquatorialRadius,
                                                           const double degreeTwoLoveNumber,
                                                           const double degreeTwoShidaNumber );
