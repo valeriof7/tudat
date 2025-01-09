@@ -51,7 +51,7 @@ public:
     BasicTidalBodyDeformation( const std::function< Eigen::Vector6d( const double ) > deformedBodyStateFunction,
                                const std::vector< std::function< Eigen::Vector6d( const double ) > >& deformingBodyStateFunctions,
                                const std::function< Eigen::Quaterniond( const double ) > deformedBodyRotationFunction,
-                               const std::function< double( ) > gravitionalParameterOfDeformedBody,
+        const std::function< double( ) > gravitionalParameterOfDeformedBody,
                                const std::vector< std::function< double( ) > >& gravitionalParametersOfDeformingBodies,
                                const double deformedBodyEquatorialRadius,
                                const std::map< int, std::pair< double, double > >& displacementLoveNumbers );
