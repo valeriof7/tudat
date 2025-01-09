@@ -40,8 +40,8 @@ Eigen::Vector3d calculateDegreeTwoBasicTidalDisplacement( const double gravitati
 //! Calculate displacement due to degree 3 tide, band-independet love and shida numbers.
 Eigen::Vector3d calculateDegreeThreeBasicTidalDisplacement( const double gravitationalParameterRatio,
                                                             const Eigen::Vector3d& stationPositionUnitVector,
-    const Eigen::Vector3d& relativeBodyState,
-                                            const double bodyEquatorialRadius,
+                                                            const Eigen::Vector3d& relativeBodyState,
+                                                            const double bodyEquatorialRadius,
                                                             const double degreeThreeLoveNumber,
                                                             const double degreeThreeShidaNumber );
 
@@ -50,11 +50,11 @@ class BasicTidalBodyDeformation : public BodyDeformationModel
 public:
     BasicTidalBodyDeformation( const std::function< Eigen::Vector6d( const double ) > deformedBodyStateFunction,
                                const std::vector< std::function< Eigen::Vector6d( const double ) > >& deformingBodyStateFunctions,
-                                 const std::function< Eigen::Quaterniond( const double ) > deformedBodyRotationFunction,
-        const std::function< double( ) > gravitionalParameterOfDeformedBody,
-        const std::vector< std::function< double( ) > >& gravitionalParametersOfDeformingBodies,
-            const double deformedBodyEquatorialRadius,
-                     const std::map< int, std::pair< double, double > >& displacementLoveNumbers );
+                               const std::function< Eigen::Quaterniond( const double ) > deformedBodyRotationFunction,
+                               const std::function< double( ) > gravitionalParameterOfDeformedBody,
+                               const std::vector< std::function< double( ) > >& gravitionalParametersOfDeformingBodies,
+                               const double deformedBodyEquatorialRadius,
+                               const std::map< int, std::pair< double, double > >& displacementLoveNumbers );
 
     virtual Eigen::Vector3d calculateDisplacement( const double time, const Eigen::Vector3d& bodyFixedPosition );
 
