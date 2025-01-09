@@ -41,7 +41,7 @@ Eigen::Vector3d calculateDegreeTwoBasicTidalDisplacement( const double gravitati
 Eigen::Vector3d calculateDegreeThreeBasicTidalDisplacement( const double gravitationalParameterRatio,
                                                             const Eigen::Vector3d& stationPositionUnitVector,
     const Eigen::Vector3d& relativeBodyState,
-                                                            const double bodyEquatorialRadius,
+                                            const double bodyEquatorialRadius,
                                                             const double degreeThreeLoveNumber,
                                                             const double degreeThreeShidaNumber );
 
