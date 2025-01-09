@@ -54,7 +54,7 @@ public:
         const std::function< double( ) > gravitionalParameterOfDeformedBody,
         const std::vector< std::function< double( ) > >& gravitionalParametersOfDeformingBodies,
         const double deformedBodyEquatorialRadius,
-                               const std::map< int, std::pair< double, double > >& displacementLoveNumbers );
+                        const std::map< int, std::pair< double, double > >& displacementLoveNumbers );
 
     virtual Eigen::Vector3d calculateDisplacement( const double time, const Eigen::Vector3d& bodyFixedPosition );
 
