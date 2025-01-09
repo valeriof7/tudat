@@ -47,9 +47,9 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: false
 SpaceBeforeCtorInitializerColon: false
 SpacesInAngles: true
 SpacesInParentheses: true
-# SpacesInSquareBrackets: true
+SpacesInSquareBrackets: true
 SpaceInEmptyParentheses: true
-SpaceInEmptySquareBrackets: true
+# SpaceInEmptySquareBrackets: true
 SpaceInEmptyBlock: true
 
 ColumnLimit: 140
