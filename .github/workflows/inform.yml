@@ -16,8 +16,8 @@ jobs:
       - name: repository-dispatch
         uses: peter-evans/repository-dispatch@v1
         with:
-          token: ${{ secrets.GH_TOKEN }}
-          repository: tudat-team/.github
+          token: ${{ secrets.GH_PAT }}
+          repository: valeriof7/tudat
           event-type: push to ${{ github.repository }}
           client-payload: >-
             {
