@@ -21,6 +21,9 @@ namespace aerodynamics
         // Compute the hash key??
         basic_astrodynamics::DateTime currentDateTime_ = basic_astrodynamics::getCalendarDateFromTime( time );
         currentF107_ =  f107Function_( time );
+        if (currentF107_ > 100.0) {
+            currentF107_ = 100.0;
+        }
         //std::cout << "F107: " << currentF107_ << std::endl;
         currentDensity_ = getTotalDensity(
                 altitude, latitude, longitude,
@@ -254,6 +257,9 @@ namespace aerodynamics
         double doy = date2.marsDayofYear(date2); //day of year
         //std::cout << "doy: " << doy << std::endl;
         double t = computeLocalSolarTime(longitude, day_, month_, year_, hours_, minutes_); //seconds
+        if (currentF107_ > 100.0) {
+            currentF107_ = 100.0;
+        }
         //std::cout<<"F107: "<<currentF107_<<std::endl;
         double F = currentF107_ - 65.0;
         // Non-periodic term
@@ -300,6 +306,9 @@ namespace aerodynamics
         double sin2h = 2.0*sin(hl0)*cos(hl0);
         //flux terms:
         double ff0 = 0.0;
+        if (currentF107_ > 100.0) {
+            currentF107_ = 100.0;
+        }
         double F = currentF107_ - 65.0;
         //std::cout<<"currentF107 "<<currentF107_<<std::endl;
         double F2 = F*F;
