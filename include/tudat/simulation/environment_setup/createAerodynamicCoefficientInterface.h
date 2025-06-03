@@ -446,6 +446,36 @@ private:
     std::function< Eigen::Vector3d( const std::vector< double >& ) > momentCoefficientFunction_;
 };
 
+class PanelledAerodynamicCoefficientSettings: public AerodynamicCoefficientSettings
+{
+public:
+
+PanelledAerodynamicCoefficientSettings( const tudat::aerodynamics::GasSurfaceInteractionModelType gasSurfaceInteractionModelType, 
+                                        const int maximumNumberOfPixels ):
+                                        AerodynamicCoefficientSettings( panelled_coefficients, TUDAT_NAN,
+                                         TUDAT_NAN, Eigen::Vector3d::Zero( ), {} ),
+                                        gasSurfaceInteractionModelType_( gasSurfaceInteractionModelType ),
+                                        maximumNumberOfPixels_( maximumNumberOfPixels )
+{ }
+
+int getMaximumNumberOfPixels( ) const
+{
+    return maximumNumberOfPixels_;
+}
+
+tudat::aerodynamics::GasSurfaceInteractionModelType getGasSurfaceInteractionModelType( ) const
+{
+    return gasSurfaceInteractionModelType_;
+}
+
+private:
+
+tudat::aerodynamics::GasSurfaceInteractionModelType gasSurfaceInteractionModelType_;
+
+int maximumNumberOfPixels_;
+
+};
+
 //! @get_docstring(constantAerodynamicCoefficientSettings)
 inline std::shared_ptr< AerodynamicCoefficientSettings > constantAerodynamicCoefficientSettingsDeprecated(
         const double referenceArea,
@@ -605,6 +635,13 @@ inline std::shared_ptr< AerodynamicCoefficientSettings > customAerodynamicCoeffi
             independentVariableNames,
             forceCoefficientsFrame,
             aerodynamics::undefined_frame_coefficients );
+}
+
+inline std::shared_ptr< AerodynamicCoefficientSettings > panelledAerodynamicCoefficientSettings( 
+        const tudat::aerodynamics::GasSurfaceInteractionModelType gasSurfaceInteractionModelType,
+        const int maximumNumberOfPixels = 0 ) 
+{
+    return std::make_shared< PanelledAerodynamicCoefficientSettings >( gasSurfaceInteractionModelType, maximumNumberOfPixels );
 }
 
 //  Base class (non-functional) for the different classes of TabulatedAerodynamicCoefficientSettings.

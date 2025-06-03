@@ -324,6 +324,9 @@ std::string getDependentVariableName( const std::shared_ptr< SingleDependentVari
         case full_body_paneled_geometry:
             variableName = "Full body paneled geometry";
             break;
+        case aerodynamic_coefficients:
+            variableName = "Aerodynamic coefficients";
+            break;
         default:
             std::string errorMessage = "Error, dependent variable " + std::to_string( propagationDependentVariables ) +
                     "not found when retrieving parameter name ";
@@ -472,6 +475,10 @@ std::string getDependentVariableId( const std::shared_ptr< SingleDependentVariab
                         dependentVariableSettings->secondaryBody_;
     }
     if ( dependentVariableSettings->dependentVariableType_ == full_body_paneled_geometry )
+    {
+        variableId += " of body " + dependentVariableSettings->associatedBody_;
+    }
+    if ( dependentVariableSettings->dependentVariableType_ == aerodynamic_coefficients )
     {
         variableId += " of body " + dependentVariableSettings->associatedBody_;
     }

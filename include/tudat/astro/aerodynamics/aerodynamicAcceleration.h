@@ -20,6 +20,9 @@
 #include "tudat/astro/aerodynamics/aerodynamicCoefficientInterface.h"
 #include "tudat/astro/aerodynamics/aerodynamicForce.h"
 #include "tudat/astro/basic_astro/accelerationModel.h"
+#include "tudat/astro/system_models/selfShadowing.h"
+#include "tudat/astro/aerodynamics/gasSurfaceInteractionModel.h"
+#include "tudat/simulation/environment_setup/body.h"
 
 namespace tudat
 {
@@ -91,8 +94,8 @@ public:
      *          (default true).
      */
     AerodynamicAcceleration( const CoefficientReturningFunction coefficientFunction,
-                             const DoubleReturningFunction densityFunction,
-                             const DoubleReturningFunction airSpeedFunction,
+                             const std::function< double( ) > densityFunction,
+                             const std::function< double( ) > airSpeedFunction,
                              const double constantMass,
                              const double constantReferenceArea,
                              const bool areCoefficientsInNegativeDirection = true ):
@@ -118,10 +121,10 @@ public:
      *          (default true).
      */
     AerodynamicAcceleration( const CoefficientReturningFunction coefficientFunction,
-                             const DoubleReturningFunction densityFunction,
-                             const DoubleReturningFunction airSpeedFunction,
-                             const DoubleReturningFunction massFunction,
-                             const DoubleReturningFunction referenceAreaFunction,
+                             const std::function< double( ) > densityFunction,
+                             const std::function< double( ) > airSpeedFunction,
+                             const std::function< double( ) > massFunction,
+                             const std::function< double( ) > referenceAreaFunction,
                              const bool areCoefficientsInNegativeDirection = true ):
         coefficientFunction_( coefficientFunction ), densityFunction_( densityFunction ), airSpeedFunction_( airSpeedFunction ),
         massFunction_( massFunction ), referenceAreaFunction_( referenceAreaFunction )
@@ -130,7 +133,7 @@ public:
     }
 
     //! Destructor
-    ~AerodynamicAcceleration( ) { }
+    virtual ~AerodynamicAcceleration( ) { }
 
     //! Update member variables used by the aerodynamic acceleration model.
     /*!
@@ -140,7 +143,7 @@ public:
      * them to update the associated variables to their current state.
      * \param currentTime Time at which acceleration model is to be updated.
      */
-    void updateMembers( const double currentTime = TUDAT_NAN )
+    virtual void updateMembers( const double currentTime = TUDAT_NAN )
     {
         if( !( this->currentTime_ == currentTime ) )
         {
@@ -169,21 +172,21 @@ public:
         return currentMass_;
     }
 
-private:
+protected:
     //! Function to retrieve the current aerodynamic force coefficients.
     const CoefficientReturningFunction coefficientFunction_;
 
     //! Function to retrieve the current density.
-    const DoubleReturningFunction densityFunction_;
+    const std::function< double( ) > densityFunction_;
 
     //! Function to retrieve the current airspeed.
-    const DoubleReturningFunction airSpeedFunction_;
+    const std::function< double( ) > airSpeedFunction_;
 
     //! Function to retrieve the current mass.
-    const DoubleReturningFunction massFunction_;
+    const std::function< double( ) > massFunction_;
 
     //! Function to retrieve the current reference area.
-    const DoubleReturningFunction referenceAreaFunction_;
+    const std::function< double( ) > referenceAreaFunction_;
 
     //! Current aerodynamic force coefficients.
     Eigen::Vector3d currentForceCoefficients_;
@@ -202,6 +205,142 @@ private:
 
     //! Multiplier to reverse direction of coefficients.
     double coefficientMultiplier_;
+};
+
+class PanelledAerodynamicAcceleration : public AerodynamicAcceleration
+{
+public:
+PanelledAerodynamicAcceleration( const std::shared_ptr< tudat::simulation_setup::Body > bodyUndergoingAcceleration,
+                                 const GasSurfaceInteractionModelType gasSurfaceInteractionModel, 
+                                 const int maximumNumberOfPixels,
+                                 const std::function< double( ) > densityFunction,
+                                 const std::function< double( ) > airSpeedFunction,
+                                 const std::function< double( ) > massFunction,
+                                 const std::function< Eigen::Vector3d( ) > airSpeedVectorFunction,
+                                 const std::function< double( ) > freeStreamTemperatureFunction ):
+                                 AerodynamicAcceleration( nullptr,
+                                    densityFunction,
+                                    airSpeedFunction,
+                                    massFunction,
+                                    nullptr ),
+                                 bodyUndergoingAcceleration_( bodyUndergoingAcceleration ),
+                                 gasSurfaceInteractionModelType_( gasSurfaceInteractionModel ),
+                                 maximumNumberOfPixels_( maximumNumberOfPixels ),
+                                 airSpeedVectorFunction_( airSpeedVectorFunction ),
+                                 freeStreamTemperatureFunction_( freeStreamTemperatureFunction )
+{ 
+    switch( gasSurfaceInteractionModelType_ )
+    {
+        case newton: {
+            gasSurfaceInteractionModel_ = std::make_shared< NewtonGasSurfaceInteractionModel >( 
+                bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ), maximumNumberOfPixels_,
+                airSpeedVectorFunction_, freeStreamTemperatureFunction_);
+            break;
+        }
+        case storch: {
+            // checking material properties
+            for ( auto panel: bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ) )
+            {
+                if ( std::isnan( panel->getNormalAccomodationCoefficient( ) ) )
+                {
+                    throw std::runtime_error( "Error, normal accomodation coefficient for panel type " + panel->getPanelTypeId( ) +
+                            " not defined but is required for Storch model" );
+                }
+                if ( std::isnan( panel->getTangentialAccomodationCoefficient( ) ) )
+                {
+                    throw std::runtime_error( "Error, tangential accomodation coefficient for panel type " + panel->getPanelTypeId( ) +
+                            " not defined but is required for Storch model" );
+                }
+                if ( std::isnan( panel->getNormalVelocityAtWallRatio( ) ) )
+                {
+                    throw std::runtime_error( "Error, normal velocity ratio for panel type " + panel->getPanelTypeId( ) +
+                            " not defined but is required for Storch model" );
+                }
+            }
+            gasSurfaceInteractionModel_ = std::make_shared< StorchGasSurfaceInteractionModel >( 
+                bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ), maximumNumberOfPixels_,
+                airSpeedVectorFunction_, freeStreamTemperatureFunction_);
+            break;
+        }
+        case sentman: {
+            // checking material properties
+            for ( auto panel: bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ) )
+            {
+                if ( std::isnan( panel->getEnergyAccomodationCoefficient( ) ) )
+                {
+                    throw std::runtime_error( "Error, energy accomodation coefficient for panel type " + panel->getPanelTypeId( ) +
+                            " not defined but is required for Sentman model" );
+                }
+            }
+            gasSurfaceInteractionModel_ = std::make_shared< SentmanGasSurfaceInteractionModel >( 
+                bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ), maximumNumberOfPixels_,
+                airSpeedVectorFunction_, freeStreamTemperatureFunction_);
+            break;
+        }
+        case cook: {
+            // checking material properties
+            for ( auto panel: bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ) )
+            {
+                if ( std::isnan( panel->getEnergyAccomodationCoefficient( ) ) )
+                {
+                    throw std::runtime_error( "Error, energy accomodation coefficient for panel type " + panel->getPanelTypeId( ) +
+                            " not defined but is required for Cook model" );
+                }
+            }
+            gasSurfaceInteractionModel_ = std::make_shared< CookGasSurfaceInteractionModel >( 
+                bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ), maximumNumberOfPixels_,
+                airSpeedVectorFunction_, freeStreamTemperatureFunction_);
+            break;
+        }
+        default:
+            throw std::runtime_error( "Error, unknown gas surface interaction model provided for " + bodyUndergoingAcceleration_->getBodyName( ) );
+    }
+}
+
+void updateMembers( const double currentTime = TUDAT_NAN )
+    {
+        if( !( this->currentTime_ == currentTime ) )
+        {
+            currentDensity_ = this->densityFunction_( );
+            currentMass_ = this->massFunction_( );
+            currentAirspeed_ = this->airSpeedVectorFunction_( ).norm( );
+            currentForceCoefficientsBodyFrame_ = gasSurfaceInteractionModel_->computeAerodynamicCoefficients( );
+            currentForceCoefficients_ = bodyUndergoingAcceleration_->getCurrentRotationToGlobalFrame( ) * currentForceCoefficientsBodyFrame_;
+            currentReferenceArea_ = gasSurfaceInteractionModel_->getReferenceArea( );
+            currentTime_ = currentTime;
+
+            currentAcceleration_ = computeAerodynamicAcceleration( 0.5 * currentDensity_ * currentAirspeed_ * currentAirspeed_,
+                                                                   currentReferenceArea_,
+                                                                   currentForceCoefficients_,
+                                                                   currentMass_ );
+        }
+    }
+
+std::shared_ptr< GasSurfaceInteractionModel > getGasSurfaceInteractionModel( ) const
+{
+    return gasSurfaceInteractionModel_;
+}
+
+Eigen::Vector3d getAerodynamicCoefficients( ) const
+{
+    return currentForceCoefficientsBodyFrame_;
+}
+private:
+
+std::shared_ptr< tudat::simulation_setup::Body > bodyUndergoingAcceleration_;
+
+GasSurfaceInteractionModelType gasSurfaceInteractionModelType_;
+
+std::shared_ptr< GasSurfaceInteractionModel > gasSurfaceInteractionModel_;
+
+int maximumNumberOfPixels_;
+
+std::function< Eigen::Vector3d( ) > airSpeedVectorFunction_;
+
+std::function< double( ) > freeStreamTemperatureFunction_;
+
+Eigen::Vector3d currentForceCoefficientsBodyFrame_;
+
 };
 
 //! Typedef for shared-pointer to AerodynamicAcceleration object.

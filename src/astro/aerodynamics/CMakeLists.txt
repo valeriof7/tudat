@@ -23,6 +23,7 @@ set(aerodynamics_SOURCES
         "flightConditions.cpp"
         "trimOrientation.cpp"
         "equilibriumWallTemperature.cpp"
+        "gasSurfaceInteractionModel.cpp"
         )
 
 # Set the header files.
@@ -46,6 +47,7 @@ set(aerodynamics_HEADERS
         "aerodynamicGuidance.h"
         "equilibriumWallTemperature.h"
         "windModel.h"
+        "gasSurfaceInteractionModel.h"
         )
 
     set(aerodynamics_SOURCES

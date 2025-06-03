@@ -87,7 +87,7 @@ void PaneledRadiationPressureTargetModel::updateRadiationPressureForcing( double
         surfacePanelCosines_[ i ] = ( -sourceToTargetDirectionLocalFrame ).dot( surfaceNormals_[ i ] );
         if( computeTorques_ )
         {
-            panelCentroidMomentArms_[ i ] = this->allPanels_.at( i )->getFrameFixedPositionVector( )( ) - currentCenterOfMass ;
+            panelCentroidMomentArms_[ i ] = this->allPanels_.at( i )->getBodyFixedPositionVector( )( ) - currentCenterOfMass ;
         }
         if( surfacePanelCosines_[ i ] > 0 )
         {

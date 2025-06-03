@@ -680,6 +680,47 @@ private:
     bool isScalingRelative_;
 };
 
+enum GasSurfaceInteractionModelType
+{
+    newton,
+    storch,
+    sentman,
+    cook
+};
+
+class PanelledAerodynamicCoefficientInterface : public AerodynamicCoefficientInterface
+{
+public:
+
+PanelledAerodynamicCoefficientInterface( const GasSurfaceInteractionModelType gasSurfaceInteractionModelType, 
+                                         const int maximumNumberOfPixels ):
+                                         AerodynamicCoefficientInterface( TUDAT_NAN, TUDAT_NAN, Eigen::Vector3d::Zero( ), { } ),
+                                         gasSurfaceInteractionModelType_( gasSurfaceInteractionModelType ),
+                                         maximumNumberOfPixels_( maximumNumberOfPixels )
+{ }
+
+void updateCurrentCoefficients( const std::vector<double>& independentVariables, 
+        const double currentTime = TUDAT_NAN) override
+{ }
+
+int getMaximumNumberOfPixels( ) const
+{
+    return maximumNumberOfPixels_;
+}
+
+GasSurfaceInteractionModelType getGasSurfaceInteractionModelType( ) const
+{
+    return gasSurfaceInteractionModelType_;
+}
+
+private:
+
+GasSurfaceInteractionModelType gasSurfaceInteractionModelType_;
+
+int maximumNumberOfPixels_;
+
+};
+
 //! Typedef for shared-pointer to AerodynamicCoefficientInterface object.
 typedef std::shared_ptr< AerodynamicCoefficientInterface > AerodynamicCoefficientInterfacePointer;
 

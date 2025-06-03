@@ -443,6 +443,33 @@ std::shared_ptr< aerodynamics::AerodynamicCoefficientInterface > createAerodynam
             }
             break;
         }
+        case panelled_coefficients: {
+            if ( bodies.count( body ) == 0 )
+            {
+                throw std::runtime_error( "Error, trying to set panelled coefficients but body " + body + " not found ");
+            }
+            // Check consistency of type.
+            std::shared_ptr< PanelledAerodynamicCoefficientSettings > panelledCoefficientSettings =
+                    std::dynamic_pointer_cast< PanelledAerodynamicCoefficientSettings >( coefficientSettings );
+            if( panelledCoefficientSettings == nullptr )
+            {
+                throw std::runtime_error( "Error, expected panelled coefficients for body " + body );
+            }
+            std::shared_ptr< system_models::VehicleSystems > vehicle = 
+                std::dynamic_pointer_cast< system_models::VehicleSystems >( bodies.at( body )->getVehicleSystems( ) );
+            if ( vehicle == nullptr )
+            {
+                throw std::runtime_error( "Error, trying to set panelled coefficients but body " + body + " has no vehicle system assigned" );
+            }
+            if ( !vehicle->isPanelGeometryDefined( ) )
+            {
+                throw std::runtime_error( "Error, trying to set panelled coefficients but body " + body + " has no panelled geometry defined" );
+            }
+            coefficientInterface = std::make_shared< PanelledAerodynamicCoefficientInterface >( 
+                panelledCoefficientSettings->getGasSurfaceInteractionModelType( ), panelledCoefficientSettings->getMaximumNumberOfPixels( ) );
+            break;
+
+        }
         default:
             throw std::runtime_error( "Error, do not recognize aerodynamic coefficient settings for " + body );
     }

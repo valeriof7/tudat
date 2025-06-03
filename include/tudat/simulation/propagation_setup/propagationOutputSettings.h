@@ -139,7 +139,8 @@ enum PropagationDependentVariables {
     nrlmsise_input_data = 72,
     illuminated_panel_fraction = 73,
     cross_section_change = 74,
-    full_body_paneled_geometry = 75
+    full_body_paneled_geometry = 75,
+    aerodynamic_coefficients = 76
 
 };
 
@@ -638,6 +639,20 @@ public:
     { }
     
     std::string panelTypeId_;
+};
+
+class CrossSectionChangeDependentVariableSaveSettings : public SingleDependentVariableSaveSettings
+{
+public:
+    CrossSectionChangeDependentVariableSaveSettings( const std::string& bodyName,
+                                                     const std::string& sourceName, 
+                                                     const std::string& accelerationType ):
+        SingleDependentVariableSaveSettings( cross_section_change, bodyName, sourceName ),
+        accelerationType_( accelerationType )
+    { }
+
+    std::string accelerationType_;
+
 };
 
 // Function to get a string representing a 'named identification' of a variable type.
@@ -1327,14 +1342,19 @@ inline std::shared_ptr< SingleDependentVariableSaveSettings > illuminatedPanelFr
 }
 
 inline std::shared_ptr< SingleDependentVariableSaveSettings > crossSectionChangeDependentVariable( const std::string& bodyName,
-    const std::string& sourceName )
+    const std::string& sourceName, const std::string& accelerationType )
 {
-return std::make_shared< SingleDependentVariableSaveSettings >( cross_section_change, bodyName, sourceName );
+    return std::make_shared< CrossSectionChangeDependentVariableSaveSettings >( bodyName, sourceName, accelerationType );
 }
 
 inline std::shared_ptr< SingleDependentVariableSaveSettings > fullBodyPaneledGeometryDependentVariable( const std::string& bodyName )
 {
 return std::make_shared< SingleDependentVariableSaveSettings >( full_body_paneled_geometry, bodyName );
+}
+
+inline std::shared_ptr< SingleDependentVariableSaveSettings > aerodynamicCoefficientsInBodyFrameDependentVariable( const std::string& bodyName, const std::string& centralBodyName )
+{
+    return std::make_shared< SingleDependentVariableSaveSettings >( aerodynamic_coefficients, bodyName, centralBodyName );
 }
 
 }  // namespace propagators

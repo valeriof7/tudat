@@ -611,6 +611,9 @@ int getDependentVariableSize( const std::shared_ptr< SingleDependentVariableSave
             variableSize = 9 * totalNumberOfPanels;
             break;
         }
+        case aerodynamic_coefficients:
+            variableSize = 3;
+            break;
         default:
             std::string errorMessage = "Error, did not recognize dependent variable size of type: " +
                     std::to_string( dependentVariableSettings->dependentVariableType_ );

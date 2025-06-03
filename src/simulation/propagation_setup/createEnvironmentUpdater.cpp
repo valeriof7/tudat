@@ -368,11 +368,21 @@ createTranslationalEquationsOfMotionEnvironmentUpdaterSettings( const basic_astr
                         }
                         break;
                     }
-                    case aerodynamic:
+                    case aerodynamic: {
                         singleAccelerationUpdateNeeds[ body_rotational_state_update ].push_back( accelerationModelIterator->first );
                         singleAccelerationUpdateNeeds[ vehicle_flight_conditions_update ].push_back( acceleratedBodyIterator->first );
                         singleAccelerationUpdateNeeds[ body_mass_update ].push_back( acceleratedBodyIterator->first );
+                        std::shared_ptr< aerodynamics::PanelledAerodynamicAcceleration > panelledAerodynamicAcceleration =
+                                std::dynamic_pointer_cast< aerodynamics::PanelledAerodynamicAcceleration >(
+                                        accelerationModelIterator->second.at( i ) );
+                        if ( panelledAerodynamicAcceleration != nullptr && 
+                            std::count( singleAccelerationUpdateNeeds[body_segment_orientation_update].begin( ), 
+                                        singleAccelerationUpdateNeeds[body_segment_orientation_update].end( ), acceleratedBodyIterator->first ) == 0 )
+                        {
+                            singleAccelerationUpdateNeeds[body_segment_orientation_update].push_back( acceleratedBodyIterator->first );
+                        }
                         break;
+                    }
                     case radiation_pressure: {
                         const auto sourceName = accelerationModelIterator->first;
                         const auto targetName = acceleratedBodyIterator->first;
@@ -429,7 +439,9 @@ createTranslationalEquationsOfMotionEnvironmentUpdaterSettings( const basic_astr
                                 }
                             }
 
-                            if( paneledRadiationPressureTargetModel->getTotalNumberOfPanels( ) > 0 )
+                            if( paneledRadiationPressureTargetModel->getTotalNumberOfPanels( ) > 0 && 
+                                std::count( singleAccelerationUpdateNeeds[body_segment_orientation_update].begin( ), 
+                                            singleAccelerationUpdateNeeds[body_segment_orientation_update].end( ), targetName ) == 0 )
                             {
                                 singleAccelerationUpdateNeeds[ body_segment_orientation_update ].push_back( targetName );
                             }
