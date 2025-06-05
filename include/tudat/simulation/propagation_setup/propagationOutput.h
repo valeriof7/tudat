@@ -26,6 +26,7 @@
 #include "tudat/simulation/environment_setup/createFlightConditions.h"
 #include "tudat/math/basic/rotationRepresentations.h"
 #include "tudat/astro/aerodynamics/nrlmsise00Atmosphere.h"
+#include "tudat/astro/aerodynamics/aerodynamicAcceleration.h"
 
 namespace tudat
 {
@@ -1861,8 +1862,7 @@ std::pair< std::function< Eigen::VectorXd( ) >, int > getVectorDependentVariable
             };
             break;
         }
-        case aerodynamic_coefficients:
-        {
+        case aerodynamic_coefficients:{
             std::string targetBody = dependentVariableSettings->associatedBody_;
             std::string centralBody = dependentVariableSettings->secondaryBody_;
             auto aerodynamicAccelerationList = getAccelerationBetweenBodies( targetBody,
@@ -1871,16 +1871,16 @@ std::pair< std::function< Eigen::VectorXd( ) >, int > getVectorDependentVariable
                     basic_astrodynamics::aerodynamic );
             if( aerodynamicAccelerationList.empty( ) )
             {
-            std::string errorMessage = "Error, aerodynamic acceleration with target " + targetBody + 
-            " and source " + centralBody + " not found";
-            throw std::runtime_error( errorMessage );
+                std::string errorMessage = "Error, aerodynamic acceleration with target " + targetBody + 
+                    " and source " + centralBody + " not found";
+                throw std::runtime_error( errorMessage );
             }
             auto panelledAerodynamicAcceleration = std::dynamic_pointer_cast< tudat::aerodynamics::PanelledAerodynamicAcceleration >(
                 aerodynamicAccelerationList.front( ) );
             if ( panelledAerodynamicAcceleration == nullptr )
             {
                 std::string errorMessage = "Error, aerodynamic acceleration with paneled target " + targetBody + 
-                            " and source " + centralBody + " not found";
+                            " and source " + centralBody + " not found, but required for aerodynamic coefficients";
                 throw std::runtime_error( errorMessage );
             }
             parameterSize = 3;
@@ -2772,16 +2772,19 @@ std::function< double( ) > getDoubleDependentVariableFunction(
                         basic_astrodynamics::aerodynamic );
                     if( aerodynamicAccelerationList.empty( ) )
                     {
-                    std::string errorMessage = "Error, aerodynamic acceleration with target " + illuminatedBody + 
-                    " and source " + sourceBody + " not found";
-                    throw std::runtime_error( errorMessage );
+                        std::string errorMessage = "Error, aerodynamic acceleration with target " + illuminatedBody + 
+                            " and source " + sourceBody + " not found";
+                        throw std::runtime_error( errorMessage );
                     }
-                    auto panelledAerodynamicAcceleration = std::dynamic_pointer_cast< tudat::aerodynamics::PanelledAerodynamicAcceleration >(
+                    auto aerodynamicAcceleration = std::dynamic_pointer_cast< tudat::aerodynamics::AerodynamicAcceleration >(
                         aerodynamicAccelerationList.front( ) );
+                    auto panelledAerodynamicAcceleration = std::dynamic_pointer_cast< tudat::aerodynamics::PanelledAerodynamicAcceleration >(
+                        aerodynamicAcceleration );
+
                     if ( panelledAerodynamicAcceleration == nullptr )
                     {
                         std::string errorMessage = "Error, aerodynamic acceleration with paneled target " + illuminatedBody + 
-                                    " and source " + sourceBody + " not found";
+                                    " and source " + sourceBody + " not found, required for cross-section change";
                         throw std::runtime_error( errorMessage );
                     }
                     std::vector< double > panelAreas;
@@ -2862,7 +2865,8 @@ std::function< double( ) > getDoubleDependentVariableFunction(
                         return crossSectionChange;
                     };
                 }
-                else
+                if ( crossSectionChangeDependentVariableSaveSettings->accelerationType_ != "aerodynamic" && 
+                     crossSectionChangeDependentVariableSaveSettings->accelerationType_ != "radiation_pressure" )
                 {
                     std::string errorMessage = "Error, " + crossSectionChangeDependentVariableSaveSettings->accelerationType_ + " acceleration with paneled target " + 
                         illuminatedBody + " and source " + sourceBody + " not found";

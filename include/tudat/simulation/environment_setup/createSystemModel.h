@@ -312,8 +312,8 @@ inline std::vector< std::shared_ptr< BodyPanelSettings > > bodyPanelSettingsList
         {
             throw std::runtime_error("Material ID " + materialId + " not found in material properties settings!");
         }
-        if ( std::isnan( materialPropertiesMap.at( materialId )->specularReflectivity_ ) ||
-            std::isnan( materialPropertiesMap.at( materialId )->diffuseReflectivity_ ) )
+        if ( materialPropertiesMap.at( materialId )->specularReflectivity_ == -1 ||
+             materialPropertiesMap.at( materialId )->diffuseReflectivity_ == -1 )
         {
              throw std::runtime_error("Material ID " + materialId + " has no specular or diffuse reflectivity coefficients!");
         }

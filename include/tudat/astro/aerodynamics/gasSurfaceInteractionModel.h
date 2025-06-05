@@ -29,10 +29,13 @@ class GasSurfaceInteractionModel
 public:
 GasSurfaceInteractionModel( const GasSurfaceInteractionModelType modelType,
                             const std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > >& allPanels,
+                            const std::function< Eigen::Quaterniond( ) > rotationToBodyFrameFunction,
                             const int maximumNumberOfPixels, 
                             const std::function< Eigen::Vector3d( ) > airSpeedVectorFunction, 
                             const std::function< double( ) > freeStreamTemperatureFunction ):
-                            modelType_( modelType), allPanels_( allPanels ), maximumNumberOfPixels_( maximumNumberOfPixels ),
+                            modelType_( modelType), allPanels_( allPanels ), 
+                            rotationToBodyFrameFunction_( rotationToBodyFrameFunction ),
+                            maximumNumberOfPixels_( maximumNumberOfPixels ),
                             airSpeedVectorFunction_( airSpeedVectorFunction ),
                             freeStreamTemperatureFunction_( freeStreamTemperatureFunction )                            
 { 
@@ -75,6 +78,8 @@ GasSurfaceInteractionModelType modelType_;
 
 const std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > >& allPanels_;
 
+const std::function< Eigen::Quaterniond( ) > rotationToBodyFrameFunction_;
+
 std::shared_ptr< tudat::system_models::SelfShadowing > aerodynamicSelfShadowing_;
 
 int maximumNumberOfPixels_;
@@ -103,11 +108,12 @@ class NewtonGasSurfaceInteractionModel : public GasSurfaceInteractionModel
 {
 public:
 NewtonGasSurfaceInteractionModel( const std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > >& allPanels,
+                                  const std::function< Eigen::Quaterniond( ) > rotationToBodyFrameFunction,
                                   const int maximumNumberOfPixels, 
                                   const std::function< Eigen::Vector3d( ) > airSpeedVectorFunction, 
                                   const std::function< double( ) > freeStreamTemperatureFunction ):
-                                  GasSurfaceInteractionModel( newton, allPanels, maximumNumberOfPixels, 
-                                    airSpeedVectorFunction, freeStreamTemperatureFunction )
+                                  GasSurfaceInteractionModel( newton, allPanels, rotationToBodyFrameFunction,
+                                    maximumNumberOfPixels, airSpeedVectorFunction, freeStreamTemperatureFunction )
 { }
 
 Eigen::Vector3d computeAerodynamicCoefficients( );
@@ -118,11 +124,12 @@ class StorchGasSurfaceInteractionModel : public GasSurfaceInteractionModel
 {
 public:
 StorchGasSurfaceInteractionModel( const std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > >& allPanels,
+                                  const std::function< Eigen::Quaterniond( ) > rotationToBodyFrameFunction,
                                   const int maximumNumberOfPixels, 
                                   const std::function< Eigen::Vector3d( ) > airSpeedVectorFunction, 
                                   const std::function< double( ) > freeStreamTemperatureFunction ):
-                                  GasSurfaceInteractionModel( storch, allPanels, maximumNumberOfPixels, 
-                                    airSpeedVectorFunction, freeStreamTemperatureFunction )
+                                  GasSurfaceInteractionModel( storch, allPanels, rotationToBodyFrameFunction,
+                                    maximumNumberOfPixels, airSpeedVectorFunction, freeStreamTemperatureFunction )
 { }
 
 Eigen::Vector3d computeAerodynamicCoefficients( );
@@ -133,11 +140,12 @@ class SentmanGasSurfaceInteractionModel : public GasSurfaceInteractionModel
 {
 public:
 SentmanGasSurfaceInteractionModel( const std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > >& allPanels,
+                                   const std::function< Eigen::Quaterniond( ) > rotationToBodyFrameFunction,
                                    const int maximumNumberOfPixels, 
                                    const std::function< Eigen::Vector3d( ) > airSpeedVectorFunction, 
                                    const std::function< double( ) > freeStreamTemperatureFunction ):
-                                   GasSurfaceInteractionModel( sentman, allPanels, maximumNumberOfPixels, 
-                                    airSpeedVectorFunction, freeStreamTemperatureFunction )
+                                   GasSurfaceInteractionModel( sentman, allPanels, rotationToBodyFrameFunction,
+                                     maximumNumberOfPixels, airSpeedVectorFunction, freeStreamTemperatureFunction )
 { }
 
 Eigen::Vector3d computeAerodynamicCoefficients( );
@@ -148,11 +156,12 @@ class CookGasSurfaceInteractionModel : public GasSurfaceInteractionModel
 {
 public:
 CookGasSurfaceInteractionModel( const std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > >& allPanels,
+                                const std::function< Eigen::Quaterniond( ) > rotationToBodyFrameFunction,
                                 const int maximumNumberOfPixels, 
                                 const std::function< Eigen::Vector3d( ) > airSpeedVectorFunction, 
                                 const std::function< double( ) > freeStreamTemperatureFunction ):
-                                GasSurfaceInteractionModel( cook, allPanels, maximumNumberOfPixels, 
-                                    airSpeedVectorFunction, freeStreamTemperatureFunction )
+                                GasSurfaceInteractionModel( cook, allPanels, rotationToBodyFrameFunction,
+                                  maximumNumberOfPixels, airSpeedVectorFunction, freeStreamTemperatureFunction )
 { }
 
 Eigen::Vector3d computeAerodynamicCoefficients( );

@@ -1010,13 +1010,17 @@ std::shared_ptr< aerodynamics::AerodynamicAcceleration > createAerodynamicAccele
 
     if ( panelledAerodynamicCoefficientInterface != nullptr )
     {
+        std::function< Eigen::Vector3d( ) > airSpeedVectorFunction = [ = ]( ){
+            Eigen::Vector3d currentVelocity = bodyUndergoingAcceleration->getState( ).segment(3, 3);
+            return currentVelocity;
+        };
         return std::make_shared< PanelledAerodynamicAcceleration >( bodyUndergoingAcceleration,
                 panelledAerodynamicCoefficientInterface->getGasSurfaceInteractionModelType( ),
                 panelledAerodynamicCoefficientInterface->getMaximumNumberOfPixels( ),
                 std::bind( &AtmosphericFlightConditions::getCurrentDensity, bodyFlightConditions ),
                 std::bind( &AtmosphericFlightConditions::getCurrentAirspeed, bodyFlightConditions ),
                 std::bind( &Body::getBodyMass, bodyUndergoingAcceleration ),
-                std::bind( &AtmosphericFlightConditions::getCurrentAirspeedBasedVelocity, bodyFlightConditions ),
+                airSpeedVectorFunction,
                 std::bind( &AtmosphericFlightConditions::getCurrentFreestreamTemperature, bodyFlightConditions ) );
     }
     else

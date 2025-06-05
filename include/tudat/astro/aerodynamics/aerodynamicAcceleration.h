@@ -229,67 +229,71 @@ PanelledAerodynamicAcceleration( const std::shared_ptr< tudat::simulation_setup:
                                  airSpeedVectorFunction_( airSpeedVectorFunction ),
                                  freeStreamTemperatureFunction_( freeStreamTemperatureFunction )
 { 
+    std::function< Eigen::Quaterniond( ) > rotationToBodyFrameFunction = [ = ]( ) { 
+                Eigen::Quaterniond rotationMatrix = bodyUndergoingAcceleration_->getCurrentRotationToLocalFrame( );
+                return rotationMatrix;
+            };
     switch( gasSurfaceInteractionModelType_ )
     {
         case newton: {
             gasSurfaceInteractionModel_ = std::make_shared< NewtonGasSurfaceInteractionModel >( 
-                bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ), maximumNumberOfPixels_,
-                airSpeedVectorFunction_, freeStreamTemperatureFunction_);
+                bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ), rotationToBodyFrameFunction, 
+                maximumNumberOfPixels_, airSpeedVectorFunction_, freeStreamTemperatureFunction_);
             break;
         }
         case storch: {
             // checking material properties
             for ( auto panel: bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ) )
             {
-                if ( std::isnan( panel->getNormalAccomodationCoefficient( ) ) )
+                if ( panel->getNormalAccomodationCoefficient( ) == -1 )
                 {
                     throw std::runtime_error( "Error, normal accomodation coefficient for panel type " + panel->getPanelTypeId( ) +
                             " not defined but is required for Storch model" );
                 }
-                if ( std::isnan( panel->getTangentialAccomodationCoefficient( ) ) )
+                if ( panel->getTangentialAccomodationCoefficient( ) == -1 )
                 {
                     throw std::runtime_error( "Error, tangential accomodation coefficient for panel type " + panel->getPanelTypeId( ) +
                             " not defined but is required for Storch model" );
                 }
-                if ( std::isnan( panel->getNormalVelocityAtWallRatio( ) ) )
+                if ( panel->getNormalVelocityAtWallRatio( ) == -1 )
                 {
                     throw std::runtime_error( "Error, normal velocity ratio for panel type " + panel->getPanelTypeId( ) +
                             " not defined but is required for Storch model" );
                 }
             }
             gasSurfaceInteractionModel_ = std::make_shared< StorchGasSurfaceInteractionModel >( 
-                bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ), maximumNumberOfPixels_,
-                airSpeedVectorFunction_, freeStreamTemperatureFunction_);
+                bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ), rotationToBodyFrameFunction, 
+                maximumNumberOfPixels_, airSpeedVectorFunction_, freeStreamTemperatureFunction_);
             break;
         }
         case sentman: {
             // checking material properties
             for ( auto panel: bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ) )
             {
-                if ( std::isnan( panel->getEnergyAccomodationCoefficient( ) ) )
+                if ( panel->getEnergyAccomodationCoefficient( ) == -1 )
                 {
                     throw std::runtime_error( "Error, energy accomodation coefficient for panel type " + panel->getPanelTypeId( ) +
                             " not defined but is required for Sentman model" );
                 }
             }
             gasSurfaceInteractionModel_ = std::make_shared< SentmanGasSurfaceInteractionModel >( 
-                bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ), maximumNumberOfPixels_,
-                airSpeedVectorFunction_, freeStreamTemperatureFunction_);
+                bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ), rotationToBodyFrameFunction, 
+                maximumNumberOfPixels_, airSpeedVectorFunction_, freeStreamTemperatureFunction_);
             break;
         }
         case cook: {
             // checking material properties
             for ( auto panel: bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ) )
             {
-                if ( std::isnan( panel->getEnergyAccomodationCoefficient( ) ) )
+                if ( panel->getEnergyAccomodationCoefficient( ) == -1 )
                 {
                     throw std::runtime_error( "Error, energy accomodation coefficient for panel type " + panel->getPanelTypeId( ) +
                             " not defined but is required for Cook model" );
                 }
             }
             gasSurfaceInteractionModel_ = std::make_shared< CookGasSurfaceInteractionModel >( 
-                bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ), maximumNumberOfPixels_,
-                airSpeedVectorFunction_, freeStreamTemperatureFunction_);
+                bodyUndergoingAcceleration_->getVehicleSystems( )->getAllPanels( ), rotationToBodyFrameFunction, 
+                maximumNumberOfPixels_, airSpeedVectorFunction_, freeStreamTemperatureFunction_);
             break;
         }
         default:
@@ -306,6 +310,7 @@ void updateMembers( const double currentTime = TUDAT_NAN )
             currentAirspeed_ = this->airSpeedVectorFunction_( ).norm( );
             currentForceCoefficientsBodyFrame_ = gasSurfaceInteractionModel_->computeAerodynamicCoefficients( );
             currentForceCoefficients_ = bodyUndergoingAcceleration_->getCurrentRotationToGlobalFrame( ) * currentForceCoefficientsBodyFrame_;
+            currentForceCoefficientsBodyFrame_ = currentForceCoefficients_;
             currentReferenceArea_ = gasSurfaceInteractionModel_->getReferenceArea( );
             currentTime_ = currentTime;
 

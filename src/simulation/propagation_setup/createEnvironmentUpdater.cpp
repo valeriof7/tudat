@@ -1093,6 +1093,8 @@ std::map< propagators::EnvironmentModelsToUpdate, std::vector< std::string > > c
             break;
         case full_body_paneled_geometry:
             break;
+        case aerodynamic_coefficients:
+            break;
         default:
             throw std::runtime_error( "Error when getting environment updates for dependent variables, parameter " +
                                       std::to_string( dependentVariableSaveSettings->dependentVariableType_ ) + " not found." );
