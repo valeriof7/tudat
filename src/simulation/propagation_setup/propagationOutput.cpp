@@ -601,6 +601,9 @@ int getDependentVariableSize( const std::shared_ptr< SingleDependentVariableSave
         case cross_section_change:
             variableSize = 1;
             break;
+        case actual_cross_section:
+            variableSize = 1;
+            break;
         case full_body_paneled_geometry: {
             std::string targetBody = dependentVariableSettings->associatedBody_;
             if ( !bodies.at( targetBody )->getVehicleSystems( )->isPanelGeometryDefined( ) )

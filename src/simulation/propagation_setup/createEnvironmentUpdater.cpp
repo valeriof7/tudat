@@ -372,10 +372,12 @@ createTranslationalEquationsOfMotionEnvironmentUpdaterSettings( const basic_astr
                         singleAccelerationUpdateNeeds[ body_rotational_state_update ].push_back( accelerationModelIterator->first );
                         singleAccelerationUpdateNeeds[ vehicle_flight_conditions_update ].push_back( acceleratedBodyIterator->first );
                         singleAccelerationUpdateNeeds[ body_mass_update ].push_back( acceleratedBodyIterator->first );
-                        std::shared_ptr< aerodynamics::PanelledAerodynamicAcceleration > panelledAerodynamicAcceleration =
-                                std::dynamic_pointer_cast< aerodynamics::PanelledAerodynamicAcceleration >(
+                        std::shared_ptr< aerodynamics::AerodynamicAcceleration > aerodynamicAcceleration =
+                                std::dynamic_pointer_cast< aerodynamics::AerodynamicAcceleration >(
                                         accelerationModelIterator->second.at( i ) );
-                        if ( panelledAerodynamicAcceleration != nullptr && 
+                        auto panelledAerodynamicCoefficientInterface = std::dynamic_pointer_cast< aerodynamics::PanelledAerodynamicCoefficientInterface >( 
+                            aerodynamicAcceleration->getCoefficientInterface( ) );
+                        if ( panelledAerodynamicCoefficientInterface != nullptr && 
                             std::count( singleAccelerationUpdateNeeds[body_segment_orientation_update].begin( ), 
                                         singleAccelerationUpdateNeeds[body_segment_orientation_update].end( ), acceleratedBodyIterator->first ) == 0 )
                         {
@@ -1090,6 +1092,8 @@ std::map< propagators::EnvironmentModelsToUpdate, std::vector< std::string > > c
         case illuminated_panel_fraction:
             break;
         case cross_section_change:
+            break;
+        case actual_cross_section:
             break;
         case full_body_paneled_geometry:
             break;

@@ -465,8 +465,16 @@ std::shared_ptr< aerodynamics::AerodynamicCoefficientInterface > createAerodynam
             {
                 throw std::runtime_error( "Error, trying to set panelled coefficients but body " + body + " has no panelled geometry defined" );
             }
+            if ( vehicle->isPanelGeometryDefined( ) && panelledCoefficientSettings->getMaximumNumberOfPixels( ) < 2 && 
+                 panelledCoefficientSettings->getMaximumNumberOfPixels( ) != 0 )
+            {
+                throw std::runtime_error( "Error, trying to set panelled coefficients but assigned number of pixels must be > 2" );
+            }                
             coefficientInterface = std::make_shared< PanelledAerodynamicCoefficientInterface >( 
-                panelledCoefficientSettings->getGasSurfaceInteractionModelType( ), panelledCoefficientSettings->getMaximumNumberOfPixels( ) );
+                panelledCoefficientSettings->getGasSurfaceInteractionModelType( ),
+                bodies.at( body )->getVehicleSystems( )->getAllPanels( ),
+                panelledCoefficientSettings->getReferenceArea( ),
+                panelledCoefficientSettings->getMaximumNumberOfPixels( ) );
             break;
 
         }

@@ -26,6 +26,9 @@
 #include "tudat/astro/aerodynamics/aerodynamics.h"
 #include "tudat/astro/reference_frames/referenceFrameTransformations.h"
 #include "tudat/basics/utilities.h"
+#include "tudat/astro/system_models/selfShadowing.h"
+#include "tudat/astro/system_models/vehicleExteriorPanels.h"
+#include "tudat/astro/aerodynamics/gasSurfaceInteractionModel.h"
 
 namespace tudat
 {
@@ -680,32 +683,123 @@ private:
     bool isScalingRelative_;
 };
 
-enum GasSurfaceInteractionModelType
-{
-    newton,
-    storch,
-    sentman,
-    cook
-};
-
 class PanelledAerodynamicCoefficientInterface : public AerodynamicCoefficientInterface
 {
 public:
 
-PanelledAerodynamicCoefficientInterface( const GasSurfaceInteractionModelType gasSurfaceInteractionModelType, 
+PanelledAerodynamicCoefficientInterface( const GasSurfaceInteractionModelType gasSurfaceInteractionModelType,
+                                         const std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > >& allPanels,
+                                         const double referenceArea, 
                                          const int maximumNumberOfPixels ):
-                                         AerodynamicCoefficientInterface( TUDAT_NAN, TUDAT_NAN, Eigen::Vector3d::Zero( ), { } ),
-                                         gasSurfaceInteractionModelType_( gasSurfaceInteractionModelType ),
-                                         maximumNumberOfPixels_( maximumNumberOfPixels )
-{ }
+                                         AerodynamicCoefficientInterface( TUDAT_NAN, referenceArea, Eigen::Vector3d::Zero( ), { }, body_fixed_frame_coefficients ),
+                                         gasSurfaceInteractionModelType_( gasSurfaceInteractionModelType )
+{ 
+    switch( gasSurfaceInteractionModelType_ )
+    {
+        case newton: {
+            gasSurfaceInteractionModel_ = std::make_shared< NewtonGasSurfaceInteractionModel >( 
+                allPanels, referenceArea, maximumNumberOfPixels );
+                // assign model specific dependent variables
+            independentVariableNames_ = {
+                angle_of_attack_dependent,
+                angle_of_sideslip_dependent
+            };
+            break;
+        }
+        case storch: {
+            // checking material properties
+            for ( auto panel: allPanels )
+            {
+                if ( panel->getNormalAccomodationCoefficient( ) == -1 )
+                {
+                    throw std::runtime_error( "Error, normal accomodation coefficient for panel type " + panel->getPanelTypeId( ) +
+                            " not defined but is required for Storch model" );
+                }
+                if ( panel->getTangentialAccomodationCoefficient( ) == -1 )
+                {
+                    throw std::runtime_error( "Error, tangential accomodation coefficient for panel type " + panel->getPanelTypeId( ) +
+                            " not defined but is required for Storch model" );
+                }
+                if ( panel->getNormalVelocityAtWallRatio( ) == -1 )
+                {
+                    throw std::runtime_error( "Error, normal velocity ratio for panel type " + panel->getPanelTypeId( ) +
+                            " not defined but is required for Storch model" );
+                }
+            }
+            gasSurfaceInteractionModel_ = std::make_shared< StorchGasSurfaceInteractionModel >( 
+                allPanels, referenceArea, maximumNumberOfPixels );
+            // assign model specific dependent variables
+            independentVariableNames_ = {
+                angle_of_attack_dependent,
+                angle_of_sideslip_dependent
+            };
+            break;
+        }
+        case sentman: {
+            // checking material properties
+            for ( auto panel: allPanels )
+            {
+                if ( panel->getEnergyAccomodationCoefficient( ) == -1 )
+                {
+                    throw std::runtime_error( "Error, energy accomodation coefficient for panel type " + panel->getPanelTypeId( ) +
+                            " not defined but is required for Sentman model" );
+                }
+            }
+            gasSurfaceInteractionModel_ = std::make_shared< SentmanGasSurfaceInteractionModel >( 
+                allPanels, referenceArea, maximumNumberOfPixels );
+            // assign model specific dependent variables
+            independentVariableNames_ = {
+                angle_of_attack_dependent,
+                angle_of_sideslip_dependent,
+                temperature_dependent,
+                velocity_dependent
+            };
+            break;
+        }
+        case cook: {
+            // checking material properties
+            for ( auto panel: allPanels )
+            {
+                if ( panel->getEnergyAccomodationCoefficient( ) == -1 )
+                {
+                    throw std::runtime_error( "Error, energy accomodation coefficient for panel type " + panel->getPanelTypeId( ) +
+                            " not defined but is required for Cook model" );
+                }
+            }
+            gasSurfaceInteractionModel_ = std::make_shared< CookGasSurfaceInteractionModel >( 
+                allPanels, referenceArea, maximumNumberOfPixels );
+            // assign model specific dependent variables
+            independentVariableNames_ = {
+                angle_of_attack_dependent,
+                angle_of_sideslip_dependent,
+                temperature_dependent
+            };
+            break;
+        }
+        default:
+            throw std::runtime_error( "Error, unknown gas surface interaction model " );
+    }
+    numberOfIndependentVariables_ = independentVariableNames_.size( );
+}
 
 void updateCurrentCoefficients( const std::vector<double>& independentVariables, 
         const double currentTime = TUDAT_NAN) override
-{ }
-
-int getMaximumNumberOfPixels( ) const
-{
-    return maximumNumberOfPixels_;
+{   
+    gasSurfaceInteractionModel_->setIncomingDirection( 
+        Eigen::Vector3d(
+            -std::cos(independentVariables[0]) * std::cos(independentVariables[1]),
+            -std::sin(independentVariables[1]),
+            -std::sin(independentVariables[0]) * std::cos(independentVariables[1])
+    ));
+    if ( gasSurfaceInteractionModelType_ == sentman || gasSurfaceInteractionModelType_ == cook )
+    {
+        gasSurfaceInteractionModel_->setFreeStreamTemperature( independentVariables[ 2 ] );
+    }
+    if ( gasSurfaceInteractionModelType_ == sentman )
+    {
+        gasSurfaceInteractionModel_->setAirSpeed( independentVariables[ 3 ] );
+    }
+    currentForceCoefficients_ = gasSurfaceInteractionModel_->computeAerodynamicCoefficients( );
 }
 
 GasSurfaceInteractionModelType getGasSurfaceInteractionModelType( ) const
@@ -713,11 +807,15 @@ GasSurfaceInteractionModelType getGasSurfaceInteractionModelType( ) const
     return gasSurfaceInteractionModelType_;
 }
 
+std::shared_ptr< GasSurfaceInteractionModel > getGasSurfaceInteractionModel( ) 
+{
+    return gasSurfaceInteractionModel_;
+}
 private:
 
 GasSurfaceInteractionModelType gasSurfaceInteractionModelType_;
 
-int maximumNumberOfPixels_;
+std::shared_ptr< GasSurfaceInteractionModel > gasSurfaceInteractionModel_;
 
 };
 

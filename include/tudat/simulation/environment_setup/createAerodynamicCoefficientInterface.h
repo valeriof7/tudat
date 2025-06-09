@@ -186,7 +186,7 @@ public:
         controlSurfaceSettings_[ controlSurfaceName ] = controlSurfaceSetting;
     }
 
-private:
+protected:
     //  Type of atmosphere model that is to be created.
     AerodynamicCoefficientTypes aerodynamicCoefficientTypes_;
 
@@ -450,10 +450,10 @@ class PanelledAerodynamicCoefficientSettings: public AerodynamicCoefficientSetti
 {
 public:
 
-PanelledAerodynamicCoefficientSettings( const tudat::aerodynamics::GasSurfaceInteractionModelType gasSurfaceInteractionModelType, 
+PanelledAerodynamicCoefficientSettings( const tudat::aerodynamics::GasSurfaceInteractionModelType gasSurfaceInteractionModelType,
+                                        const double referenceArea, 
                                         const int maximumNumberOfPixels ):
-                                        AerodynamicCoefficientSettings( panelled_coefficients, TUDAT_NAN,
-                                         TUDAT_NAN, Eigen::Vector3d::Zero( ), {} ),
+                                        AerodynamicCoefficientSettings( panelled_coefficients, TUDAT_NAN, referenceArea, Eigen::Vector3d::Zero( ), {} ),
                                         gasSurfaceInteractionModelType_( gasSurfaceInteractionModelType ),
                                         maximumNumberOfPixels_( maximumNumberOfPixels )
 { }
@@ -639,9 +639,10 @@ inline std::shared_ptr< AerodynamicCoefficientSettings > customAerodynamicCoeffi
 
 inline std::shared_ptr< AerodynamicCoefficientSettings > panelledAerodynamicCoefficientSettings( 
         const tudat::aerodynamics::GasSurfaceInteractionModelType gasSurfaceInteractionModelType,
+        const double referenceArea, 
         const int maximumNumberOfPixels = 0 ) 
 {
-    return std::make_shared< PanelledAerodynamicCoefficientSettings >( gasSurfaceInteractionModelType, maximumNumberOfPixels );
+    return std::make_shared< PanelledAerodynamicCoefficientSettings >( gasSurfaceInteractionModelType, referenceArea, maximumNumberOfPixels );
 }
 
 //  Base class (non-functional) for the different classes of TabulatedAerodynamicCoefficientSettings.

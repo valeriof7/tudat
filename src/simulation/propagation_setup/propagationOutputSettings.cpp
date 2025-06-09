@@ -321,6 +321,9 @@ std::string getDependentVariableName( const std::shared_ptr< SingleDependentVari
         case cross_section_change:
             variableName = "Cross section change";
             break;
+        case actual_cross_section:
+            variableName = "Actual cross section";
+            break;
         case full_body_paneled_geometry:
             variableName = "Full body paneled geometry";
             break;
@@ -470,6 +473,11 @@ std::string getDependentVariableId( const std::shared_ptr< SingleDependentVariab
         }
     }
     if ( dependentVariableSettings->dependentVariableType_ == cross_section_change )
+    {
+        variableId += " of body " + dependentVariableSettings->associatedBody_ + " w.r.t. source " +
+                        dependentVariableSettings->secondaryBody_;
+    }
+    if ( dependentVariableSettings->dependentVariableType_ == actual_cross_section )
     {
         variableId += " of body " + dependentVariableSettings->associatedBody_ + " w.r.t. source " +
                         dependentVariableSettings->secondaryBody_;

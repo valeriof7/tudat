@@ -1875,17 +1875,12 @@ std::pair< std::function< Eigen::VectorXd( ) >, int > getVectorDependentVariable
                     " and source " + centralBody + " not found";
                 throw std::runtime_error( errorMessage );
             }
-            auto panelledAerodynamicAcceleration = std::dynamic_pointer_cast< tudat::aerodynamics::PanelledAerodynamicAcceleration >(
+            auto aerodynamicAcceleration = std::dynamic_pointer_cast< tudat::aerodynamics::AerodynamicAcceleration >(
                 aerodynamicAccelerationList.front( ) );
-            if ( panelledAerodynamicAcceleration == nullptr )
-            {
-                std::string errorMessage = "Error, aerodynamic acceleration with paneled target " + targetBody + 
-                            " and source " + centralBody + " not found, but required for aerodynamic coefficients";
-                throw std::runtime_error( errorMessage );
-            }
+
             parameterSize = 3;
             variableFunction = [ = ]( ) { 
-                Eigen::Vector3d aerodynamicCoefficients = panelledAerodynamicAcceleration->getAerodynamicCoefficients( );
+                Eigen::Vector3d aerodynamicCoefficients = aerodynamicAcceleration->getCurrentForceCoefficientsInAerodynamicFrame( );
                 return aerodynamicCoefficients;
             };
             break;
@@ -2761,7 +2756,7 @@ std::function< double( ) > getDoubleDependentVariableFunction(
                 break;
             }
             case cross_section_change: {
-                auto crossSectionChangeDependentVariableSaveSettings = std::dynamic_pointer_cast< CrossSectionChangeDependentVariableSaveSettings >( dependentVariableSettings );
+                auto crossSectionChangeDependentVariableSaveSettings = std::dynamic_pointer_cast< CrossSectionDependentVariableSaveSettings >( dependentVariableSettings );
                 std::string illuminatedBody = crossSectionChangeDependentVariableSaveSettings->associatedBody_;
                 std::string sourceBody = crossSectionChangeDependentVariableSaveSettings->secondaryBody_;
                 if ( crossSectionChangeDependentVariableSaveSettings->accelerationType_ == "aerodynamic" )
@@ -2778,10 +2773,11 @@ std::function< double( ) > getDoubleDependentVariableFunction(
                     }
                     auto aerodynamicAcceleration = std::dynamic_pointer_cast< tudat::aerodynamics::AerodynamicAcceleration >(
                         aerodynamicAccelerationList.front( ) );
-                    auto panelledAerodynamicAcceleration = std::dynamic_pointer_cast< tudat::aerodynamics::PanelledAerodynamicAcceleration >(
-                        aerodynamicAcceleration );
+                    std::shared_ptr< aerodynamics::AerodynamicCoefficientInterface > aerodynamicCoefficients =
+                            bodies.at( illuminatedBody )->getAerodynamicCoefficientInterface( );
+                    auto panelledAerodynamicCoefficientInterface = std::dynamic_pointer_cast< tudat::aerodynamics::PanelledAerodynamicCoefficientInterface >( aerodynamicCoefficients );
 
-                    if ( panelledAerodynamicAcceleration == nullptr )
+                    if ( panelledAerodynamicCoefficientInterface == nullptr )
                     {
                         std::string errorMessage = "Error, aerodynamic acceleration with paneled target " + illuminatedBody + 
                                     " and source " + sourceBody + " not found, required for cross-section change";
@@ -2795,23 +2791,18 @@ std::function< double( ) > getDoubleDependentVariableFunction(
                     }
 
                     variableFunction = [ = ]( ) { 
-                        std::vector< double > surfacePanelCosine =  panelledAerodynamicAcceleration->getGasSurfaceInteractionModel( )->getSurfacePanelCosines( );
-                        double totalCrossSection = 0.0, actualCrossSection = 0.0;
+                        std::vector< double > surfacePanelCosine =  panelledAerodynamicCoefficientInterface->getGasSurfaceInteractionModel( )->getSurfacePanelCosines( );
+                        std::vector< double > illuminatedPanelFractions = panelledAerodynamicCoefficientInterface->getGasSurfaceInteractionModel( )->getIlluminatedPanelFractions( );
+                        double totalCrossSection = 0.0, actualCrossSection = 0.0, increment;
                         for ( unsigned int i=0; i<allPanels.size( ); i++ )
                         {
-                            double cosine = ( surfacePanelCosine[ i ] > 0 ) ? surfacePanelCosine[ i ] : 0.0;
-                            totalCrossSection += panelAreas[ i ] * cosine;
+                            increment = panelAreas[ i ] * surfacePanelCosine[ i ];
+                            totalCrossSection += increment;
+                            actualCrossSection += increment * illuminatedPanelFractions[ i ];
                         }
-                        double crossSectionChange;
-                        if ( totalCrossSection == 0.0 )
-                        {
-                            crossSectionChange = 0.0;
-                        }
-                        else
-                        {
-                            crossSectionChange = 1.0 - panelledAerodynamicAcceleration->getGasSurfaceInteractionModel( )->getReferenceArea( ) / totalCrossSection;
-                        }
+                        double crossSectionChange = 1.0 - actualCrossSection / totalCrossSection;
                         return crossSectionChange;
+                        
                     };
                 }
                 if ( crossSectionChangeDependentVariableSaveSettings->accelerationType_ == "radiation_pressure" )
@@ -2846,12 +2837,12 @@ std::function< double( ) > getDoubleDependentVariableFunction(
                     variableFunction = [ = ]( ) { 
                         std::vector< double > surfacePanelCosine =  paneledRadiationPressureTargetModel->getSurfacePanelCosines( sourceBody );
                         std::vector< double > illuminatedPanelFractionsAll = paneledRadiationPressureTargetModel->getIlluminatedPanelFractions( sourceBody );
-                        double totalCrossSection = 0.0, actualCrossSection = 0.0;
+                        double totalCrossSection = 0.0, actualCrossSection = 0.0, increment;
                         for ( unsigned int i=0; i<illuminatedPanelFractionsAll.size( ); i++ )
                         {
-                            double cosine = ( surfacePanelCosine[ i ] > 0 ) ? surfacePanelCosine[ i ] : 0.0;
-                            totalCrossSection += panelAreas[ i ] * cosine;
-                            actualCrossSection += illuminatedPanelFractionsAll[ i ] * panelAreas[ i ] * cosine;
+                            increment = panelAreas[ i ] * surfacePanelCosine[ i ];
+                            totalCrossSection += increment;
+                            actualCrossSection += illuminatedPanelFractionsAll[ i ] * increment;
                         }
                         double crossSectionChange;
                         if ( totalCrossSection == 0.0 )
@@ -2869,6 +2860,101 @@ std::function< double( ) > getDoubleDependentVariableFunction(
                      crossSectionChangeDependentVariableSaveSettings->accelerationType_ != "radiation_pressure" )
                 {
                     std::string errorMessage = "Error, " + crossSectionChangeDependentVariableSaveSettings->accelerationType_ + " acceleration with paneled target " + 
+                        illuminatedBody + " and source " + sourceBody + " not found";
+                    throw std::runtime_error( errorMessage );
+                }
+                break;
+            }
+            case actual_cross_section: {
+                auto actualCrossSectionDependentVariableSaveSettings = std::dynamic_pointer_cast< CrossSectionDependentVariableSaveSettings >( dependentVariableSettings );
+                std::string illuminatedBody = actualCrossSectionDependentVariableSaveSettings->associatedBody_;
+                std::string sourceBody = actualCrossSectionDependentVariableSaveSettings->secondaryBody_;
+                if ( actualCrossSectionDependentVariableSaveSettings->accelerationType_ == "aerodynamic" )
+                {
+                    auto aerodynamicAccelerationList = getAccelerationBetweenBodies( illuminatedBody,
+                        sourceBody,
+                        stateDerivativeModels,
+                        basic_astrodynamics::aerodynamic );
+                    if( aerodynamicAccelerationList.empty( ) )
+                    {
+                        std::string errorMessage = "Error, aerodynamic acceleration with target " + illuminatedBody + 
+                            " and source " + sourceBody + " not found";
+                        throw std::runtime_error( errorMessage );
+                    }
+                    auto aerodynamicAcceleration = std::dynamic_pointer_cast< tudat::aerodynamics::AerodynamicAcceleration >(
+                        aerodynamicAccelerationList.front( ) );
+                    std::shared_ptr< aerodynamics::AerodynamicCoefficientInterface > aerodynamicCoefficients =
+                            bodies.at( illuminatedBody )->getAerodynamicCoefficientInterface( );
+                    auto panelledAerodynamicCoefficientInterface = std::dynamic_pointer_cast< tudat::aerodynamics::PanelledAerodynamicCoefficientInterface >( aerodynamicCoefficients );
+
+                    if ( panelledAerodynamicCoefficientInterface == nullptr )
+                    {
+                        std::string errorMessage = "Error, aerodynamic acceleration with paneled target " + illuminatedBody + 
+                                    " and source " + sourceBody + " not found, required for actual cross-section";
+                        throw std::runtime_error( errorMessage );
+                    }
+                    std::vector< double > panelAreas;
+                    std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > > allPanels = bodies.at( illuminatedBody )->getVehicleSystems( )->getAllPanels( );
+                    for ( unsigned int i = 0; i<allPanels.size( ); i++ )
+                    {
+                        panelAreas.push_back( allPanels[ i ]->getPanelArea( ) );
+                    }
+
+                    variableFunction = [ = ]( ) { 
+                        std::vector< double > surfacePanelCosine =  panelledAerodynamicCoefficientInterface->getGasSurfaceInteractionModel( )->getSurfacePanelCosines( );
+                        std::vector< double > illuminatedPanelFractions = panelledAerodynamicCoefficientInterface->getGasSurfaceInteractionModel( )->getIlluminatedPanelFractions( );
+                        double actualCrossSection = 0.0;
+                        for ( unsigned int i=0; i<allPanels.size( ); i++ )
+                        {
+                            actualCrossSection += panelAreas[ i ] * surfacePanelCosine[ i ] * illuminatedPanelFractions[ i ];
+                        }
+                        return actualCrossSection;
+                    };
+                }
+                if ( actualCrossSectionDependentVariableSaveSettings->accelerationType_ == "radiation_pressure" )
+                {
+                    auto radiationPressureAccelerationList = getAccelerationBetweenBodies( illuminatedBody,
+                        sourceBody,
+                        stateDerivativeModels,
+                        basic_astrodynamics::radiation_pressure );
+                    if( radiationPressureAccelerationList.empty( ) )
+                    {
+                        std::string errorMessage = "Error, radiation pressure acceleration with target " + illuminatedBody + 
+                                " and source " + sourceBody + " not found";
+                        throw std::runtime_error( errorMessage );
+                    }
+                    auto radiationPressureAcceleration = std::dynamic_pointer_cast< electromagnetism::RadiationPressureAcceleration >(
+                        radiationPressureAccelerationList.front( ) );
+                    auto paneledRadiationPressureTargetModel = std::dynamic_pointer_cast< electromagnetism::PaneledRadiationPressureTargetModel >(
+                        radiationPressureAcceleration->getTargetModel( ) );
+                    if ( paneledRadiationPressureTargetModel == nullptr )
+                    {
+                        std::string errorMessage = "Error, radiation pressure acceleration with paneled target " + illuminatedBody + 
+                                    " and source " + sourceBody + " not found";
+                        throw std::runtime_error( errorMessage );
+                    }
+                    std::vector< double > panelAreas;
+                    std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > > allPanels = paneledRadiationPressureTargetModel->getAllPanels( );
+                    for ( int i = 0; i<paneledRadiationPressureTargetModel->getTotalNumberOfPanels( ); i++ )
+                    {
+                        panelAreas.push_back( allPanels[ i ]->getPanelArea( ) );
+                    }
+
+                    variableFunction = [ = ]( ) { 
+                        std::vector< double > surfacePanelCosine =  paneledRadiationPressureTargetModel->getSurfacePanelCosines( sourceBody );
+                        std::vector< double > illuminatedPanelFractionsAll = paneledRadiationPressureTargetModel->getIlluminatedPanelFractions( sourceBody );
+                        double actualCrossSection = 0.0;
+                        for ( unsigned int i=0; i<illuminatedPanelFractionsAll.size( ); i++ )
+                        {
+                            actualCrossSection += illuminatedPanelFractionsAll[ i ] * panelAreas[ i ] * surfacePanelCosine[ i ];
+                        }
+                        return actualCrossSection;
+                    };
+                }
+                if ( actualCrossSectionDependentVariableSaveSettings->accelerationType_ != "aerodynamic" && 
+                     actualCrossSectionDependentVariableSaveSettings->accelerationType_ != "radiation_pressure" )
+                {
+                    std::string errorMessage = "Error, " + actualCrossSectionDependentVariableSaveSettings->accelerationType_ + " acceleration with paneled target " + 
                         illuminatedBody + " and source " + sourceBody + " not found";
                     throw std::runtime_error( errorMessage );
                 }
