@@ -60,7 +60,7 @@ void PaneledRadiationPressureTargetModel::updateRadiationPressureForcing( double
     {
         resetComputations( sourceName );
     }
-    
+
     Eigen::Vector3d currentCenterOfMass = Eigen::Vector3d::Constant( TUDAT_NAN );
     if( computeTorques_ )
     {
@@ -69,8 +69,8 @@ void PaneledRadiationPressureTargetModel::updateRadiationPressureForcing( double
     Eigen::Vector3d currentPanelForce = Eigen::Vector3d::Zero( );
     Eigen::Vector3d currentPanelTorque = Eigen::Vector3d::Zero( );
 
-    if ( selfShadowingPerSource_.count( sourceName ) == 0 || selfShadowingPerSource_.at( sourceName )->getMaximumNumberOfPixels( ) == 0 )
-    {   
+    if( selfShadowingPerSource_.count( sourceName ) == 0 || selfShadowingPerSource_.at( sourceName )->getMaximumNumberOfPixels( ) == 0 )
+    {
         // SSH off
         illuminatedPanelFractions_ = unityIlluminationFraction_;
     }
@@ -93,10 +93,10 @@ void PaneledRadiationPressureTargetModel::updateRadiationPressureForcing( double
         }
         if( surfacePanelCosines_[ i ] > 0 )
         {
-            currentPanelForce = radiationPressure * illuminatedPanelFractions_[ i ] *
-                this->allPanels_.at( i )->getPanelArea( ) * surfacePanelCosines_[ i ] *
-                this->allPanels_.at( i )->getReflectionLaw( )->evaluateReactionVector( surfaceNormals_[ i ],
-                                                                                         sourceToTargetDirectionLocalFrame );
+            currentPanelForce = radiationPressure * illuminatedPanelFractions_[ i ] * this->allPanels_.at( i )->getPanelArea( ) *
+                    surfacePanelCosines_[ i ] *
+                    this->allPanels_.at( i )->getReflectionLaw( )->evaluateReactionVector( surfaceNormals_[ i ],
+                                                                                           sourceToTargetDirectionLocalFrame );
             this->currentRadiationPressureForce_[ sourceName ] += currentPanelForce;
             if( computeTorques_ )
             {
@@ -118,7 +118,7 @@ void PaneledRadiationPressureTargetModel::updateRadiationPressureForcing( double
         if( computeTorques_ )
         {
             panelTorques_[ i ] += currentPanelTorque;
-        } 
+        }
     }
 }
 
@@ -128,7 +128,7 @@ void PaneledRadiationPressureTargetModel::saveLocalComputations( const std::stri
     {
         surfacePanelCosinesPerSource_[ sourceName ] = surfacePanelCosines_;
     }
-    if ( this->panelGeometryDefined_ )
+    if( this->panelGeometryDefined_ )
     {
         illuminatedPanelFractionsPerSource_[ sourceName ] = illuminatedPanelFractions_;
     }

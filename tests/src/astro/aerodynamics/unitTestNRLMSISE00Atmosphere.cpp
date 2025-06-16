@@ -86,10 +86,6 @@ NRLMSISE00Input nrlmsiseTestFunction( double altitude,
 //  Check the consistency between full output and get parameter output functions.
 BOOST_AUTO_TEST_CASE( testNRLMSISE00AtmosphereTestFunctions )
 {
-    auto computedCartesianPosition = coordinate_conversions::convertGeodeticToCartesianCoordinates(
-            ( Eigen::Vector3d( ) << 400.0E3, 60.0 * PI / 180.0, -70.0 * PI / 180.0 ).finished( ), 6378137.0, 1.0 / 298.257223563 );
-    auto sphericalPosition = coordinate_conversions::convertCartesianToSpherical( computedCartesianPosition );
-
     // Manual reset of switch
     gen_data.switches[ 9 ] = 1;
 
@@ -1261,7 +1257,7 @@ BOOST_AUTO_TEST_CASE( testNRLMSISEInPropagation )
 
     // Define simulation body settings.
     BodyListSettings bodySettings = getDefaultBodySettings( { "Earth", "Moon" }, "Earth", "ECLIPJ2000" );
-    bodySettings.at( "Earth" )->gravityFieldSettings = std::make_shared< simulation_setup::GravityFieldSettings >( central_spice );
+    bodySettings.at( "Earth" )->gravityFieldSettings = centralGravityFromSpiceSettings( );
     bodySettings.at( "Earth" )->atmosphereSettings =
             std::make_shared< simulation_setup::NRLMSISE00AtmosphereSettings >( paths::getSpaceWeatherDataPath( ) + "/sw19571001.txt", 0 );
     bodySettings.at( "Earth" )->shapeModelSettings =
@@ -1481,7 +1477,7 @@ BOOST_AUTO_TEST_CASE( testNRLMSISEInPropagationStormLikeConditions )
 
     // Define simulation body settings.
     BodyListSettings bodySettings = getDefaultBodySettings( { "Earth", "Moon" }, "Earth", "ECLIPJ2000" );
-    bodySettings.at( "Earth" )->gravityFieldSettings = std::make_shared< simulation_setup::GravityFieldSettings >( central_spice );
+    bodySettings.at( "Earth" )->gravityFieldSettings = centralGravityFromSpiceSettings( );
     bodySettings.at( "Earth" )->atmosphereSettings =
             std::make_shared< simulation_setup::NRLMSISE00AtmosphereSettings >( paths::getSpaceWeatherDataPath( ) + "/sw19571001.txt", 1 );
     bodySettings.at( "Earth" )->shapeModelSettings =
