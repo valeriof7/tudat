@@ -75,7 +75,9 @@ public:
                              currentMass_( currentMass )
     {
         coefficientInterface_ = flightConditions_->getAerodynamicCoefficientInterface( );
-        coefficientMultiplier_ = aerodynamics::areCoefficientsInNegativeDirection( coefficientInterface_->getForceCoefficientsFrame( ) ) == true ? -1.0 : 1.0;
+        aerodynamicCoefficientFrame_ = coefficientInterface_->getForceCoefficientsFrame( );
+        aerodynamicCompleteCoefficientFrame_ = getCompleteFrameForCoefficients( aerodynamicCoefficientFrame_ );
+        coefficientMultiplier_ = areCoefficientsInNegativeDirection( aerodynamicCoefficientFrame_) == true ? -1.0 : 1.0;
     }
 
     //! Destructor
@@ -96,7 +98,7 @@ public:
             currentTime_ = currentTime;
             currentForceCoefficients_ = coefficientInterface_->getCurrentForceCoefficients( );
             currentForceCoefficients_ = coefficientMultiplier_ *  ( flightConditions_->getAerodynamicAngleCalculator( )->getRotationQuaternionBetweenFrames(
-                aerodynamics::getCompleteFrameForCoefficients( coefficientInterface_->getForceCoefficientsFrame( ) ), reference_frames::inertial_frame ) * currentForceCoefficients_ );
+                aerodynamicCompleteCoefficientFrame_, reference_frames::inertial_frame ) * currentForceCoefficients_ );
 
             currentAcceleration_ = computeAerodynamicAcceleration( flightConditions_->getCurrentDynamicPressure( ),
                                                                    coefficientInterface_->getReferenceArea( ),
@@ -137,7 +139,9 @@ private:
 
     double coefficientMultiplier_;
 
-    std::function< Eigen::Vector3d(const Eigen::Vector3d&) > toPropagationFrameTransformation_;
+    AerodynamicCoefficientFrames aerodynamicCoefficientFrame_;
+
+    reference_frames::AerodynamicsReferenceFrames aerodynamicCompleteCoefficientFrame_;
 
 };
 

@@ -452,10 +452,12 @@ public:
 
 PanelledAerodynamicCoefficientSettings( const tudat::aerodynamics::GasSurfaceInteractionModelType gasSurfaceInteractionModelType,
                                         const double referenceArea, 
-                                        const int maximumNumberOfPixels ):
+                                        const int maximumNumberOfPixels,
+                                        const bool onlyDrag ):
                                         AerodynamicCoefficientSettings( panelled_coefficients, TUDAT_NAN, referenceArea, Eigen::Vector3d::Zero( ), {} ),
                                         gasSurfaceInteractionModelType_( gasSurfaceInteractionModelType ),
-                                        maximumNumberOfPixels_( maximumNumberOfPixels )
+                                        maximumNumberOfPixels_( maximumNumberOfPixels ),
+                                        onlyDrag_( onlyDrag )
 { }
 
 int getMaximumNumberOfPixels( ) const
@@ -468,11 +470,18 @@ tudat::aerodynamics::GasSurfaceInteractionModelType getGasSurfaceInteractionMode
     return gasSurfaceInteractionModelType_;
 }
 
+bool getOnlyDrag( ) const
+{
+    return onlyDrag_;
+}
+
 private:
 
 tudat::aerodynamics::GasSurfaceInteractionModelType gasSurfaceInteractionModelType_;
 
 int maximumNumberOfPixels_;
+
+bool onlyDrag_;
 
 };
 
@@ -640,9 +649,10 @@ inline std::shared_ptr< AerodynamicCoefficientSettings > customAerodynamicCoeffi
 inline std::shared_ptr< AerodynamicCoefficientSettings > panelledAerodynamicCoefficientSettings( 
         const tudat::aerodynamics::GasSurfaceInteractionModelType gasSurfaceInteractionModelType,
         const double referenceArea, 
-        const int maximumNumberOfPixels = 0 ) 
+        const int maximumNumberOfPixels = 0,
+        const bool onlyDrag = false ) 
 {
-    return std::make_shared< PanelledAerodynamicCoefficientSettings >( gasSurfaceInteractionModelType, referenceArea, maximumNumberOfPixels );
+    return std::make_shared< PanelledAerodynamicCoefficientSettings >( gasSurfaceInteractionModelType, referenceArea, maximumNumberOfPixels, onlyDrag );
 }
 
 //  Base class (non-functional) for the different classes of TabulatedAerodynamicCoefficientSettings.

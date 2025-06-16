@@ -474,7 +474,8 @@ std::shared_ptr< aerodynamics::AerodynamicCoefficientInterface > createAerodynam
                 panelledCoefficientSettings->getGasSurfaceInteractionModelType( ),
                 bodies.at( body )->getVehicleSystems( )->getAllPanels( ),
                 panelledCoefficientSettings->getReferenceArea( ),
-                panelledCoefficientSettings->getMaximumNumberOfPixels( ) );
+                panelledCoefficientSettings->getMaximumNumberOfPixels( ),
+                panelledCoefficientSettings->getOnlyDrag( ) );
             break;
 
         }

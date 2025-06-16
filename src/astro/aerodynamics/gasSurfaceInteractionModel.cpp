@@ -69,6 +69,10 @@ Eigen::Vector3d NewtonGasSurfaceInteractionModel::computeAerodynamicCoefficients
     }
     // divide by total reference area to obtain true aerodynamic coefficients
     currentForceCoefficientsBodyFrame /= referenceArea_;
+    if ( onlyDrag_ )
+    {
+        currentForceCoefficientsBodyFrame = incomingDirection_ * ( currentForceCoefficientsBodyFrame.dot( incomingDirection_ ) );
+    }
     return currentForceCoefficientsBodyFrame;
     
 }
@@ -110,13 +114,17 @@ Eigen::Vector3d StorchGasSurfaceInteractionModel::computeAerodynamicCoefficients
     }
     // divide by total reference area to obtain true aerodynamic coefficients
     currentForceCoefficientsBodyFrame /= referenceArea_;
+    if ( onlyDrag_ )
+    {
+        currentForceCoefficientsBodyFrame = incomingDirection_ * ( currentForceCoefficientsBodyFrame.dot( incomingDirection_ ) );
+    }
     return currentForceCoefficientsBodyFrame;
 }
 
 Eigen::Vector3d SentmanGasSurfaceInteractionModel::computeAerodynamicCoefficients( )
 {
     updateMembers( );
-    speedRatio_ = airSpeed_ / std::sqrt( 2 * physical_constants::SPECIFIC_GAS_CONSTANT_AIR * freeStreamTemperature_ );
+    speedRatio_ = airSpeed_ / std::sqrt( 2 * specificGasConstant_ * freeStreamTemperature_ );
     double cosineDelta, sineDelta;
     double Cp, Ct, panelArea;
     double erf, exp;
@@ -159,6 +167,10 @@ Eigen::Vector3d SentmanGasSurfaceInteractionModel::computeAerodynamicCoefficient
     }
     // divide by total reference area to obtain true aerodynamic coefficients
     currentForceCoefficientsBodyFrame /= referenceArea_;
+    if ( onlyDrag_ )
+    {
+        currentForceCoefficientsBodyFrame = incomingDirection_ * ( currentForceCoefficientsBodyFrame.dot( incomingDirection_ ) );
+    }
     return currentForceCoefficientsBodyFrame;
 }
 
@@ -204,6 +216,10 @@ Eigen::Vector3d CookGasSurfaceInteractionModel::computeAerodynamicCoefficients( 
     }
     // divide by total reference area to obtain true aerodynamic coefficients
     currentForceCoefficientsBodyFrame /= referenceArea_;
+    if ( onlyDrag_ )
+    {
+        currentForceCoefficientsBodyFrame = incomingDirection_ * ( currentForceCoefficientsBodyFrame.dot( incomingDirection_ ) );
+    }
     return currentForceCoefficientsBodyFrame;
 }
 

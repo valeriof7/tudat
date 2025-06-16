@@ -690,7 +690,8 @@ public:
 PanelledAerodynamicCoefficientInterface( const GasSurfaceInteractionModelType gasSurfaceInteractionModelType,
                                          const std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > >& allPanels,
                                          const double referenceArea, 
-                                         const int maximumNumberOfPixels ):
+                                         const int maximumNumberOfPixels,
+                                         const bool onlyDrag ):
                                          AerodynamicCoefficientInterface( TUDAT_NAN, referenceArea, Eigen::Vector3d::Zero( ), { }, body_fixed_frame_coefficients ),
                                          gasSurfaceInteractionModelType_( gasSurfaceInteractionModelType )
 { 
@@ -698,7 +699,7 @@ PanelledAerodynamicCoefficientInterface( const GasSurfaceInteractionModelType ga
     {
         case newton: {
             gasSurfaceInteractionModel_ = std::make_shared< NewtonGasSurfaceInteractionModel >( 
-                allPanels, referenceArea, maximumNumberOfPixels );
+                allPanels, referenceArea, maximumNumberOfPixels, onlyDrag );
                 // assign model specific dependent variables
             independentVariableNames_ = {
                 angle_of_attack_dependent,
@@ -727,7 +728,7 @@ PanelledAerodynamicCoefficientInterface( const GasSurfaceInteractionModelType ga
                 }
             }
             gasSurfaceInteractionModel_ = std::make_shared< StorchGasSurfaceInteractionModel >( 
-                allPanels, referenceArea, maximumNumberOfPixels );
+                allPanels, referenceArea, maximumNumberOfPixels, onlyDrag );
             // assign model specific dependent variables
             independentVariableNames_ = {
                 angle_of_attack_dependent,
@@ -746,7 +747,7 @@ PanelledAerodynamicCoefficientInterface( const GasSurfaceInteractionModelType ga
                 }
             }
             gasSurfaceInteractionModel_ = std::make_shared< SentmanGasSurfaceInteractionModel >( 
-                allPanels, referenceArea, maximumNumberOfPixels );
+                allPanels, referenceArea, maximumNumberOfPixels, onlyDrag );
             // assign model specific dependent variables
             independentVariableNames_ = {
                 angle_of_attack_dependent,
@@ -767,7 +768,7 @@ PanelledAerodynamicCoefficientInterface( const GasSurfaceInteractionModelType ga
                 }
             }
             gasSurfaceInteractionModel_ = std::make_shared< CookGasSurfaceInteractionModel >( 
-                allPanels, referenceArea, maximumNumberOfPixels );
+                allPanels, referenceArea, maximumNumberOfPixels, onlyDrag );
             // assign model specific dependent variables
             independentVariableNames_ = {
                 angle_of_attack_dependent,

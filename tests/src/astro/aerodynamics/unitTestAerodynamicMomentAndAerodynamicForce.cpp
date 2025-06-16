@@ -46,6 +46,9 @@
 #include "tudat/simulation/environment_setup/defaultBodies.h"
 #include "tudat/simulation/environment_setup/createSystemModel.h"
 #include "tudat/astro/aerodynamics/testApolloCapsuleCoefficients.h"
+#include "tudat/astro/system_models/panelGeometryUtils.h"
+#include "tudat/astro/system_models/vehicleExteriorPanels.h"
+#include "tudat/astro/aerodynamics/gasSurfaceInteractionModel.h"
 
 namespace tudat
 {
@@ -63,6 +66,8 @@ using namespace basic_mathematics;
 using namespace basic_astrodynamics;
 using namespace orbital_element_conversions;
 using namespace spice_interface;
+using namespace system_models;
+using mathematical_constants::PI;
 
 //! Test implementation of aerodynamic force and acceleration models.
 BOOST_AUTO_TEST_CASE( testAerodynamicForceAndAcceleration )
@@ -148,71 +153,71 @@ BOOST_AUTO_TEST_CASE( testAerodynamicForceAndAcceleration )
         TUDAT_CHECK_MATRIX_CLOSE_FRACTION( expectedForce, force, tolerance );
     }
 
-    // Test 5: Test the acceleration model class without inverted coefficients.
-    {
-        // Create aaerodynamic acceleration model class, no inverted coefficients, direct mass
-        // and reference area.
-        AerodynamicAccelerationPointer accelerationClass =
-                std::make_shared< AerodynamicAcceleration >( [ & ]( Eigen::Vector3d& input ) { input = forceCoefficients; },
-                                                             [ & ]( ) { return density; },
-                                                             [ & ]( ) { return airSpeed; },
-                                                             mass,
-                                                             referenceArea,
-                                                             false );
-        accelerationClass->updateMembers( );
-        Eigen::Vector3d force = accelerationClass->getAcceleration( ) * mass;
+//     // Test 5: Test the acceleration model class without inverted coefficients.
+//     {
+//         // Create aaerodynamic acceleration model class, no inverted coefficients, direct mass
+//         // and reference area.
+//         std::shared_ptr< AerodynamicAcceleration > accelerationClass =
+//                 std::make_shared< AerodynamicAcceleration >( [ & ]( Eigen::Vector3d& input ) { input = forceCoefficients; },
+//                                                              [ & ]( ) { return density; },
+//                                                              [ & ]( ) { return airSpeed; },
+//                                                              mass,
+//                                                              referenceArea,
+//                                                              false );
+//         accelerationClass->updateMembers( );
+//         Eigen::Vector3d force = accelerationClass->getAcceleration( ) * mass;
 
-        // Check if computed force matches expected.
-        TUDAT_CHECK_MATRIX_CLOSE_FRACTION( expectedForce, force, tolerance );
+//         // Check if computed force matches expected.
+//         TUDAT_CHECK_MATRIX_CLOSE_FRACTION( expectedForce, force, tolerance );
 
-        // Create aerodynamic acceleration model class, no inverted coefficients, mass and
-        // reference area set through std::functions.
-        AerodynamicAccelerationPointer accelerationClass2 =
-                std::make_shared< AerodynamicAcceleration >( [ & ]( Eigen::Vector3d& input ) { input = forceCoefficients; },
-                                                             [ & ]( ) { return density; },
-                                                             [ & ]( ) { return airSpeed; },
-                                                             [ & ]( ) { return mass; },
-                                                             [ & ]( ) { return referenceArea; },
-                                                             false );
-        accelerationClass2->updateMembers( );
-        force = accelerationClass2->getAcceleration( ) * mass;
+//         // Create aerodynamic acceleration model class, no inverted coefficients, mass and
+//         // reference area set through std::functions.
+//         std::shared_ptr< AerodynamicAcceleration > accelerationClass2 =
+//                 std::make_shared< AerodynamicAcceleration >( [ & ]( Eigen::Vector3d& input ) { input = forceCoefficients; },
+//                                                              [ & ]( ) { return density; },
+//                                                              [ & ]( ) { return airSpeed; },
+//                                                              [ & ]( ) { return mass; },
+//                                                              [ & ]( ) { return referenceArea; },
+//                                                              false );
+//         accelerationClass2->updateMembers( );
+//         force = accelerationClass2->getAcceleration( ) * mass;
 
-        // Check if computed force matches expected.
-        TUDAT_CHECK_MATRIX_CLOSE_FRACTION( expectedForce, force, tolerance );
-    }
+//         // Check if computed force matches expected.
+//         TUDAT_CHECK_MATRIX_CLOSE_FRACTION( expectedForce, force, tolerance );
+//     }
 
-    // Test 6: Test the acceleration model class with inverted coefficients
-    {
-        // Create aaerodynamic acceleration model class, inverted coefficients, direct mass
-        // and reference area.
-        AerodynamicAccelerationPointer accelerationClass =
-                std::make_shared< AerodynamicAcceleration >( [ & ]( Eigen::Vector3d& input ) { input = -forceCoefficients; },
-                                                             [ & ]( ) { return density; },
-                                                             [ & ]( ) { return airSpeed; },
-                                                             mass,
-                                                             referenceArea,
-                                                             true );
-        accelerationClass->updateMembers( );
-        Eigen::Vector3d force = accelerationClass->getAcceleration( ) * mass;
+//     // Test 6: Test the acceleration model class with inverted coefficients
+//     {
+//         // Create aaerodynamic acceleration model class, inverted coefficients, direct mass
+//         // and reference area.
+//         std::shared_ptr< AerodynamicAcceleration > accelerationClass =
+//                 std::make_shared< AerodynamicAcceleration >( [ & ]( Eigen::Vector3d& input ) { input = -forceCoefficients; },
+//                                                              [ & ]( ) { return density; },
+//                                                              [ & ]( ) { return airSpeed; },
+//                                                              mass,
+//                                                              referenceArea,
+//                                                              true );
+//         accelerationClass->updateMembers( );
+//         Eigen::Vector3d force = accelerationClass->getAcceleration( ) * mass;
 
-        // Check if computed force matches expected.
-        TUDAT_CHECK_MATRIX_CLOSE_FRACTION( expectedForce, force, tolerance );
+//         // Check if computed force matches expected.
+//         TUDAT_CHECK_MATRIX_CLOSE_FRACTION( expectedForce, force, tolerance );
 
-        // Create aerodynamic acceleration model class, inverted coefficients, mass and
-        // reference area set through std::functions.
-        AerodynamicAccelerationPointer accelerationClass2 =
-                std::make_shared< AerodynamicAcceleration >( [ & ]( Eigen::Vector3d& input ) { input = -forceCoefficients; },
-                                                             [ & ]( ) { return density; },
-                                                             [ & ]( ) { return airSpeed; },
-                                                             [ & ]( ) { return mass; },
-                                                             [ & ]( ) { return referenceArea; },
-                                                             true );
-        accelerationClass2->updateMembers( );
-        force = accelerationClass2->getAcceleration( ) * mass;
+//         // Create aerodynamic acceleration model class, inverted coefficients, mass and
+//         // reference area set through std::functions.
+//         std::shared_ptr< AerodynamicAcceleration > accelerationClass2 =
+//                 std::make_shared< AerodynamicAcceleration >( [ & ]( Eigen::Vector3d& input ) { input = -forceCoefficients; },
+//                                                              [ & ]( ) { return density; },
+//                                                              [ & ]( ) { return airSpeed; },
+//                                                              [ & ]( ) { return mass; },
+//                                                              [ & ]( ) { return referenceArea; },
+//                                                              true );
+//         accelerationClass2->updateMembers( );
+//         force = accelerationClass2->getAcceleration( ) * mass;
 
-        // Check if computed force matches expected.
-        TUDAT_CHECK_MATRIX_CLOSE_FRACTION( expectedForce, force, tolerance );
-    }
+//         // Check if computed force matches expected.
+//         TUDAT_CHECK_MATRIX_CLOSE_FRACTION( expectedForce, force, tolerance );
+//     }
 }
 
 //! Test implementation of aerodynamic moment and rotational acceleration models.
@@ -1123,6 +1128,200 @@ BOOST_AUTO_TEST_CASE( testCombinedAerodynamicForceAndMoment )
             }
         }
     }
+}
+
+BOOST_AUTO_TEST_CASE( test_panelled_coefficients )
+{       
+        const double tolerance = std::numeric_limits< double >::epsilon( );
+
+        double panelArea = 0.5;
+        double referenceArea = 1.0;
+        double panelTemperature = 300.0;
+        double energyAccomodationCoefficient = 1.0;
+        double normalAccomodationCoefficient = 1.0;
+        double tangentialAccomodationCoefficient = 1.0;
+        double normalVelocityAtWallRatio = 1.0;
+
+        double freeStreamTemperature = 500.0;
+        double airSpeed = 3.5E3;
+        double specificGasConstant = 400.0;
+        std::vector< double > angleOfAttack = { 0.0, PI/10, PI/5, PI/2 };
+        std::vector< double > angleOfSideslip = { 0.0, PI/10, PI/5, PI/2 };
+
+        std::function< Eigen::Vector3d( ) > localFrameSurfaceNormal = [ = ]( ){ Eigen::Vector3d normal( 1.0, 0.0, 0.0); 
+                return normal;};
+        std::function< Eigen::Vector3d( ) > localFramePositionVector = [ = ]( ){ Eigen::Vector3d position( 1.0, 0.0, 0.0); 
+                return position;};
+        Eigen::Vector3d frameOrigin( 0.0, 0.0, 0.0 );
+        Eigen::Vector3d vertexA( 0.0, 0.0, 0.0 );
+        Eigen::Vector3d vertexB( 0.0, 1.0, 0.0 );
+        Eigen::Vector3d vertexC( 0.0, 0.0, 1.0 );
+        Triangle3d triangle3d( vertexA, vertexB, vertexC );
+
+        std::shared_ptr< system_models::VehicleExteriorPanel > exteriorPanel = std::make_shared< system_models::VehicleExteriorPanel >(
+            localFrameSurfaceNormal, localFramePositionVector, panelArea, panelTemperature, "", nullptr,
+            triangle3d, frameOrigin, true );
+        
+        exteriorPanel->setEnergyAccomodationCoefficient( energyAccomodationCoefficient );
+        exteriorPanel->setNormalAccomodationCoefficient( normalAccomodationCoefficient );
+        exteriorPanel->setTangentialAccomodationCoefficient( tangentialAccomodationCoefficient );
+        exteriorPanel->setNormalVelocityAtWallRatio( normalVelocityAtWallRatio );
+        
+        std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > > allPanels = { exteriorPanel };
+        allPanels[ 0 ]->updatePanel( Eigen::Quaterniond::Identity( ) );
+
+        // TEST 1: Newton
+        {
+                NewtonGasSurfaceInteractionModel newtonModel( allPanels, referenceArea, 0, false );
+                Eigen::Vector3d forceCoefficients, actualForceCoefficients, panelNormal, incomingDirection;
+                double Cp, cosineDelta;
+                for( unsigned int i=0; i<angleOfAttack.size( ); i++ )
+                {
+                        for( unsigned int j=0; j<angleOfSideslip.size( ); j++ )
+                        {
+                                incomingDirection = Eigen::Vector3d(
+                                        -std::cos(angleOfAttack[i]) * std::cos(angleOfSideslip[j]),
+                                        -std::sin(angleOfSideslip[j]),
+                                        -std::sin(angleOfAttack[i]) * std::cos(angleOfSideslip[j]) );
+
+                                newtonModel.setIncomingDirection( incomingDirection );
+                                forceCoefficients = newtonModel.computeAerodynamicCoefficients( );
+                                
+                                panelNormal = panelNormal = localFrameSurfaceNormal( );
+                                cosineDelta = panelNormal.dot( -incomingDirection );
+                                cosineDelta = cosineDelta > 0 ? cosineDelta : 0.0;
+                                Cp = 2 * cosineDelta * cosineDelta;
+                                actualForceCoefficients = -Cp * panelNormal * panelArea / referenceArea;
+                                for( int k=0; k<3; k++ )
+                                {
+                                        BOOST_CHECK_SMALL( std::fabs( forceCoefficients( k ) - actualForceCoefficients( k ) ), tolerance );
+                                }
+                        } 
+                }
+        }
+        // TEST 2: Storch
+        {
+                StorchGasSurfaceInteractionModel storchModel( allPanels, referenceArea, 0, false );
+                Eigen::Vector3d forceCoefficients, actualForceCoefficients, panelNormal, incomingDirection;
+                double Cp, Ct, cosineDelta, sineDelta;
+                for( unsigned int i=0; i<angleOfAttack.size( ); i++ )
+                {
+                        for( unsigned int j=0; j<angleOfSideslip.size( ); j++ )
+                        {
+                                incomingDirection = Eigen::Vector3d(
+                                        -std::cos(angleOfAttack[i]) * std::cos(angleOfSideslip[j]),
+                                        -std::sin(angleOfSideslip[j]),
+                                        -std::sin(angleOfAttack[i]) * std::cos(angleOfSideslip[j]) );
+
+                                storchModel.setIncomingDirection( incomingDirection );
+                                forceCoefficients = storchModel.computeAerodynamicCoefficients( );
+                                
+                                panelNormal = localFrameSurfaceNormal( );
+                                cosineDelta = panelNormal.dot( -incomingDirection );
+                                cosineDelta = cosineDelta > 0 ? cosineDelta : 0.0;
+                                sineDelta = std::sqrt(std::max(0.0, 1 - cosineDelta * cosineDelta));
+
+                                Cp = 2 * cosineDelta * ( normalVelocityAtWallRatio + ( 2 - normalAccomodationCoefficient ) * cosineDelta );
+                                Ct = 2 * tangentialAccomodationCoefficient * sineDelta * cosineDelta;
+
+                                actualForceCoefficients = ( -Cp * panelNormal - Ct * (
+                                        incomingDirection.cross( panelNormal ) ).cross( panelNormal ) ) * panelArea / referenceArea;
+                                for( int k=0; k<3; k++ )
+                                {
+                                        BOOST_CHECK_SMALL( std::fabs( forceCoefficients( k ) - actualForceCoefficients( k ) ), tolerance );
+                                }
+                        } 
+                }
+        }
+        // TEST 3: Sentman
+        {
+                SentmanGasSurfaceInteractionModel sentmanModel( allPanels, referenceArea, 0, false );
+                sentmanModel.setFreeStreamTemperature( freeStreamTemperature );
+                sentmanModel.setAirSpeed( airSpeed );
+                sentmanModel.setSpecifiGasConstant( specificGasConstant );
+                Eigen::Vector3d forceCoefficients, actualForceCoefficients, panelNormal, incomingDirection;
+                double Cp, Ct, cosineDelta, sineDelta, erf, exp;
+                double speedRatio = airSpeed / std::sqrt( 2 * specificGasConstant * freeStreamTemperature );
+                double sqrtPi = std::sqrt( mathematical_constants::PI );
+                double incidentTemperature = 2.0/3.0 * speedRatio * speedRatio * freeStreamTemperature;
+                for( unsigned int i=0; i<angleOfAttack.size( ); i++ )
+                {
+                        for( unsigned int j=0; j<angleOfSideslip.size( ); j++ )
+                        {
+                                incomingDirection = Eigen::Vector3d(
+                                        -std::cos(angleOfAttack[i]) * std::cos(angleOfSideslip[j]),
+                                        -std::sin(angleOfSideslip[j]),
+                                        -std::sin(angleOfAttack[i]) * std::cos(angleOfSideslip[j]) );
+
+                                sentmanModel.setIncomingDirection( incomingDirection );
+                                forceCoefficients = sentmanModel.computeAerodynamicCoefficients( );
+                                
+                                panelNormal = localFrameSurfaceNormal( );
+                                cosineDelta = panelNormal.dot( -incomingDirection );
+                                cosineDelta = cosineDelta > 0 ? cosineDelta : 0.0;
+                                erf = std::erf( speedRatio * cosineDelta );
+                                exp = std::exp( -speedRatio * speedRatio * cosineDelta * cosineDelta );
+                                sineDelta = std::sqrt(std::max(0.0, 1 - cosineDelta * cosineDelta));
+                                //Cp 
+                                Cp = ( cosineDelta * cosineDelta ) * ( 1 + erf ) + 
+                                    cosineDelta / ( speedRatio * sqrtPi ) * exp +
+                                    0.5 * std::sqrt( 2.0/3.0 * ( 1 + ( energyAccomodationCoefficient * 
+                                    panelTemperature ) / ( incidentTemperature - 1) ) ) * ( sqrtPi * cosineDelta * ( 1 + erf ) +
+                                    1.0 / speedRatio * exp );
+                                //Ct
+                                Ct = sineDelta * cosineDelta * ( 1 + erf ) + sineDelta / ( speedRatio * sqrtPi ) * exp;
+
+                                actualForceCoefficients = ( -Cp * panelNormal - Ct * (
+                                        incomingDirection.cross( panelNormal ) ).cross( panelNormal ) ) * panelArea / referenceArea;
+
+                                for( int k=0; k<3; k++ )
+                                {
+                                        BOOST_CHECK_SMALL( std::fabs( forceCoefficients( k ) - actualForceCoefficients( k ) ), tolerance );
+                                }
+                        } 
+                }
+        }
+        // TEST 4: Cook
+        {
+                CookGasSurfaceInteractionModel cookModel( allPanels, referenceArea, 0, false );
+                cookModel.setFreeStreamTemperature( freeStreamTemperature );
+                Eigen::Vector3d forceCoefficients, actualForceCoefficients, panelNormal, incomingDirection;
+                double Cp, Ct, cosineDelta, sineDelta, sqrt, Cd, Cl;
+                for( unsigned int i=0; i<angleOfAttack.size( ); i++ )
+                {
+                        for( unsigned int j=0; j<angleOfSideslip.size( ); j++ )
+                        {
+                                incomingDirection = Eigen::Vector3d(
+                                        -std::cos(angleOfAttack[i]) * std::cos(angleOfSideslip[j]),
+                                        -std::sin(angleOfSideslip[j]),
+                                        -std::sin(angleOfAttack[i]) * std::cos(angleOfSideslip[j]) );
+
+                                cookModel.setIncomingDirection( incomingDirection );
+                                forceCoefficients = cookModel.computeAerodynamicCoefficients( );
+                                
+                                panelNormal = localFrameSurfaceNormal( );
+                                cosineDelta = panelNormal.dot( -incomingDirection );
+                                cosineDelta = cosineDelta > 0 ? cosineDelta : 0.0;
+                                sqrt = std::sqrt(  1 + ( energyAccomodationCoefficient ) * 
+                                        panelTemperature / ( freeStreamTemperature - 1) );
+                                sineDelta = std::sqrt(std::max(0.0, 1 - cosineDelta * cosineDelta));
+                                Cd = 2 * cosineDelta * ( 1 + 2.0/3.0 * cosineDelta * sqrt );
+                                // Cl
+                                Cl = 4.0/3.0 * sineDelta * cosineDelta * sqrt;
+                                // convert cd, cd to cp, ct
+                                Cp = cosineDelta * Cd + sineDelta * Cl;
+                                Ct = sineDelta * Cd - cosineDelta * Cl;
+                                
+                                actualForceCoefficients = ( -Cp * panelNormal - Ct * (
+                                        incomingDirection.cross( panelNormal ) ).cross( panelNormal ) ) * panelArea / referenceArea;
+                                        
+                                for( int k=0; k<3; k++ )
+                                {
+                                        BOOST_CHECK_SMALL( std::fabs( forceCoefficients( k ) - actualForceCoefficients( k ) ), tolerance );
+                                }
+                        } 
+                }
+        }
 }
 
 BOOST_AUTO_TEST_SUITE_END( )

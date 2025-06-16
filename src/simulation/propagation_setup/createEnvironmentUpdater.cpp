@@ -377,9 +377,7 @@ createTranslationalEquationsOfMotionEnvironmentUpdaterSettings( const basic_astr
                                         accelerationModelIterator->second.at( i ) );
                         auto panelledAerodynamicCoefficientInterface = std::dynamic_pointer_cast< aerodynamics::PanelledAerodynamicCoefficientInterface >( 
                             aerodynamicAcceleration->getCoefficientInterface( ) );
-                        if ( panelledAerodynamicCoefficientInterface != nullptr && 
-                            std::count( singleAccelerationUpdateNeeds[body_segment_orientation_update].begin( ), 
-                                        singleAccelerationUpdateNeeds[body_segment_orientation_update].end( ), acceleratedBodyIterator->first ) == 0 )
+                        if ( panelledAerodynamicCoefficientInterface != nullptr )
                         {
                             singleAccelerationUpdateNeeds[body_segment_orientation_update].push_back( acceleratedBodyIterator->first );
                         }
@@ -441,9 +439,7 @@ createTranslationalEquationsOfMotionEnvironmentUpdaterSettings( const basic_astr
                                 }
                             }
 
-                            if( paneledRadiationPressureTargetModel->getTotalNumberOfPanels( ) > 0 && 
-                                std::count( singleAccelerationUpdateNeeds[body_segment_orientation_update].begin( ), 
-                                            singleAccelerationUpdateNeeds[body_segment_orientation_update].end( ), targetName ) == 0 )
+                            if( paneledRadiationPressureTargetModel->getTotalNumberOfPanels( ) > 0 )
                             {
                                 singleAccelerationUpdateNeeds[ body_segment_orientation_update ].push_back( targetName );
                             }

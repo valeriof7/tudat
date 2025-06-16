@@ -38,10 +38,12 @@ public:
 GasSurfaceInteractionModel( const GasSurfaceInteractionModelType modelType,
                             const std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > >& allPanels,
                             const double referenceArea,
-                            const int maximumNumberOfPixels ):
+                            const int maximumNumberOfPixels, 
+                            const bool onlyDrag ):
                             modelType_( modelType), allPanels_( allPanels ),
                             referenceArea_( referenceArea ),
-                            maximumNumberOfPixels_( maximumNumberOfPixels )                        
+                            maximumNumberOfPixels_( maximumNumberOfPixels ),
+                            onlyDrag_( onlyDrag )                     
 { 
     totalNumberOfPanels_ = allPanels_.size( );
     surfacePanelCosines_.resize( totalNumberOfPanels_ );
@@ -84,12 +86,17 @@ void setIncomingDirection( const Eigen::Vector3d incomingDirection )
 
 void setFreeStreamTemperature( const double freeStreamTemperature )
 {
-    freeStreamTemperature_ = freeStreamTemperature_;
+    freeStreamTemperature_ = freeStreamTemperature;
 }
 
 void setAirSpeed( const double airSpeed )
 {
     airSpeed_ = airSpeed;
+}
+
+void setSpecifiGasConstant( const double specificGasConstant )
+{
+    specificGasConstant_ = specificGasConstant;
 }
 
 protected:
@@ -102,6 +109,8 @@ std::shared_ptr< tudat::system_models::SelfShadowing > aerodynamicSelfShadowing_
 double referenceArea_;
 
 int maximumNumberOfPixels_;
+
+bool onlyDrag_;
 
 Eigen::Vector3d incomingDirection_;
 
@@ -121,6 +130,8 @@ double freeStreamTemperature_;
 
 double incidentTemperature_;
 
+double specificGasConstant_;
+
 };
 
 class NewtonGasSurfaceInteractionModel : public GasSurfaceInteractionModel
@@ -128,8 +139,9 @@ class NewtonGasSurfaceInteractionModel : public GasSurfaceInteractionModel
 public:
 NewtonGasSurfaceInteractionModel( const std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > >& allPanels,
                                   const double referenceArea,
-                                  const int maximumNumberOfPixels ):
-                                  GasSurfaceInteractionModel( newton, allPanels, referenceArea, maximumNumberOfPixels )
+                                  const int maximumNumberOfPixels, 
+                                  const bool onlyDrag ):
+                                  GasSurfaceInteractionModel( newton, allPanels, referenceArea, maximumNumberOfPixels, onlyDrag )
 { }
 
 Eigen::Vector3d computeAerodynamicCoefficients( );
@@ -141,8 +153,9 @@ class StorchGasSurfaceInteractionModel : public GasSurfaceInteractionModel
 public:
 StorchGasSurfaceInteractionModel( const std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > >& allPanels,
                                   const double referenceArea,
-                                  const int maximumNumberOfPixels ):
-                                  GasSurfaceInteractionModel( storch, allPanels, referenceArea, maximumNumberOfPixels )
+                                  const int maximumNumberOfPixels,
+                                  const bool onlyDrag ):
+                                  GasSurfaceInteractionModel( storch, allPanels, referenceArea, maximumNumberOfPixels, onlyDrag )
 { }
 
 Eigen::Vector3d computeAerodynamicCoefficients( );
@@ -154,8 +167,9 @@ class SentmanGasSurfaceInteractionModel : public GasSurfaceInteractionModel
 public:
 SentmanGasSurfaceInteractionModel( const std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > >& allPanels,
                                    const double referenceArea,
-                                   const int maximumNumberOfPixels ):
-                                   GasSurfaceInteractionModel( sentman, allPanels, referenceArea, maximumNumberOfPixels )
+                                   const int maximumNumberOfPixels,
+                                   const bool onlyDrag ):
+                                   GasSurfaceInteractionModel( sentman, allPanels, referenceArea, maximumNumberOfPixels, onlyDrag )
 { }
 
 Eigen::Vector3d computeAerodynamicCoefficients( );
@@ -167,8 +181,9 @@ class CookGasSurfaceInteractionModel : public GasSurfaceInteractionModel
 public:
 CookGasSurfaceInteractionModel( const std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > >& allPanels,
                                 const double referenceArea,
-                                const int maximumNumberOfPixels ):
-                                GasSurfaceInteractionModel( cook, allPanels, referenceArea, maximumNumberOfPixels )
+                                const int maximumNumberOfPixels,
+                                const bool onlyDrag ):
+                                GasSurfaceInteractionModel( cook, allPanels, referenceArea, maximumNumberOfPixels, onlyDrag )
 { }
 
 Eigen::Vector3d computeAerodynamicCoefficients( );
