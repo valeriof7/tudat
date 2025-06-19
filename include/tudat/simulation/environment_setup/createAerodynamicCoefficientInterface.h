@@ -20,6 +20,7 @@
 #include "tudat/math/interpolators/multiLinearInterpolator.h"
 #include "tudat/math/interpolators/createInterpolator.h"
 #include "tudat/paths.hpp"
+#include "tudat/astro/aerodynamics/gasSurfaceInteractionModel.h"
 
 namespace tudat
 {

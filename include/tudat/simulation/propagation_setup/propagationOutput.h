@@ -27,6 +27,7 @@
 #include "tudat/math/basic/rotationRepresentations.h"
 #include "tudat/astro/aerodynamics/nrlmsise00Atmosphere.h"
 #include "tudat/astro/aerodynamics/aerodynamicAcceleration.h"
+#include "tudat/astro/aerodynamics/panelledAerodynamicCoefficientInterface.h"
 
 namespace tudat
 {

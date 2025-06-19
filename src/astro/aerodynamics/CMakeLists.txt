@@ -32,6 +32,7 @@ set(aerodynamics_HEADERS
         "aerodynamicTorque.h"
         "aerodynamicCoefficientGenerator.h"
         "aerodynamicCoefficientInterface.h"
+        "panelledAerodynamicCoefficientInterface.h"
         "aerodynamicAcceleration.h"
         "aerodynamicForce.h"
         "aerodynamics.h"

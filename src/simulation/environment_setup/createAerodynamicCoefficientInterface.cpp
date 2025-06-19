@@ -11,6 +11,8 @@
 #include <boost/lambda/lambda.hpp>
 
 #include "tudat/simulation/environment_setup/createAerodynamicCoefficientInterface.h"
+#include "tudat/astro/aerodynamics/gasSurfaceInteractionModel.h"
+#include "tudat/astro/aerodynamics/panelledAerodynamicCoefficientInterface.h"
 
 namespace tudat
 {
@@ -469,13 +471,16 @@ std::shared_ptr< aerodynamics::AerodynamicCoefficientInterface > createAerodynam
                  panelledCoefficientSettings->getMaximumNumberOfPixels( ) != 0 )
             {
                 throw std::runtime_error( "Error, trying to set panelled coefficients but assigned number of pixels must be > 2" );
-            }                
+            }
             coefficientInterface = std::make_shared< PanelledAerodynamicCoefficientInterface >( 
-                panelledCoefficientSettings->getGasSurfaceInteractionModelType( ),
-                bodies.at( body )->getVehicleSystems( )->getAllPanels( ),
-                panelledCoefficientSettings->getReferenceArea( ),
-                panelledCoefficientSettings->getMaximumNumberOfPixels( ),
-                panelledCoefficientSettings->getOnlyDrag( ) );
+                createGasSurfaceInteractionModel( panelledCoefficientSettings->getGasSurfaceInteractionModelType( ),
+                                                  bodies.at( body )->getVehicleSystems( )->getAllPanels( ),
+                                                  panelledCoefficientSettings->getReferenceArea( ),
+                                                  panelledCoefficientSettings->getMaximumNumberOfPixels( ),
+                                                  panelledCoefficientSettings->getOnlyDrag( ) ),
+                createIndependentVariablesNamesForGasSurfaceInteractionModel( panelledCoefficientSettings->getGasSurfaceInteractionModelType( ) ),
+                panelledCoefficientSettings->getReferenceArea( ) );             
+
             break;
 
         }
