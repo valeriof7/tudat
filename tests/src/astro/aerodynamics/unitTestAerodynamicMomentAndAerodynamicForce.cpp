@@ -49,6 +49,7 @@
 #include "tudat/astro/system_models/panelGeometryUtils.h"
 #include "tudat/astro/system_models/vehicleExteriorPanels.h"
 #include "tudat/astro/aerodynamics/gasSurfaceInteractionModel.h"
+#include "tudat/simulation/environment_setup/createBodies.h"
 
 namespace tudat
 {
@@ -151,6 +152,62 @@ BOOST_AUTO_TEST_CASE( testAerodynamicForceAndAcceleration )
 
         // Check if computed force matches expected.
         TUDAT_CHECK_MATRIX_CLOSE_FRACTION( expectedForce, force, tolerance );
+    }
+    // Test 5: Test the acceleration model class without inverted coefficients.
+    {
+                // Set initial state
+        Eigen::Vector6d systemInitialState = Eigen::Vector6d::Zero( );
+
+        systemInitialState( 0 ) = 6.8E6;
+        systemInitialState( 4 ) = airSpeed;
+
+        
+        std::vector< std::string > bodiesToCreate;
+        bodiesToCreate.push_back( "Earth" );
+        // Create body objects.
+        BodyListSettings defaultBodySettings = getDefaultBodySettings( bodiesToCreate, "SSB", "J2000" );
+        defaultBodySettings.at( "Earth" )->ephemerisSettings = std::make_shared< ConstantEphemerisSettings >( Eigen::Vector6d::Zero( ) );
+        SystemOfBodies bodies = createSystemOfBodies( defaultBodySettings );
+
+        bodies.createEmptyBody( "Vehicle" );
+        bodies.at( "Vehicle" )->setConstantBodyMass( mass );
+        bodies.at( "Vehicle" )->setEphemeris( std::make_shared< ConstantEphemeris >( systemInitialState ) );
+
+        std::shared_ptr< AerodynamicCoefficientSettings > aerodynamicCoefficientSettings =
+                std::make_shared< ConstantAerodynamicCoefficientSettings >(
+                        referenceArea, forceCoefficients, negative_aerodynamic_frame_coefficients );
+        
+        // Set constant density and constant rotation models to Earth
+        DensityFunction densityFunction = [=]( ) { return density; };                
+        bodies.at( "Earth" )->setAtmosphereModel( std::make_shared< CustomConstantTemperatureAtmosphereSettings >( densityFunction, 300.0 ) );
+        bodies.at( "Earth" )
+                    ->setRotationalEphemeris( createRotationModel(
+                            constantRotationModelSettings( "ECLIPJ2000", "EarthFixed", Eigen::Matrix3d::Identity( ) ),
+                            "Earth",
+                            bodies ) );
+        // Create and set aerodynamic coefficients object
+        bodies.at( "Vehicle" )
+                ->setAerodynamicCoefficientInterface(
+                        createAerodynamicCoefficientInterface( aerodynamicCoefficientSettings, "Vehicle", bodies ) );
+        bodies.at( "Vehicle" )
+                    ->setRotationalEphemeris( createRotationModel(
+                            constantRotationModelSettings( "ECLIPJ2000", "VehicleFixed", Eigen::Matrix3d::Identity( ) ),
+                            "Vehicle",
+                            bodies ) );
+
+        bodyFlightConditions = createAtmosphericFlightConditions(
+                bodies.at( "Vehicle" ), bodies.at( "Earth" ), "Vehicle", "Earth" );
+        bodies.at( "Vehicle" )->setFlightConditions( bodyFlightConditions );
+
+        AerodynamicAcceleration aerodynamicAcceleration( bodyFlightConditions, std::bind( &Body::getBodyMass, bodies.at( "Vehicle" ) ) );
+
+        aerodynamicAcceleration->updateMembers( );
+        Eigen::Vector3d force = aerodynamicAcceleration->getAcceleration( ) * mass;   
+        // Check if computed force matches expected.
+        TUDAT_CHECK_MATRIX_CLOSE_FRACTION( expectedForce, force, tolerance );
+    }
+
+
     }
 
 //     // Test 5: Test the acceleration model class without inverted coefficients.
