@@ -35,6 +35,36 @@ void GasSurfaceInteractionModel::updateMembers( )
     }
 }
 
+Eigen::Vector3d ConstantInteractionModel::computeAerodynamicCoefficients( )
+{
+    updateMembers( );
+
+    double cosineDelta, sineDelta;
+    double actualCrossSectionArea = 0;
+    Eigen::Vector3d panelNormal;
+
+    for ( int i=0; i<totalNumberOfPanels_; i++ )
+    {   
+        panelNormal = allPanels_[ i ]->getBodyFixedSurfaceNormal( )( );
+        cosineDelta = panelNormal.dot( -incomingDirection_ );
+        cosineDelta = cosineDelta > 0.0 ? cosineDelta : 0.0;
+        surfacePanelCosines_[ i ] = cosineDelta;
+        if ( cosineDelta == 0 )
+        {
+            illuminatedPanelFractions_[ i ] = 0.0;
+            continue;
+        }
+        if ( illuminatedPanelFractions_[ i ] == 0.0 )
+        {
+            continue;
+        }
+        actualCrossSectionArea += allPanels_[ i ]->getPanelArea( ) * illuminatedPanelFractions_[ i ];
+    }
+    referenceArea_ = actualCrossSectionArea;
+    return constantAerodynamicCoefficients_;
+    
+}
+
 Eigen::Vector3d NewtonGasSurfaceInteractionModel::computeAerodynamicCoefficients( )
 {
     updateMembers( );

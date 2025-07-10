@@ -23,8 +23,9 @@ public:
 
 PanelledAerodynamicCoefficientInterface( const std::shared_ptr< GasSurfaceInteractionModel > gasSurfaceInteractionModel,
                                          const std::vector< AerodynamicCoefficientsIndependentVariables > independentVariableNames,
-                                         const double referenceArea  ):
-                                         AerodynamicCoefficientInterface( TUDAT_NAN, referenceArea, Eigen::Vector3d::Zero( ), independentVariableNames, body_fixed_frame_coefficients ),
+                                         const double referenceArea, 
+                                         const AerodynamicCoefficientFrames coefficientFrame ):
+                                         AerodynamicCoefficientInterface( TUDAT_NAN, referenceArea, Eigen::Vector3d::Zero( ), independentVariableNames, coefficientFrame ),
                                          gasSurfaceInteractionModel_( gasSurfaceInteractionModel )
 { 
     numberOfIndependentVariables_ = independentVariableNames_.size( );
@@ -49,6 +50,8 @@ void updateCurrentCoefficients( const std::vector<double>& independentVariables,
         gasSurfaceInteractionModel_->setAirSpeed( independentVariables[ 3 ] );
     }
     currentForceCoefficients_ = gasSurfaceInteractionModel_->computeAerodynamicCoefficients( );
+
+    referenceArea_ = gasSurfaceInteractionModel_->getReferenceArea( );
 }
 
 GasSurfaceInteractionModelType getGasSurfaceInteractionModelType( ) const

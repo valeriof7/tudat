@@ -479,7 +479,14 @@ std::shared_ptr< aerodynamics::AerodynamicCoefficientInterface > createAerodynam
                                                   panelledCoefficientSettings->getMaximumNumberOfPixels( ),
                                                   panelledCoefficientSettings->getOnlyDrag( ) ),
                 createIndependentVariablesNamesForGasSurfaceInteractionModel( panelledCoefficientSettings->getGasSurfaceInteractionModelType( ) ),
-                panelledCoefficientSettings->getReferenceArea( ) );             
+                panelledCoefficientSettings->getReferenceArea( ),
+                panelledCoefficientSettings->getForceCoefficientsFrame( ) );
+            // specific case of constant aerodynamic coeffs but variable cross-section
+            if ( panelledCoefficientSettings->getGasSurfaceInteractionModelType( ) == constantCoefficients )
+            {
+                std::dynamic_pointer_cast< PanelledAerodynamicCoefficientInterface >( coefficientInterface )->getGasSurfaceInteractionModel( )->setConstantAerodynamicCoefficients( 
+                    panelledCoefficientSettings->getConstantForceCoefficient( ) );
+            }             
 
             break;
 

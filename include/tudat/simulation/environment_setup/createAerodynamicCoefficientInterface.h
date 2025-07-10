@@ -454,11 +454,15 @@ public:
 PanelledAerodynamicCoefficientSettings( const tudat::aerodynamics::GasSurfaceInteractionModelType gasSurfaceInteractionModelType,
                                         const double referenceArea, 
                                         const int maximumNumberOfPixels,
-                                        const bool onlyDrag ):
-                                        AerodynamicCoefficientSettings( panelled_coefficients, TUDAT_NAN, referenceArea, Eigen::Vector3d::Zero( ), {} ),
+                                        const bool onlyDrag, 
+                                        const aerodynamics::AerodynamicCoefficientFrames coefficientFrame,
+                                        const Eigen::Vector3d& constantForceCoefficient = Eigen::Vector3d::Zero( ) ):
+                                        AerodynamicCoefficientSettings( panelled_coefficients, TUDAT_NAN, referenceArea, 
+                                            Eigen::Vector3d::Zero( ), {}, coefficientFrame ),
                                         gasSurfaceInteractionModelType_( gasSurfaceInteractionModelType ),
                                         maximumNumberOfPixels_( maximumNumberOfPixels ),
-                                        onlyDrag_( onlyDrag )
+                                        onlyDrag_( onlyDrag ),
+                                        constantForceCoefficient_( constantForceCoefficient )
 { }
 
 int getMaximumNumberOfPixels( ) const
@@ -476,6 +480,11 @@ bool getOnlyDrag( ) const
     return onlyDrag_;
 }
 
+Eigen::Vector3d getConstantForceCoefficient( ) const
+{
+    return constantForceCoefficient_;
+}
+
 private:
 
 tudat::aerodynamics::GasSurfaceInteractionModelType gasSurfaceInteractionModelType_;
@@ -483,6 +492,11 @@ tudat::aerodynamics::GasSurfaceInteractionModelType gasSurfaceInteractionModelTy
 int maximumNumberOfPixels_;
 
 bool onlyDrag_;
+
+aerodynamics::AerodynamicCoefficientFrames coefficientFrame_;
+
+// constant force coefficient (variable cross-section)
+Eigen::Vector3d constantForceCoefficient_;
 
 };
 
@@ -653,7 +667,17 @@ inline std::shared_ptr< AerodynamicCoefficientSettings > panelledAerodynamicCoef
         const int maximumNumberOfPixels = 0,
         const bool onlyDrag = false ) 
 {
-    return std::make_shared< PanelledAerodynamicCoefficientSettings >( gasSurfaceInteractionModelType, referenceArea, maximumNumberOfPixels, onlyDrag );
+    return std::make_shared< PanelledAerodynamicCoefficientSettings >( gasSurfaceInteractionModelType, referenceArea, 
+        maximumNumberOfPixels, onlyDrag, aerodynamics::body_fixed_frame_coefficients );
+}
+
+inline std::shared_ptr< AerodynamicCoefficientSettings > panelledConstantAerodynamicCoefficientSettings( 
+        const Eigen::Vector3d& constantForceCoefficient,
+        const int maximumNumberOfPixels = 0, 
+        const aerodynamics::AerodynamicCoefficientFrames coefficientFrame = aerodynamics::negative_aerodynamic_frame_coefficients) 
+{
+    return std::make_shared< PanelledAerodynamicCoefficientSettings >( tudat::aerodynamics::constantCoefficients, TUDAT_NAN, 
+        maximumNumberOfPixels, false, coefficientFrame, constantForceCoefficient );
 }
 
 //  Base class (non-functional) for the different classes of TabulatedAerodynamicCoefficientSettings.

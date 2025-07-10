@@ -26,6 +26,7 @@ namespace aerodynamics
 
 enum GasSurfaceInteractionModelType
 {
+    constantCoefficients,
     newton,
     storch,
     sentman,
@@ -104,6 +105,11 @@ GasSurfaceInteractionModelType getGasSurfaceInteractionModelType( ) const
     return modelType_;
 }
 
+void setConstantAerodynamicCoefficients( const Eigen::Vector3d constantAerodynamicCoefficients )
+{
+    constantAerodynamicCoefficients_ = constantAerodynamicCoefficients;
+}
+
 protected:
 GasSurfaceInteractionModelType modelType_;
 
@@ -136,6 +142,23 @@ double freeStreamTemperature_;
 double incidentTemperature_;
 
 double specificGasConstant_;
+
+// for constant coefficients but variable cross-section
+Eigen::Vector3d constantAerodynamicCoefficients_;
+
+};
+
+class ConstantInteractionModel : public GasSurfaceInteractionModel
+{
+public:
+ConstantInteractionModel( const std::vector< std::shared_ptr< system_models::VehicleExteriorPanel > >& allPanels,
+                                  const double referenceArea,
+                                  const int maximumNumberOfPixels, 
+                                  const bool onlyDrag ):
+                                  GasSurfaceInteractionModel( constantCoefficients, allPanels, referenceArea, maximumNumberOfPixels, onlyDrag )
+{ }
+
+Eigen::Vector3d computeAerodynamicCoefficients( );
 
 };
 
@@ -200,6 +223,12 @@ inline std::vector< AerodynamicCoefficientsIndependentVariables > createIndepend
 {
     switch( gasSurfaceInteractionModelType )
     {
+        case constantCoefficients: {
+            return {
+                angle_of_attack_dependent,
+                angle_of_sideslip_dependent
+            };
+        }
         case newton: {
             return {
                 angle_of_attack_dependent,
@@ -240,6 +269,9 @@ inline std::shared_ptr< GasSurfaceInteractionModel > createGasSurfaceInteraction
 {
     switch( gasSurfaceInteractionModelType )
     {
+        case constantCoefficients: {
+            return std::make_shared< ConstantInteractionModel >( allPanels, referenceArea, maximumNumberOfPixels, onlyDrag );
+        }
         case newton: {
             return std::make_shared< NewtonGasSurfaceInteractionModel >( allPanels, referenceArea, maximumNumberOfPixels, onlyDrag );
         }
