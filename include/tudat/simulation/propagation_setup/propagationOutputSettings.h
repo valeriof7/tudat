@@ -1369,8 +1369,9 @@ inline std::shared_ptr< SingleDependentVariableSaveSettings > illuminatedPanelFr
     return std::make_shared< IlluminatedPanelFractionDependentVariableSaveSettings >( bodyName, sourceName, panelTypeId );
 }
 
-inline std::shared_ptr< SingleDependentVariableSaveSettings > crossSectionChangeDependentVariable( const std::string& bodyName )
-    const std::string& sourceName, const std::string& accelerationType )
+inline std::shared_ptr< SingleDependentVariableSaveSettings > crossSectionChangeDependentVariable( const std::string& bodyName,
+                                                                                                   const std::string& sourceName,
+                                                                                                   const std::string& accelerationType )
 {
     return std::make_shared< CrossSectionDependentVariableSaveSettings >( cross_section_change, bodyName, sourceName, accelerationType )
 }
