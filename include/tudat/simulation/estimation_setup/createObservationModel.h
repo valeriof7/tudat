@@ -1952,16 +1952,22 @@ public:
                 }
 
                 // Create observation model
-                observationModel = std::make_shared< OneWayRangeObservationModel< ObservationScalarType, TimeType > >(
-                        linkEnds,
+                std::shared_ptr< observation_models::LightTimeCalculator< ObservationScalarType, TimeType > > lightTimeCalculator =
                         createLightTimeCalculator< ObservationScalarType, TimeType >( linkEnds,
                                                                                       transmitter,
                                                                                       receiver,
                                                                                       bodies,
                                                                                       topLevelObservableType,
                                                                                       observationSettings->lightTimeCorrectionsList_,
-                                                                                      observationSettings->lightTimeConvergenceCriteria_ ),
-                        observationBias );
+                                                                                      observationSettings->lightTimeConvergenceCriteria_ );
+                std::shared_ptr< OneWayRangeObservationModel< ObservationScalarType, TimeType > > oneWayRangeObservationModel =
+                        std::make_shared< OneWayRangeObservationModel< ObservationScalarType, TimeType > >(
+                                linkEnds, lightTimeCalculator, observationBias );
+                if( lightTimeCalculator->doCorrectionsNeedFrequency( ) )
+                {
+                    oneWayRangeObservationModel->setFrequencyInterpolator( getTransmittingFrequencyInterpolator( bodies, linkEnds ) );
+                }
+                observationModel = oneWayRangeObservationModel;
 
                 break;
             }

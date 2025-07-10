@@ -34,6 +34,8 @@
 #include "tudat/astro/observation_models/corrections/lightTimeCorrection.h"
 #include "tudat/astro/basic_astro/unitConversions.h"
 #include "tudat/astro/earth_orientation/terrestrialTimeScaleConverter.h"
+#include "tudat/math/basic/legendrePolynomials.h"
+#include "tudat/astro/basic_astro/ionosphereModel.h"
 
 namespace tudat
 {
@@ -302,7 +304,7 @@ private:
 };
 
 // Enum listing the available tropospheric mapping models.
-enum TroposphericMappingModel { simplified_chao, niell };
+enum TroposphericMappingModel { simplified_chao, niell, vmf3 };
 
 // Base class defining a tropospheric elevation mapping function (used to map a zenith tropospheric correction
 // to the desired elevation)
@@ -741,6 +743,143 @@ private:
     // Water vapor partial pressure at the ground station as a function of time
     std::function< double( const double ) > waterVaporPartialPressureFunction_;
 };
+
+// Class to compute tropospheric delay models from:
+//  VMF3 & GPT3: Landskron & Böhm (2018) VMF3/GPT3: refined discrete and empirical troposphere mapping functions.
+//  DOI:10.1007/s00190-017-1066-2
+class VMF3TroposphericCorrection : public MappedTroposphericCorrection
+{
+public:
+    VMF3TroposphericCorrection( const std::shared_ptr< TroposhericElevationMapping > elevationMapping,
+                                const bool isUplinkCorrection,
+                                const std::shared_ptr< ground_stations::StationTroposphereData > troposphereData,
+                                const bool useGradient ):
+        MappedTroposphericCorrection( vmf3_tropospheric, elevationMapping, isUplinkCorrection ), troposphereData_( troposphereData ),
+        useGradient_( useGradient )
+    { }
+
+    // Computes the dry atmosphere zenith range correction (in meters)
+    double computeDryZenithRangeCorrection( const double stationTime )
+    {
+        return troposphereData_->getZenithDelay( stationTime )( 0 );
+    }
+
+    // Computes the wet atmosphere zenith range correction (in meters)
+    double computeWetZenithRangeCorrection( const double stationTime )
+    {
+        return troposphereData_->getZenithDelay( stationTime )( 1 );
+    }
+
+    double calculateLightTimeCorrectionWithMultiLegLinkEndStates(
+            const std::vector< Eigen::Vector6d >& linkEndsStates,
+            const std::vector< double >& linkEndsTimes,
+            const unsigned int currentMultiLegTransmitterIndex,
+            const std::shared_ptr< observation_models::ObservationAncilliarySimulationSettings > ancillarySettings = nullptr ) override;
+
+private:
+    // VMF3 data container (interpolated coefficients)
+    std::shared_ptr< ground_stations::StationTroposphereData > troposphereData_;
+
+    //! Whether gradient data should be used
+    bool useGradient_;
+};
+
+class VMF3MappingModel : public TroposhericElevationMapping
+{
+public:
+    VMF3MappingModel( std::function< double( Eigen::Vector3d, double ) > elevationFunction,
+                      std::function< double( Eigen::Vector3d, double ) > azimuthFunction,
+                      std::function< Eigen::Vector3d( double ) > groundStationGeodeticPositionFunction,
+                      bool isUplinkCorrection ):
+        elevationFunction_( std::move( elevationFunction ) ), azimuthFunction_( std::move( azimuthFunction ) ),
+        groundStationGeodeticPositionFunction_( std::move( groundStationGeodeticPositionFunction ) ),
+        isUplinkCorrection_( isUplinkCorrection ), currentElevation_( TUDAT_NAN ), currentAzimuth_( TUDAT_NAN ),
+        currentStationLatitude_( TUDAT_NAN ), currentStationLongitude_( TUDAT_NAN ), currentDayOfYear_( TUDAT_NAN ),
+        currentDryMappingCoefficient_( TUDAT_NAN ), currentWetMappingCoefficient_( TUDAT_NAN )
+    {
+        legendreCache_ = basic_mathematics::LegendreCache( 12, 1 );
+        loadLegendreCoefficientTables( );
+        timeScaleConverter_ = std::make_shared< earth_orientation::TerrestrialTimeScaleConverter >( );
+    }
+
+    double computeGradientContribution( const Eigen::Vector6d& transmitterState,
+                                        const Eigen::Vector6d& receiverState,
+                                        const double transmissionTime,
+                                        const double receptionTime,
+                                        const Eigen::Vector4d& gradients );
+
+    //! Compute and store current elevation and azimuth
+    void computeCurrentVMFdata( const Eigen::Vector6d& transmitterState,
+                                const Eigen::Vector6d& receiverState,
+                                const double transmissionTime,
+                                const double receptionTime );
+
+    double computeDryTroposphericMapping( const Eigen::Vector6d& transmitterState,
+                                          const Eigen::Vector6d& receiverState,
+                                          const double transmissionTime,
+                                          const double receptionTime ) override;
+
+    double computeWetTroposphericMapping( const Eigen::Vector6d& transmitterState,
+                                          const Eigen::Vector6d& receiverState,
+                                          const double transmissionTime,
+                                          const double receptionTime ) override;
+
+    double computeMappingFunction( const double mappingCoefficient, const bool isHydrostatic ) const;
+
+    void updateMappingCoefficients( const Eigen::Vector2d& mappingCoefficients )
+    {
+        currentDryMappingCoefficient_ = mappingCoefficients( 0 );
+        currentWetMappingCoefficient_ = mappingCoefficients( 1 );
+    }
+
+private:
+    std::function< double( Eigen::Vector3d, double ) > elevationFunction_;
+    std::function< double( Eigen::Vector3d, double ) > azimuthFunction_;
+    std::function< Eigen::Vector3d( double ) > groundStationGeodeticPositionFunction_;
+    bool isUplinkCorrection_;
+    double currentElevation_, currentAzimuth_, currentStationLatitude_, currentStationLongitude_;
+    double currentDayOfYear_;
+    double currentDryMappingCoefficient_, currentWetMappingCoefficient_;
+    mutable tudat::basic_mathematics::LegendreCache legendreCache_;
+    std::shared_ptr< earth_orientation::TerrestrialTimeScaleConverter > timeScaleConverter_;
+
+    // Declare this struct in the header
+    struct Vmf3SphericalHarmonicComponentSet {
+        Eigen::VectorXd A0, A1, B1, A2, B2;
+    };
+
+    // Declare coefficient sets
+    Vmf3SphericalHarmonicComponentSet anm_bh_, bnm_bh_;
+    Vmf3SphericalHarmonicComponentSet anm_bw_, bnm_bw_;
+    Vmf3SphericalHarmonicComponentSet anm_ch_, bnm_ch_;
+    Vmf3SphericalHarmonicComponentSet anm_cw_, bnm_cw_;
+
+    // Add missing function declarations
+    Vmf3SphericalHarmonicComponentSet loadCoefficientSet( const std::string& filePath );
+    void loadLegendreCoefficientTables( );
+
+    double evaluateSeasonalCoefficient( const Eigen::VectorXd& A0,
+                                        const Eigen::VectorXd& A1,
+                                        const Eigen::VectorXd& B1,
+                                        const Eigen::VectorXd& A2,
+                                        const Eigen::VectorXd& B2,
+                                        const std::vector< std::vector< double > >& V,
+                                        const std::vector< std::vector< double > >& W,
+                                        const double dayOfYear ) const;
+
+    struct VnmWnmMatrix {
+        std::vector< std::vector< double > > V;
+        std::vector< std::vector< double > > W;
+    };
+
+    VnmWnmMatrix computeVnmWnmMatrix( int nMax, double latitude, double longitude ) const;
+
+    double evaluateSphericalExpansion( const Eigen::VectorXd& anm_column,
+                                       const Eigen::VectorXd& bnm_column,
+                                       const std::vector< std::vector< double > >& V,
+                                       const std::vector< std::vector< double > >& W ) const;
+};
+
 //
 // class VMF1TroposphericCorrection : public MappedTroposphericCorrection
 //{
@@ -785,19 +924,15 @@ public:
      * Constructor
      * @param referenceCorrectionCalculator Range correction calculator. Corrections based on real time data, which should
      *      read from DSN TRK-2-23 files.
-     * @param transmittedFrequencyFunction Function calculating the frequency at the current link given a vector with
-     *     the frequency bands in each link of the model and the transmission time.
      * @param baseObservableType Observable type associated with the correction.
      * @param isUplinkCorrection Boolean indicating whether correction is for uplink (i.e. transmitting station on planet,
      *      reception on spacecraft) or downlink (i.e. transmission from spacecraft, reception at ground station)
      * @param referenceFrequency Frequency for which the reference corrections are given.
      */
-    TabulatedIonosphericCorrection(
-            std::shared_ptr< TabulatedMediaReferenceCorrectionManager > referenceCorrectionCalculator,
-            std::function< double( std::vector< FrequencyBands > frequencyBands, double time ) > transmittedFrequencyFunction,
-            ObservableType baseObservableType,
-            bool isUplinkCorrection,
-            double referenceFrequency = 2295e6 );
+    TabulatedIonosphericCorrection( std::shared_ptr< TabulatedMediaReferenceCorrectionManager > referenceCorrectionCalculator,
+                                    ObservableType baseObservableType,
+                                    bool isUplinkCorrection,
+                                    double referenceFrequency = 2295e6 );
 
     /*!
      * Function to compute the ionospheric light-time correction, using tabulated DSN data, according to Moyer (2000),
@@ -818,9 +953,6 @@ public:
 private:
     // Range correction calculator. Correction determined for referenceFrequency_
     std::shared_ptr< TabulatedMediaReferenceCorrectionManager > referenceCorrectionCalculator_;
-
-    // Frequency at the link as a function of the frequency bands per link, and of the current time
-    std::function< double( std::vector< FrequencyBands > frequencyBands, double time ) > transmittedFrequencyFunction_;
 
     // Reference frequency for which the reference corrections where calculated
     double referenceFrequency_;
@@ -963,6 +1095,33 @@ private:
     std::shared_ptr< earth_orientation::TerrestrialTimeScaleConverter > timeScaleConverter_;
 };
 
+class GlobalIonosphereModelVtecCalculator : public VtecCalculator
+{
+public:
+    GlobalIonosphereModelVtecCalculator(
+            const std::shared_ptr< tudat::environment::IonosphereModel >& ionosphereModel,
+            const std::shared_ptr< earth_orientation::TerrestrialTimeScaleConverter >& timeScaleConverter = nullptr,
+            const double referenceHeight = 400.0e3 ):
+        VtecCalculator( referenceHeight ), ionosphereModel_( ionosphereModel ), timeScaleConverter_( timeScaleConverter )
+    { }
+
+    double calculateVtec( const double time, const Eigen::Vector3d subIonosphericPointGeodeticPosition ) override
+    {
+        double t = timeScaleConverter_
+                ? timeScaleConverter_->getCurrentTime( basic_astrodynamics::tdb_scale, basic_astrodynamics::utc_scale, time )
+                : time;
+
+        const double latitudeDeg = unit_conversions::convertRadiansToDegrees( subIonosphericPointGeodeticPosition( 1 ) );
+        const double longitudeDeg = unit_conversions::convertRadiansToDegrees( subIonosphericPointGeodeticPosition( 2 ) );
+
+        return ionosphereModel_->getVerticalTotalElectronContent( latitudeDeg, longitudeDeg, t ) * 1.0e16;  // TECU → m^-2
+    }
+
+private:
+    std::shared_ptr< tudat::environment::IonosphereModel > ionosphereModel_;
+    std::shared_ptr< earth_orientation::TerrestrialTimeScaleConverter > timeScaleConverter_;
+};
+
 // Computes the ionospheric delay by mapping the vertical TEC to slant TEC using a very simple mapping function, following
 // Moyer (2000), section 10.3.1.
 class MappedVtecIonosphericCorrection : public LightTimeCorrection
@@ -971,8 +1130,6 @@ public:
     /*!
      * Constructor.
      * @param vtecCalculator Class to calculate the vertical total electron content (VTEC)
-     * @param transmittedFrequencyFunction Function calculating the frequency at the current link given a vector with
-     *     the frequency bands in each link of the model and the transmission time.
      * @param elevationFunction Function that computes the elevation as seen from the ground station, given the vector to
      *      the target and the current time.
      * @param azimuthFunction Function that computes the azimuth as seen from the ground station, given the vector to
@@ -987,13 +1144,13 @@ public:
      */
     MappedVtecIonosphericCorrection(
             std::shared_ptr< VtecCalculator > vtecCalculator,
-            std::function< double( std::vector< FrequencyBands > frequencyBands, double time ) > transmittedFrequencyFunction,
             std::function< double( Eigen::Vector3d inertialVectorAwayFromStation, double time ) > elevationFunction,
             std::function< double( Eigen::Vector3d inertialVectorAwayFromStation, double time ) > azimuthFunction,
             std::function< Eigen::Vector3d( double time ) > groundStationGeodeticPositionFunction,
             ObservableType baseObservableType,
             bool isUplinkCorrection,
             double bodyWithAtmosphereMeanEquatorialRadius,
+            LightTimeCorrectionType correctionType,
             double firstOrderDelayCoefficient = 40.3 );
 
     /*!
@@ -1022,9 +1179,6 @@ public:
 private:
     // Class to calculate the vertical total electron content (VTEC)
     std::shared_ptr< VtecCalculator > vtecCalculator_;
-
-    // Frequency at the link as a function of the frequency bands per link, and of the current time
-    std::function< double( std::vector< FrequencyBands > frequencyBands, double time ) > transmittedFrequencyFunction_;
 
     // Function that computes the elevation as seen from the ground station, given the vector to the target and the current time.
     std::function< double( Eigen::Vector3d inertialVectorAwayFromStation, double time ) > elevationFunction_;

@@ -224,8 +224,9 @@ inline std::map< int, std::vector< std::string > > getDefaultDsnStationNamesPerC
     std::map< int, std::vector< std::string > > stationsPerComplex;
     stationsPerComplex[ 10 ] = { "DSS-13", "DSS-14", "DSS-15", "DSS-24", "DSS-25", "DSS-26", "DSS-27" };
     stationsPerComplex[ 40 ] = {
-        "DSS-34", "DSS-35", "DSS-36", "DSS-43", "DSS-45", "DSS-47"
-    };  // DSS-47 is technically from different complex (ATAC Narrabri, not Canberra)
+        "DSS-34", "DSS-35", "DSS-36", "DSS-43", "DSS-45"
+    };  // DSS-47 is technically from different complex (ATAC Narrabri, not Canberra), but could be registered in this list too, since on
+        // same plate...
     stationsPerComplex[ 60 ] = { "DSS-54", "DSS-55", "DSS-63", "DSS-65" };
 
     return stationsPerComplex;
@@ -242,6 +243,23 @@ Eigen::Vector3d getApproximateGroundStationPosition( std::string stationName );
 std::map< std::string, Eigen::Vector3d >& getVlbiStationPositions( );
 
 std::map< std::string, Eigen::Vector3d >& getVlbiStationVelocities( );
+
+/*!
+ * Returns the velocity for a DSN ground station. The velocities are specified according to table 3 of DSN 810-005,
+ * 301 Coverage and Geometry, Revision K (2016), DSN/JPL.
+ *
+ * @return Velocity for respective station.
+ */
+Eigen::Vector3d getDsnStationVelocity( std::string stationName );
+
+/*!
+ * Returns the setting for a DSN ground station. The settings are specified according to table 2 and 3 of DSN 810-005,
+ * 301 Coverage and Geometry, Revision K (2016), DSN/JPL. The positions of the ground stations are specified with respect
+ * to ITRF2014 and account for their linear motion.
+ *
+ * @return Ground station settings for respective station.
+ */
+std::shared_ptr< GroundStationSettings > getDsnStationSetting( std::string stationName );
 
 /*!
  * Returns the settings for DSN ground stations. The settings are specified according to table 2 and 3 of DSN 810-005,
