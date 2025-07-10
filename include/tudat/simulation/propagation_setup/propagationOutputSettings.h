@@ -1373,7 +1373,7 @@ inline std::shared_ptr< SingleDependentVariableSaveSettings > crossSectionChange
                                                                                                    const std::string& sourceName,
                                                                                                    const std::string& accelerationType )
 {
-    return std::make_shared< CrossSectionDependentVariableSaveSettings >( cross_section_change, bodyName, sourceName, accelerationType )
+    return std::make_shared< CrossSectionDependentVariableSaveSettings >( cross_section_change, bodyName, sourceName, accelerationType );
 }
 
 inline std::shared_ptr< SingleDependentVariableSaveSettings > fullBodyPaneledGeometryDependentVariable( const std::string& bodyName )
