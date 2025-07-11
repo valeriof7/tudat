@@ -155,6 +155,7 @@ enum AtmosphereTypes {
     custom_constant_temperature_atmosphere,
     tabulated_atmosphere,
     nrlmsise00,
+    mars_dtm_atmosphere,
     scaled_atmosphere
 };
 
@@ -556,6 +557,36 @@ private:
 
     bool useAnomalousOxygen_;
 };
+
+class MarsDtmAtmosphereSettings: public AtmosphereSettings
+{
+public:
+
+    MarsDtmAtmosphereSettings( const std::string& marsDtmFile, const double polarRadius, const std::string& spaceWeatherFile = "" ):
+        AtmosphereSettings( mars_dtm_atmosphere ), marsDtmFile_( marsDtmFile ), polarRadius_( polarRadius ), spaceWeatherFile_( spaceWeatherFile ){ }
+
+
+    std::string getMarsDtmFile( ){ return marsDtmFile_; }
+
+    double getPolarRadius( ){ return polarRadius_; }
+
+    std::string getSpaceWeatherFile( ){ return spaceWeatherFile_; }
+
+private:
+
+    std::string marsDtmFile_;
+
+    double polarRadius_;
+
+    //  File containing space weather data.
+    /*
+     *  File containing space weather data, as in https://celestrak.com/SpaceData/sw19571001.txt
+     */
+    std::string spaceWeatherFile_;
+
+
+};
+
 
 //  AtmosphereSettings for defining an atmosphere with tabulated data from file.
 // //! @get_docstring(TabulatedAtmosphereSettings.__docstring__)
@@ -988,6 +1019,13 @@ inline std::shared_ptr< AtmosphereSettings > nrlmsise00AtmosphereSettings( const
 {
     return std::make_shared< NRLMSISE00AtmosphereSettings >( dataFile, useStormConditions, useAnomalousOxygen );
 }
+
+inline std::shared_ptr< AtmosphereSettings > marsDtmAtmosphereSettings(
+    const std::string& marsDtmFile, const double polarRadius )
+{
+    return std::make_shared< MarsDtmAtmosphereSettings >( marsDtmFile, polarRadius );
+}
+
 
 typedef std::function< double( const double, const double, const double, const double ) > DensityFunction;
 //! @get_docstring(customConstantTemperatureAtmosphereSettings,0)

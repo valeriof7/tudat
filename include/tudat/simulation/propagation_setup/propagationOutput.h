@@ -25,6 +25,7 @@
 #include "tudat/simulation/propagation_setup/propagationSettings.h"
 #include "tudat/simulation/environment_setup/createFlightConditions.h"
 #include "tudat/math/basic/rotationRepresentations.h"
+#include "tudat/astro/aerodynamics/marsDtmAtmosphereModel.h"
 #include "tudat/astro/aerodynamics/nrlmsise00Atmosphere.h"
 #include "tudat/astro/aerodynamics/aerodynamicAcceleration.h"
 #include "tudat/astro/aerodynamics/panelledAerodynamicCoefficientInterface.h"
@@ -2755,6 +2756,12 @@ std::function< double( ) > getDoubleDependentVariableFunction(
                 }
                 break;
             }
+        case solar_longitude:
+        {
+            variableFunction = std::bind( &::tudat::aerodynamics::MarsDtmAtmosphereModel::getSolarLongitude,
+                                          std::dynamic_pointer_cast< aerodynamics::MarsDtmAtmosphereModel >( bodies.at( bodyWithProperty )->getAtmosphereModel( ) ) );
+            break;
+        }
             case cross_section_change: {
                 auto crossSectionChangeDependentVariableSaveSettings = std::dynamic_pointer_cast< CrossSectionDependentVariableSaveSettings >( dependentVariableSettings );
                 std::string illuminatedBody = crossSectionChangeDependentVariableSaveSettings->associatedBody_;

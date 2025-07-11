@@ -297,6 +297,9 @@ std::string getDependentVariableName( const std::shared_ptr< SingleDependentVari
         case visible_source_area:
             variableName = "Visible area";
             break;
+        case solar_longitude:
+            variableName = "Solar longitude";
+            break;
         case vehicle_panel_inertial_surface_normals:
             variableName = "Vehicle surface panel inertial surface normals";
             break;

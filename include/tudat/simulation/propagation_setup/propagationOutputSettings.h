@@ -141,7 +141,8 @@ enum PropagationDependentVariables {
     cross_section_change = 74,
     full_body_paneled_geometry = 75,
     aerodynamic_coefficients = 76,
-    actual_cross_section = 77
+    actual_cross_section = 77,
+    solar_longitude = 78,
 
 };
 

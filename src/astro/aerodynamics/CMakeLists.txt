@@ -23,8 +23,9 @@ set(aerodynamics_SOURCES
         "flightConditions.cpp"
         "trimOrientation.cpp"
         "equilibriumWallTemperature.cpp"
+        "marsDtmAtmosphereModel.cpp"
         "gasSurfaceInteractionModel.cpp"
-        )
+)
 
 # Set the header files.
 set(aerodynamics_HEADERS
@@ -48,8 +49,9 @@ set(aerodynamics_HEADERS
         "aerodynamicGuidance.h"
         "equilibriumWallTemperature.h"
         "windModel.h"
+        "marsDtmAtmosphereModel.h"
         "gasSurfaceInteractionModel.h"
-        )
+)
 
     set(aerodynamics_SOURCES
             "${aerodynamics_SOURCES}"
