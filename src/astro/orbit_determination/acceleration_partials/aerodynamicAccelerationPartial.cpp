@@ -16,6 +16,36 @@ namespace tudat
 namespace acceleration_partials
 {
 
+void computeAerodynamicAccelerationWrtDragComponent(
+    const std::shared_ptr< aerodynamics::AerodynamicAcceleration > accelerationModel, 
+    Eigen::MatrixXd& partial )
+{
+    Eigen::Vector3d currentDragComponentPartial = Eigen::Vector3d::Zero( );
+    Eigen::Vector3d unscaledAcceleration = accelerationModel->getCurrentUnscaledAcceleration( );
+    currentDragComponentPartial( 0 ) = unscaledAcceleration( 0 );
+    partial = currentDragComponentPartial;
+};
+
+void computeAerodynamicAccelerationWrtSideComponent(
+    const std::shared_ptr< aerodynamics::AerodynamicAcceleration > accelerationModel, 
+    Eigen::MatrixXd& partial )
+{
+    Eigen::Vector3d currentSideComponentPartial = Eigen::Vector3d::Zero( );
+    Eigen::Vector3d unscaledAcceleration = accelerationModel->getCurrentUnscaledAcceleration( );
+    currentSideComponentPartial( 1 ) = unscaledAcceleration( 1 );
+    partial = currentSideComponentPartial;
+};
+
+void computeAerodynamicAccelerationWrtLiftComponent(
+    const std::shared_ptr< aerodynamics::AerodynamicAcceleration > accelerationModel, 
+    Eigen::MatrixXd& partial )
+{
+    Eigen::Vector3d currentLiftComponentPartial = Eigen::Vector3d::Zero( );
+    Eigen::Vector3d unscaledAcceleration = accelerationModel->getCurrentUnscaledAcceleration( );
+    currentLiftComponentPartial( 2 ) = unscaledAcceleration( 2 );
+    partial = currentLiftComponentPartial;  
+};
+
 //! Function for updating partial w.r.t. the bodies' positions
 void AerodynamicAccelerationPartial::update( const double currentTime )
 {
@@ -68,6 +98,54 @@ void AerodynamicAccelerationPartial::update( const double currentTime )
     aerodynamicAcceleration_->updateMembers( currentTime );
 
     currentTime_ = currentTime;
+}
+
+std::pair< std::function< void( Eigen::MatrixXd& ) >, int > AerodynamicAccelerationPartial::getParameterPartialFunction(
+            std::shared_ptr< estimatable_parameters::EstimatableParameter< double > > parameter )
+{
+    std::function< void( Eigen::MatrixXd& ) > partialFunction;
+    int numberOfColumns = 0;
+    if( parameter->getParameterName( ).second.first == acceleratedBody_ )
+    {
+        switch( parameter->getParameterName( ).first )
+        {
+            case estimatable_parameters::constant_drag_coefficient:
+            {
+                partialFunction = std::bind(
+                    &AerodynamicAccelerationPartial::computeAccelerationPartialWrtCurrentDragCoefficient, this, std::placeholders::_1 );
+                numberOfColumns = 1;
+                break;
+            }
+            case estimatable_parameters::drag_component_scaling_factor:
+            {
+                partialFunction = std::bind(
+                    &computeAerodynamicAccelerationWrtDragComponent, 
+                    AerodynamicAcceleration_, std::placeholders::_1 );
+                numberOfColumns = 1;
+                break;
+            }
+            case estimatable_parameters::side_component_scaling_factor:
+            {
+                partialFunction = std::bind(
+                    &computeAerodynamicAccelerationWrtSideComponent, 
+                    AerodynamicAcceleration_, std::placeholders::_1 );
+                numberOfColumns = 1;
+                break;
+            }
+            case estimatable_parameters::lift_component_scaling_factor:
+            {
+                partialFunction = std::bind(
+                    &computeAerodynamicAccelerationWrtLiftComponent, 
+                    AerodynamicAcceleration_, std::placeholders::_1 );
+                numberOfColumns = 1;
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    return std::make_pair( partialFunction, numberOfColumns );
 }
 
 }  // namespace acceleration_partials

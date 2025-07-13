@@ -52,6 +52,7 @@
 #include "tudat/simulation/propagation_setup/dynamicsSimulator.h"
 #include "tudat/simulation/environment_setup/body.h"
 #include "tudat/astro/orbit_determination/estimatable_parameters/specularDiffuseReflectivity.h"
+#include "tudat/astro/orbit_determination/estimatable_parameters/aerodynamicScalingCoefficient.h"
 
 namespace tudat
 {
@@ -261,6 +262,36 @@ std::vector< std::shared_ptr< basic_astrodynamics::AccelerationModel3d > > getAc
                             accelerationModelList.push_back( accelerationModelListToCheck[ i ] );
                         }
                     }
+                }
+            }
+            break;
+        }
+        case drag_component_scaling_factor:
+        case side_component_scaling_factor:
+        case lift_component_scaling_factor: {
+            if( parameterSettings == nullptr )
+            {
+                throw std::runtime_error( "Error, expected aerodynamic scaling factor parameter settings." );
+            }
+            else
+            {
+                if( accelerationModelMap.count( parameterSettings->parameterType_.second.first ) != 0 )
+                {
+                    // Retrieve acceleration model.
+                    std::vector< std::shared_ptr< basic_astrodynamics::AccelerationModel< Eigen::Vector3d > > >
+                            accelerationModelListToCheck = accelerationModelMap.at( parameterSettings->parameterType_.second.first );
+                    for( const auto& it : accelerationModelListToCheck )
+                    {
+                        if( basic_astrodynamics::getAccelerationModelType( it.second ) == basic_astrodynamics::aerodynamic )
+                        {
+                            accelerationModelList.push_back( it.second );
+                        }
+                    }
+                }
+                else
+                {
+                    throw std::runtime_error( "Error, trying to setup aerodynamic scaling coefficient for body " + 
+                        parameterSettings->parameterType_.second.first + " but no aerodynamic acceleration is defined." )
                 }
             }
             break;
@@ -940,6 +971,20 @@ std::shared_ptr< estimatable_parameters::EstimatableParameter< double > > create
                                     currentBody->getAerodynamicCoefficientInterface( ) ),
                             currentBodyName );
                 }
+                break;
+            }
+            case drag_component_scaling_factor:
+            case side_component_scaling_factor:
+            case lift_component_scaling_factor: {
+
+                std::vector< std::shared_ptr< basic_astrodynamics::AccelerationModel3d > > associatedAccelerationModels =
+                        getAccelerationModelsListForParametersFromBase< InitialStateParameterType, TimeType >( propagatorSettings,
+                                                                                                               doubleParameterName );
+                                                                                                    
+                doubleParameterToEstimate =
+                        std::make_shared< AerodynamicScalingFactor >( associatedAccelerationModels.at( 0 ),
+                                                                      doubleParameterName->parameterType_.first,
+                                                                      currentBodyName );
                 break;
             }
             case ppn_parameter_gamma: {

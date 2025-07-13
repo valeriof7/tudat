@@ -24,6 +24,18 @@ namespace tudat
 namespace acceleration_partials
 {
 
+void computeAerodynamicAccelerationWrtDragComponent(
+    const std::shared_ptr< aerodynamics::AerodynamicAcceleration > accelerationModel, 
+    Eigen::MatrixXd& partial );
+
+void computeAerodynamicAccelerationWrtSideComponent(
+    const std::shared_ptr< aerodynamics::AerodynamicAcceleration > accelerationModel, 
+    Eigen::MatrixXd& partial );
+
+void computeAerodynamicAccelerationWrtLiftComponent(
+    const std::shared_ptr< aerodynamics::AerodynamicAcceleration > accelerationModel, 
+    Eigen::MatrixXd& partial );
+
 //! Class to calculate the partials of the aerodynamic acceleration w.r.t. parameters and states.
 /*!
  * Class to calculate the partials of the aerodynamic acceleration w.r.t. parameters and states. Note that the state partials
@@ -206,26 +218,8 @@ public:
      *  \param parameter Parameter w.r.t. which partial is to be taken.
      *  \return Pair of parameter partial function and number of columns in partial (0 for no dependency, 1 otherwise).
      */
-    std::pair< std::function< void( Eigen::MatrixXd& ) >, int > getParameterPartialFunction(
-            std::shared_ptr< estimatable_parameters::EstimatableParameter< double > > parameter )
-    {
-        std::function< void( Eigen::MatrixXd& ) > partialFunction;
-        int numberOfColumns = 0;
-
-        // Check if parameter is gravitational parameter.
-        if( parameter->getParameterName( ).first == estimatable_parameters::constant_drag_coefficient )
-        {
-            // Check if parameter body is accelerated body,
-            if( parameter->getParameterName( ).second.first == acceleratedBody_ )
-            {
-                partialFunction = std::bind(
-                        &AerodynamicAccelerationPartial::computeAccelerationPartialWrtCurrentDragCoefficient, this, std::placeholders::_1 );
-                numberOfColumns = 1;
-            }
-        }
-
-        return std::make_pair( partialFunction, numberOfColumns );
-    }
+    std::pair< std::function< void( Eigen::MatrixXd& ) >, int > AerodynamicAccelerationPartial::getParameterPartialFunction(
+            std::shared_ptr< estimatable_parameters::EstimatableParameter< double > > parameter );
 
     //! Function for setting up and retrieving a function returning a partial w.r.t. a vector parameter.
     /*!
