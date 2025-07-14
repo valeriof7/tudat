@@ -278,7 +278,7 @@ std::vector< std::shared_ptr< basic_astrodynamics::AccelerationModel3d > > getAc
                 if( accelerationModelMap.count( parameterSettings->parameterType_.second.first ) != 0 )
                 {
                     // Retrieve acceleration model.
-                    std::vector< std::shared_ptr< basic_astrodynamics::AccelerationModel< Eigen::Vector3d > > >
+                    std::map< std::string, std::vector< std::shared_ptr< basic_astrodynamics::AccelerationModel< Eigen::Vector3d > > > >
                             accelerationModelListToCheck = accelerationModelMap.at( parameterSettings->parameterType_.second.first );
                     for( const auto& it : accelerationModelListToCheck )
                     {
@@ -982,9 +982,10 @@ std::shared_ptr< estimatable_parameters::EstimatableParameter< double > > create
                                                                                                                doubleParameterName );
                                                                                                     
                 doubleParameterToEstimate =
-                        std::make_shared< AerodynamicScalingFactor >( associatedAccelerationModels.at( 0 ),
-                                                                      doubleParameterName->parameterType_.first,
-                                                                      currentBodyName );
+                        std::make_shared< AerodynamicScalingFactor >( 
+                            std::dynamic_pointer_cast< aerodynamics::AerodynamicAcceleration>( associatedAccelerationModels.at( 0 ) ),
+                            doubleParameterName->parameterType_.first,
+                            currentBodyName );
                 break;
             }
             case ppn_parameter_gamma: {
