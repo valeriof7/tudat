@@ -120,7 +120,7 @@ std::pair< std::function< void( Eigen::MatrixXd& ) >, int > AerodynamicAccelerat
             {
                 partialFunction = std::bind(
                     &computeAerodynamicAccelerationWrtDragComponent, 
-                    AerodynamicAcceleration_, std::placeholders::_1 );
+                    aerodynamicAcceleration_, std::placeholders::_1 );
                 numberOfColumns = 1;
                 break;
             }
@@ -128,7 +128,7 @@ std::pair< std::function< void( Eigen::MatrixXd& ) >, int > AerodynamicAccelerat
             {
                 partialFunction = std::bind(
                     &computeAerodynamicAccelerationWrtSideComponent, 
-                    AerodynamicAcceleration_, std::placeholders::_1 );
+                    aerodynamicAcceleration_, std::placeholders::_1 );
                 numberOfColumns = 1;
                 break;
             }
@@ -136,7 +136,7 @@ std::pair< std::function< void( Eigen::MatrixXd& ) >, int > AerodynamicAccelerat
             {
                 partialFunction = std::bind(
                     &computeAerodynamicAccelerationWrtLiftComponent, 
-                    AerodynamicAcceleration_, std::placeholders::_1 );
+                    aerodynamicAcceleration_, std::placeholders::_1 );
                 numberOfColumns = 1;
                 break;
             }

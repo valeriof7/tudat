@@ -43,15 +43,15 @@ public:
     {
         if( parameterName_.first == drag_component_scaling_factor )
         {
-            return radiationPressureAcceleration_->getDragComponentScaling( );
+            return aerodynamicAcceleration_->getDragComponentScaling( );
         }
         else if( parameterName_.first == side_component_scaling_factor )
         {
-            return radiationPressureAcceleration_->getSideComponentScaling( );
+            return aerodynamicAcceleration_->getSideComponentScaling( );
         }
         else if( parameterName_.first == lift_component_scaling_factor )
         {
-            return radiationPressureAcceleration_->getLiftComponentScaling( );
+            return aerodynamicAcceleration_->getLiftComponentScaling( );
         }
         else
         {
@@ -64,15 +64,15 @@ public:
     {
         if( parameterName_.first == drag_component_scaling_factor )
         {
-            return radiationPressureAcceleration_->setDragComponentScaling( parameterValue );
+            return aerodynamicAcceleration_->setDragComponentScaling( parameterValue );
         }
         else if( parameterName_.first == side_component_scaling_factor )
         {
-            return radiationPressureAcceleration_->setSideComponentScaling( parameterValue );
+            return aerodynamicAcceleration_->setSideComponentScaling( parameterValue );
         }
         else if( parameterName_.first == lift_component_scaling_factor )
         {
-            return radiationPressureAcceleration_->setLiftComponentScaling( parameterValue );
+            return aerodynamicAcceleration_->setLiftComponentScaling( parameterValue );
         }
         else
         {

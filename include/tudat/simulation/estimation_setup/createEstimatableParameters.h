@@ -282,16 +282,16 @@ std::vector< std::shared_ptr< basic_astrodynamics::AccelerationModel3d > > getAc
                             accelerationModelListToCheck = accelerationModelMap.at( parameterSettings->parameterType_.second.first );
                     for( const auto& it : accelerationModelListToCheck )
                     {
-                        if( basic_astrodynamics::getAccelerationModelType( it.second ) == basic_astrodynamics::aerodynamic )
+                        if( basic_astrodynamics::getAccelerationModelType( it ) == basic_astrodynamics::aerodynamic )
                         {
-                            accelerationModelList.push_back( it.second );
+                            accelerationModelList.push_back( it );
                         }
                     }
                 }
                 else
                 {
                     throw std::runtime_error( "Error, trying to setup aerodynamic scaling coefficient for body " + 
-                        parameterSettings->parameterType_.second.first + " but no aerodynamic acceleration is defined." )
+                        parameterSettings->parameterType_.second.first + " but no aerodynamic acceleration is defined." );
                 }
             }
             break;
