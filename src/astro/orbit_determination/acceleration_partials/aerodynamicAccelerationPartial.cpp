@@ -24,7 +24,7 @@ void AerodynamicAccelerationPartial::computeAerodynamicAccelerationWrtDragCompon
                         reference_frames::aerodynamic_frame, reference_frames::inertial_frame );
 
     Eigen::Vector3d currentDragComponentPartial = Eigen::Vector3d::Zero( );
-    Eigen::Vector3d unscaledAcceleration = accelerationModel_->getCurrentUnscaledAcceleration( );
+    Eigen::Vector3d unscaledAcceleration = aerodynamicAcceleration_->getCurrentUnscaledAcceleration( );
     currentDragComponentPartial( 0 ) = unscaledAcceleration( 0 );
     partial = rotationToInertialFrame * currentDragComponentPartial;
 };
@@ -37,7 +37,7 @@ void AerodynamicAccelerationPartial::computeAerodynamicAccelerationWrtSideCompon
                         reference_frames::aerodynamic_frame, reference_frames::inertial_frame );
 
     Eigen::Vector3d currentSideComponentPartial = Eigen::Vector3d::Zero( );
-    Eigen::Vector3d unscaledAcceleration = accelerationModel_->getCurrentUnscaledAcceleration( );
+    Eigen::Vector3d unscaledAcceleration = aerodynamicAcceleration_->getCurrentUnscaledAcceleration( );
     currentSideComponentPartial( 1 ) = unscaledAcceleration( 1 );
     partial = rotationToInertialFrame * currentSideComponentPartial;
 };
@@ -50,7 +50,7 @@ void AerodynamicAccelerationPartial::computeAerodynamicAccelerationWrtLiftCompon
                         reference_frames::aerodynamic_frame, reference_frames::inertial_frame );
 
     Eigen::Vector3d currentLiftComponentPartial = Eigen::Vector3d::Zero( );
-    Eigen::Vector3d unscaledAcceleration = accelerationModel_->getCurrentUnscaledAcceleration( );
+    Eigen::Vector3d unscaledAcceleration = aerodynamicAcceleration_->getCurrentUnscaledAcceleration( );
     currentLiftComponentPartial( 2 ) = unscaledAcceleration( 2 );
     partial = rotationToInertialFrame * currentLiftComponentPartial;  
 };
