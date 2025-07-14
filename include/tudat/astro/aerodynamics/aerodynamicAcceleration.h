@@ -73,7 +73,8 @@ public:
                              const std::function< double( ) > currentMass ):
                              flightConditions_( flightConditions ),
                              currentMass_( currentMass ),
-                             dragComponentScaling_( 1.0 ), liftComponentScaling_( 1.0 ), 
+                             dragComponentScaling_( 1.0 ), 
+                             liftComponentScaling_( 1.0 ), 
                              sideComponentScaling_( 1.0 )
     {
         coefficientInterface_ = flightConditions_->getAerodynamicCoefficientInterface( );
@@ -106,11 +107,11 @@ public:
                                                                    coefficientInterface_->getReferenceArea( ),
                                                                    currentForceCoefficients_,
                                                                    currentMass_( ) );
-            scaledAerodynamicAcceleration( );
+            scaleAerodynamicAcceleration( );
         }
     }
 
-    void scaledAerodynamicAcceleration( )
+    void scaleAerodynamicAcceleration( )
     {
        currentAcceleration_ = currentUnscaledAcceleration_;
        if( isScalingModelSet_ )
