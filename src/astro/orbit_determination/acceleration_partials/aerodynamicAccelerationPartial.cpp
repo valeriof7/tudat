@@ -16,34 +16,43 @@ namespace tudat
 namespace acceleration_partials
 {
 
-void computeAerodynamicAccelerationWrtDragComponent(
-    const std::shared_ptr< aerodynamics::AerodynamicAcceleration > accelerationModel, 
+void AerodynamicAccelerationPartial::computeAerodynamicAccelerationWrtDragComponent(
     Eigen::MatrixXd& partial )
 {
+    Eigen::Quaterniond rotationToInertialFrame =
+                flightConditions_->getAerodynamicAngleCalculator( )->getRotationQuaternionBetweenFrames(
+                        reference_frames::aerodynamic_frame, reference_frames::inertial_frame );
+
     Eigen::Vector3d currentDragComponentPartial = Eigen::Vector3d::Zero( );
-    Eigen::Vector3d unscaledAcceleration = accelerationModel->getCurrentUnscaledAcceleration( );
+    Eigen::Vector3d unscaledAcceleration = accelerationModel_->getCurrentUnscaledAcceleration( );
     currentDragComponentPartial( 0 ) = unscaledAcceleration( 0 );
-    partial = currentDragComponentPartial;
+    partial = rotationToInertialFrame * currentDragComponentPartial;
 };
 
-void computeAerodynamicAccelerationWrtSideComponent(
-    const std::shared_ptr< aerodynamics::AerodynamicAcceleration > accelerationModel, 
+void AerodynamicAccelerationPartial::computeAerodynamicAccelerationWrtSideComponent(
     Eigen::MatrixXd& partial )
 {
+    Eigen::Quaterniond rotationToInertialFrame =
+                flightConditions_->getAerodynamicAngleCalculator( )->getRotationQuaternionBetweenFrames(
+                        reference_frames::aerodynamic_frame, reference_frames::inertial_frame );
+
     Eigen::Vector3d currentSideComponentPartial = Eigen::Vector3d::Zero( );
-    Eigen::Vector3d unscaledAcceleration = accelerationModel->getCurrentUnscaledAcceleration( );
+    Eigen::Vector3d unscaledAcceleration = accelerationModel_->getCurrentUnscaledAcceleration( );
     currentSideComponentPartial( 1 ) = unscaledAcceleration( 1 );
-    partial = currentSideComponentPartial;
+    partial = rotationToInertialFrame * currentSideComponentPartial;
 };
 
-void computeAerodynamicAccelerationWrtLiftComponent(
-    const std::shared_ptr< aerodynamics::AerodynamicAcceleration > accelerationModel, 
+void AerodynamicAccelerationPartial::computeAerodynamicAccelerationWrtLiftComponent(
     Eigen::MatrixXd& partial )
 {
+    Eigen::Quaterniond rotationToInertialFrame =
+                flightConditions_->getAerodynamicAngleCalculator( )->getRotationQuaternionBetweenFrames(
+                        reference_frames::aerodynamic_frame, reference_frames::inertial_frame );
+
     Eigen::Vector3d currentLiftComponentPartial = Eigen::Vector3d::Zero( );
-    Eigen::Vector3d unscaledAcceleration = accelerationModel->getCurrentUnscaledAcceleration( );
+    Eigen::Vector3d unscaledAcceleration = accelerationModel_->getCurrentUnscaledAcceleration( );
     currentLiftComponentPartial( 2 ) = unscaledAcceleration( 2 );
-    partial = currentLiftComponentPartial;  
+    partial = rotationToInertialFrame * currentLiftComponentPartial;  
 };
 
 //! Function for updating partial w.r.t. the bodies' positions
@@ -119,24 +128,24 @@ std::pair< std::function< void( Eigen::MatrixXd& ) >, int > AerodynamicAccelerat
             case estimatable_parameters::drag_component_scaling_factor:
             {
                 partialFunction = std::bind(
-                    &computeAerodynamicAccelerationWrtDragComponent, 
-                    aerodynamicAcceleration_, std::placeholders::_1 );
+                    &AerodynamicAccelerationPartial::computeAerodynamicAccelerationWrtDragComponent, 
+                    this, std::placeholders::_1 );
                 numberOfColumns = 1;
                 break;
             }
             case estimatable_parameters::side_component_scaling_factor:
             {
                 partialFunction = std::bind(
-                    &computeAerodynamicAccelerationWrtSideComponent, 
-                    aerodynamicAcceleration_, std::placeholders::_1 );
+                    &AerodynamicAccelerationPartial::computeAerodynamicAccelerationWrtSideComponent, 
+                    this, std::placeholders::_1 );
                 numberOfColumns = 1;
                 break;
             }
             case estimatable_parameters::lift_component_scaling_factor:
             {
                 partialFunction = std::bind(
-                    &computeAerodynamicAccelerationWrtLiftComponent, 
-                    aerodynamicAcceleration_, std::placeholders::_1 );
+                    &AerodynamicAccelerationPartial::computeAerodynamicAccelerationWrtLiftComponent, 
+                    this, std::placeholders::_1 );
                 numberOfColumns = 1;
                 break;
             }

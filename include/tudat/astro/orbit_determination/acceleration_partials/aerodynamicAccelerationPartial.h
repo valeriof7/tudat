@@ -24,18 +24,6 @@ namespace tudat
 namespace acceleration_partials
 {
 
-void computeAerodynamicAccelerationWrtDragComponent(
-    const std::shared_ptr< aerodynamics::AerodynamicAcceleration > accelerationModel, 
-    Eigen::MatrixXd& partial );
-
-void computeAerodynamicAccelerationWrtSideComponent(
-    const std::shared_ptr< aerodynamics::AerodynamicAcceleration > accelerationModel, 
-    Eigen::MatrixXd& partial );
-
-void computeAerodynamicAccelerationWrtLiftComponent(
-    const std::shared_ptr< aerodynamics::AerodynamicAcceleration > accelerationModel, 
-    Eigen::MatrixXd& partial );
-
 //! Class to calculate the partials of the aerodynamic acceleration w.r.t. parameters and states.
 /*!
  * Class to calculate the partials of the aerodynamic acceleration w.r.t. parameters and states. Note that the state partials
@@ -67,6 +55,16 @@ public:
     {
         bodyStatePerturbations_ << 10.0, 10.0, 10.0, 1.0E-2, 1.0E-2, 1.0E-2;
     }
+
+    void computeAerodynamicAccelerationWrtDragComponent(
+        Eigen::MatrixXd& partial );
+
+    void computeAerodynamicAccelerationWrtSideComponent(
+        Eigen::MatrixXd& partial );
+
+    void computeAerodynamicAccelerationWrtLiftComponent(
+        Eigen::MatrixXd& partial );
+
 
     //! Function for calculating the partial of the acceleration w.r.t. the position of body undergoing acceleration..
     /*!
