@@ -278,11 +278,12 @@ std::vector< std::shared_ptr< basic_astrodynamics::AccelerationModel3d > > getAc
                 if( accelerationModelMap.count( parameterSettings->parameterType_.second.first ) != 0 )
                 {
                     // Retrieve acceleration model.
-                    std::map< std::string, std::vector< std::shared_ptr< basic_astrodynamics::AccelerationModel< Eigen::Vector3d > > > >
-                            accelerationModelListToCheck = accelerationModelMap.at( parameterSettings->parameterType_.second.first );
+                    basic_astrodynamics::SingleBodyAccelerationMap accelerationModelListToCheck = accelerationModelMap.at( 
+                        parameterSettings->parameterType_.second.first );
+                        
                     for( const auto& it : accelerationModelListToCheck )
                     {
-                        for ( const auto accelerationModel : it.second )
+                        for ( const auto& accelerationModel : it.second )
                         {
                             if( basic_astrodynamics::getAccelerationModelType( accelerationModel ) == basic_astrodynamics::aerodynamic )
                             {
