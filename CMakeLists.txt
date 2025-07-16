@@ -80,9 +80,9 @@ option(TUDAT_BUILD_WITH_FFTW3 "Build Tudat with FFTW3." OFF)
 option(TUDAT_BUILD_WITH_PAGMO "Build Tudat with pagmo." OFF)
 if(CMAKE_CXX_SIMULATE_ID MATCHES "MSVC")
     # Build extended precision propagation tools.
-    option(TUDAT_BUILD_WITH_EXTENDED_PRECISION_PROPAGATION_TOOLS "Build tudat with extended precision propagation tools." OFF)
+    option(TUDAT_BUILD_WITH_EXTENDED_PRECISION_PROPAGATION_TOOLS "Build tudat with extended precision propagation tools." ON)
 else()
-    option(TUDAT_BUILD_WITH_EXTENDED_PRECISION_PROPAGATION_TOOLS "Build tudat with extended precision propagation tools." OFF)
+    option(TUDAT_BUILD_WITH_EXTENDED_PRECISION_PROPAGATION_TOOLS "Build tudat with extended precision propagation tools." ON)
 endif()
 
 # Build as part of a GitHub Actions workflow
