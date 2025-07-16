@@ -116,7 +116,7 @@ public:
        currentAcceleration_ = currentUnscaledAcceleration_;
 
        currentUnscaledAccelerationInAerodynamicFrame_ = flightConditions_->getAerodynamicAngleCalculator( )->getRotationQuaternionBetweenFrames(
-                reference_frames::inertial_frame, aerodynamicCompleteCoefficientFrame_ ) * currentAcceleration_;
+                reference_frames::inertial_frame, reference_frames::aerodynamic_frame ) * currentAcceleration_;
                 
        if( isScalingModelSet_ )
        {
@@ -124,7 +124,7 @@ public:
             currentAccelerationInAerodynamicFrame_( 1 ) = currentUnscaledAccelerationInAerodynamicFrame_( 1 ) * sideComponentScaling_;
             currentAccelerationInAerodynamicFrame_( 2 ) = currentUnscaledAccelerationInAerodynamicFrame_( 2 ) * liftComponentScaling_;
             currentAcceleration_ = flightConditions_->getAerodynamicAngleCalculator( )->getRotationQuaternionBetweenFrames(
-                aerodynamicCompleteCoefficientFrame_, reference_frames::inertial_frame ) * currentAccelerationInAerodynamicFrame_;
+                 reference_frames::aerodynamic_frame, reference_frames::inertial_frame ) * currentAccelerationInAerodynamicFrame_;
        }
     }
 
@@ -156,16 +156,19 @@ public:
 
     void setDragComponentScaling( double dragComponentScaling )
     {
+        enableScaling( );
         dragComponentScaling_ = dragComponentScaling;
     }
 
     void setSideComponentScaling( double sideComponentScaling )
     {
+        enableScaling( );
         sideComponentScaling_ = sideComponentScaling;
     }
 
     void setLiftComponentScaling( double liftComponentScaling )
     {
+        enableScaling( );
         liftComponentScaling_ = liftComponentScaling;
     }
 
