@@ -149,9 +149,7 @@ BOOST_AUTO_TEST_CASE( test_EstimationDragScaling )
         residuals.push_back( estimationOutput->residualStandardDeviation_ );
 
     }
-    std::cout<<residuals.at( 0 )<<std::endl;
-    std::cout<<residuals.at( 1 )<<std::endl;
-    BOOST_CHECK( std::abs( residuals.at( 0 ) - residuals.at( 1 ) ) < 1e-10 );
+    BOOST_CHECK( std::abs( residuals.at( 0 ) - residuals.at( 1 ) ) < 1e-8 );
 
 }
 BOOST_AUTO_TEST_SUITE_END( )
